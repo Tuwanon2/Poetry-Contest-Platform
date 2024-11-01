@@ -3,26 +3,27 @@ import axios from 'axios';
 import { Card, Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const NewProducts = () => {
+const PopularProducts = () => {
   const [products, setProducts] = useState([]);
 
   // ใช้ URL ของรูปภาพ placeholder แทนการ import
   const placeholderImage = '../assets/images/Splendor.jpg';
 
   useEffect(() => {
+    // เรียก API สำหรับสินค้ายอดฮิตแทนสินค้ามาใหม่
     axios
-      .get('/api/v1/products?sort=created_at&order=desc&limit=3')
+      .get('/api/v1/products?sort=popularity&order=desc&limit=3') // สมมติว่า sort=popularity ใช้สำหรับดึงสินค้ายอดฮิต
       .then((response) => {
         setProducts(response.data.items);
       })
       .catch((error) => {
-        console.error('Error fetching the products:', error);
+        console.error('Error fetching the popular products:', error);
       });
   }, []);
 
   return (
     <Container className="my-5">
-      <h2 className="text-center mb-4">สินค้ามาใหม่</h2>
+      <h2 className="text-center mb-4">สินค้ายอดฮิต</h2>
       <Row>
         {products.length > 0 ? (
           products.map((product) => {
@@ -32,7 +33,7 @@ const NewProducts = () => {
             return (
               <Col md={4} key={product.id}>
                 <Card className="mb-4">
-                  <Link to={`/product/${product.id}`} class="btn btn-5">
+                  <Link to={`/product/${product.id}`}>
                     <Card.Img 
                       variant="top" 
                       src={primaryImage || placeholderImage} 
@@ -62,4 +63,4 @@ const NewProducts = () => {
   );
 };
 
-export default NewProducts;
+export default PopularProducts;

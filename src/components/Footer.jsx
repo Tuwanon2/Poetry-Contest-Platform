@@ -14,10 +14,10 @@ const Footer = () => {
           <Col md={2}>
             <h5>About Us</h5>
             <ul className="list-unstyled">
-              <li>Careers</li>
-              <li>Our Stores</li>
-              <li>Terms & Conditions</li>
-              <li>Privacy Policy</li>
+              <li>บอร์ดเกมส์</li>
+              <li>ร้านของเรา</li>
+              <li>เงื่อนไขและข้อตกลง</li>
+              <li>นโยบายความเป็นส่วนตัว</li>
             </ul>
           </Col>
           <Col md={2}>
@@ -32,8 +32,8 @@ const Footer = () => {
           <Col md={4}>
             <h5>Contact Us</h5>
             <p>
-              70 Washington Square South, New York, NY 10012, United States <br/>
-              Email: <a href="mailto:me-mart@memartmail.com" className="text-white">me-mart@memartmail.com</a> <br/>
+              Silpakon University<br/>
+              Email: <a href="mailto:Boardgame@gmail.com" className="text-white">me-mart@memartmail.com</a> <br/>
               Phone: +1 1123 456 780
             </p>
           </Col>

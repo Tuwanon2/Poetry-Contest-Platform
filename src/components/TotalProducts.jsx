@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Container, Row, Col } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 
 const NewProducts = () => {
   const [products, setProducts] = useState([]);
@@ -32,17 +31,16 @@ const NewProducts = () => {
             return (
               <Col md={4} key={product.id}>
                 <Card className="mb-4">
-                  <Link to={`/product/${product.id}`} class="btn btn-5">
-                    <Card.Img 
-                      variant="top" 
-                      src={primaryImage || placeholderImage} 
-                      alt={product.name} 
-                      onError={(e) => {
-                        e.target.onerror = null; // ป้องกันการเรียก onError ซ้ำ
-                        e.target.src = placeholderImage; // เปลี่ยนไปใช้รูปภาพสำรอง
-                      }} 
-                    />
-                  </Link>
+                  {/* ใช้ onError เพื่อตรวจสอบว่ารูปภาพโหลดไม่สำเร็จหรือไม่ */}
+                  <Card.Img 
+                    variant="top" 
+                    src={primaryImage || placeholderImage} 
+                    alt={product.name} 
+                    onError={(e) => {
+                      e.target.onerror = null; // ป้องกันการเรียก onError ซ้ำ
+                      e.target.src = placeholderImage; // เปลี่ยนไปใช้รูปภาพสำรอง
+                    }} 
+                  />
                   <Card.Body>
                     <Card.Title>{product.name}</Card.Title>
                     <Card.Text>{product.description}</Card.Text>

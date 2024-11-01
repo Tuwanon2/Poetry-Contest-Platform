@@ -1,12 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const TopMenu = () => {
+  const location = useLocation();
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark p-0">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-          ME-Commerce
+        <Link
+          className={`navbar-brand ${location.pathname === '/' ? 'active' : ''}`}
+          to="/"
+        >
+          หน้าแรก
         </Link>
         <button
           className="navbar-toggler"
@@ -19,38 +24,27 @@ const TopMenu = () => {
         >
           <span className="navbar-toggler-icon" />
         </button>
+
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link" to="/category">
-                Fashion
+              <Link
+                className={`nav-link ${location.pathname === '/Shop' ? 'active' : ''}`}
+                to="/Shop"
+              >
+                สินค้า
               </Link>
             </li>
+
             <li className="nav-item">
-              <Link className="nav-link" to="/category">
-                Supermarket
+              <Link
+                className={`nav-link ${location.pathname === '/category' ? 'active' : ''}`}
+                to="/category"
+              >
+                comming soon
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/category">
-                Electronics
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/category">
-                Furniture
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/category">
-                Garden & Outdoors
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/category">
-                Jewellery
-              </Link>
-            </li>
+            {/* เพิ่มลิงก์อื่น ๆ ที่ต้องการ */}
           </ul>
         </div>
       </div>
