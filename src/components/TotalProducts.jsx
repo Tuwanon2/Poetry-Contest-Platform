@@ -10,7 +10,7 @@ const NewProducts = () => {
 
   useEffect(() => {
     axios
-      .get('/api/v1/products?sort=created_at&order=desc&limit=3')
+      .get('/api/v1/products?sort=created_at&order=desc&limit=10') // ดึงสินค้ามาใหม่จำนวน 3 รายการ
       .then((response) => {
         setProducts(response.data.items);
       })
@@ -31,11 +31,11 @@ const NewProducts = () => {
             return (
               <Col md={4} key={product.id}>
                 <Card className="mb-4">
-                  {/* ใช้ onError เพื่อตรวจสอบว่ารูปภาพโหลดไม่สำเร็จหรือไม่ */}
                   <Card.Img 
                     variant="top" 
                     src={primaryImage || placeholderImage} 
                     alt={product.name} 
+                    style={{ height: '300px', objectFit: 'cover' }} // ปรับขนาดและการแสดงผลของรูปภาพ
                     onError={(e) => {
                       e.target.onerror = null; // ป้องกันการเรียก onError ซ้ำ
                       e.target.src = placeholderImage; // เปลี่ยนไปใช้รูปภาพสำรอง

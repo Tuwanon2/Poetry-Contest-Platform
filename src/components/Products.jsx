@@ -11,13 +11,13 @@ const Products = () => {
   const [sortOrder, setSortOrder] = useState('price-asc');
   const [selectedCategory, setSelectedCategory] = useState('');
 
-  const placeholderImage = 'path/to/placeholder-image.jpg'; // แทนที่ด้วย URL ของ placeholder image
+  const placeholderImage = '../assets/images/Splendor.jpg'; // เปลี่ยนเป็น URL ของ placeholder ที่เหมาะสม
 
   useEffect(() => {
     axios
-      .get('/api/v1/products?sort=created_at&order=desc&limit=3')
+      .get('/api/v1/products?sort=created_at&order=desc') // ดึงสินค้าทั้งหมด
       .then((response) => {
-        setProducts(response.data.items); // ทำให้ sure ว่า response.data.items มีข้อมูลที่ต้องการ
+        setProducts(response.data.items);
       })
       .catch((error) => {
         console.error('Error fetching the products:', error);
@@ -25,12 +25,16 @@ const Products = () => {
   }, []);
 
   const categories = [
-    'บอร์ดเกมทั้งหมด',
-    'บอร์ดเกมเดี่ยว',
-    'บอร์ดเกมเล่นหลายคน',
-    'บอร์ดเกมปาร์ตี้',
-    'บอร์ดเกมกลยุทธ์',
-    'บอร์ดเกมเด็กและครอบครัว'
+    { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png' },
+    { name: 'บอร์ดเกมเดี่ยว', icon: 'path/to/icon-single.png' },
+    { name: 'บอร์ดเกมเล่นหลายคน', icon: 'path/to/icon-multiplayer.png' },
+    { name: 'บอร์ดเกมปาร์ตี้', icon: 'path/to/icon-party.png' },
+    { name: 'บอร์ดเกมกลยุทธ์', icon: 'path/to/icon-strategy.png' },
+    { name: 'บอร์ดเกมเด็กและครอบครัว', icon: 'path/to/icon-family.png' },
+    { name: 'บอร์ดเกมแนวสงคราม', icon: 'path/to/icon-family.png' },
+    { name: 'บอร์ดเกม co-op', icon: 'path/to/icon-family.png' },
+    { name: 'บอร์ดเกม gateway', icon: 'path/to/icon-family.png' },
+    { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'path/to/icon-family.png' }
   ];
 
   const filteredProducts = products
@@ -58,23 +62,46 @@ const Products = () => {
         {categories.map((category, index) => (
           <Col key={index} xs={6} md={4} className="mb-3">
             <Button 
-              variant={selectedCategory === category ? 'primary' : 'outline-primary'}
-              onClick={() => setSelectedCategory(category === selectedCategory ? '' : category)}
-              className="w-100"
+              variant={selectedCategory === category.name ? 'primary' : 'outline-primary'}
+              className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category.name ? 'selected' : 'default'}`}
+              onClick={() => setSelectedCategory(category.name === selectedCategory ? '' : category.name)}
+              style={{
+                backgroundColor: selectedCategory === category.name ? '#8BD2EC' : 'transparent',
+                height: '100px',
+                transition: 'background-color 0.2s ease-in-out',
+                borderRadius: '10px',
+              }}
             >
-              {category}
+              <div 
+                style={{
+                  width: '95%',
+                  height: '90%',
+                  borderRadius: '10px',
+                  border: '2px solid white',
+                  overflow: 'hidden',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  background: `url(${category.icon}) center/cover no-repeat`,
+                }}
+              />
+              <span className="visually-hidden">{category.name}</span>
             </Button>
           </Col>
         ))}
       </Row>
 
+      {/* แสดงหมวดหมู่ที่เลือก */}
+      <h3 className="text-center mt-5">
+        {selectedCategory ? `บอร์ดเกมในหมวดหมู่: ${selectedCategory}` : 'เลือกหมวดหมู่เพื่อเริ่มค้นหา'}
+      </h3>
+
       {/* ตัวกรองและการค้นหา */}
-      <h3 className="text-center mt-5">บอร์ดเกม ...</h3>
       <Form onSubmit={handleSearch} className="d-flex justify-content-center my-4">
         <Form.Group className="mx-2">
-        <Form.Label>ค้นหาสินค้า</Form.Label>
+          <Form.Label>ค้นหาสินค้า</Form.Label>
           <Form.Control
-          
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -109,29 +136,29 @@ const Products = () => {
 
       {/* สินค้า */}
       <Container className="my-5">
+        <h2 className="text-center mb-4">สินค้าทั้งหมด</h2>
         <Row>
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => {
-              // ใช้รูปภาพหลัก ถ้าไม่มีให้ใช้ placeholderImage
               const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
 
               return (
-                <Col md={4} key={product.id}>
+                <Col md={3} key={product.id}> {/* เปลี่ยนเป็น md={3} เพื่อให้มี 4 คอลัมน์ */}
                   <Card className="mb-4">
                     <Link to={`/product/${product.id}`}>
                       <Card.Img 
                         variant="top" 
                         src={primaryImage || placeholderImage} 
                         alt={product.name} 
+                        style={{ height: '300px', objectFit: 'cover' }} // ปรับขนาดและการแสดงผลของรูปภาพ
                         onError={(e) => {
-                          e.target.onerror = null; // ป้องกันการเรียก onError ซ้ำ
-                          e.target.src = placeholderImage; // เปลี่ยนไปใช้รูปภาพสำรอง
+                          e.target.onerror = null;
+                          e.target.src = placeholderImage;
                         }} 
                       />
                     </Link>
                     <Card.Body>
                       <Card.Title>{product.name}</Card.Title>
-                      <Card.Text>{product.description}</Card.Text>
                       <Card.Text>
                         <strong>Price: ฿{product.price}</strong>
                       </Card.Text>

@@ -11,7 +11,7 @@ const NewProducts = () => {
 
   useEffect(() => {
     axios
-      .get('/api/v1/products?sort=created_at&order=desc&limit=3')
+      .get('/api/v1/products?sort=created_at&order=desc&limit=4')
       .then((response) => {
         setProducts(response.data.items);
       })
@@ -30,13 +30,14 @@ const NewProducts = () => {
             const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
 
             return (
-              <Col md={4} key={product.id}>
+              <Col md={3} key={product.id}> {/* เปลี่ยนเป็น md={3} เพื่อให้มี 4 คอลัมน์ */}
                 <Card className="mb-4">
-                  <Link to={`/product/${product.id}`} class="btn btn-5">
+                  <Link to={`/product/${product.id}`}>
                     <Card.Img 
                       variant="top" 
                       src={primaryImage || placeholderImage} 
                       alt={product.name} 
+                      style={{ height: '300px', objectFit: 'cover' }} // ปรับขนาดและการแสดงผลของรูปภาพ
                       onError={(e) => {
                         e.target.onerror = null; // ป้องกันการเรียก onError ซ้ำ
                         e.target.src = placeholderImage; // เปลี่ยนไปใช้รูปภาพสำรอง
@@ -45,7 +46,6 @@ const NewProducts = () => {
                   </Link>
                   <Card.Body>
                     <Card.Title>{product.name}</Card.Title>
-                    <Card.Text>{product.description}</Card.Text>
                     <Card.Text>
                       <strong>Price: ฿{product.price}</strong>
                     </Card.Text>
