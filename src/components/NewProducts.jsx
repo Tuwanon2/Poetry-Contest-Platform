@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Container, Row, Col } from 'react-bootstrap';
 
+
 const NewProducts = () => {
   const [products, setProducts] = useState([]);
 
   // ใช้ URL ของรูปภาพ placeholder แทนการ import
-  const placeholderImage = '../assets/images/Splendor.jpg';
+  const placeholderImage = '../assets/images/placeholder.jpg';
 
   useEffect(() => {
     axios
-      .get('/api/v1/products?sort=created_at&order=desc&limit=3')
+      .get('/api/v1/products?sort=created_at&order=desc&limit=5')
       .then((response) => {
         setProducts(response.data.items);
       })
@@ -27,6 +28,8 @@ const NewProducts = () => {
           products.map((product) => {
             // ใช้รูปภาพหลัก ถ้าไม่มีให้ใช้ placeholderImage
             const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
+
+            console.log("Primary Image URL:", primaryImage);
 
             return (
               <Col md={4} key={product.id}>
