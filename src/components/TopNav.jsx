@@ -39,8 +39,8 @@ const TopNav = () => {
     <nav className="navbar navbar-light bg-light">
       <div className="container-fluid d-flex justify-content-between align-items-center">
         <Link className="navbar-brand" to="/">
-          <img src="/assets/logo.png" alt="Logo" width="45" height="30" />
-          E-Commerce
+          <img src="/assets/namo-logo.png" alt="Logo" width="65" height="50" />
+          Namo Boardgame
         </Link>
 
         <form onSubmit={handleSearchSubmit} className="d-flex flex-grow-1 mx-4">
