@@ -35,13 +35,29 @@ const TopMenu = () => {
                 สินค้า
               </Link>
             </li>
-
             <li className="nav-item">
               <Link
-                className={`nav-link ${location.pathname === '/category' ? 'active' : ''}`}
-                to="/category"
+                className={`nav-link ${location.pathname === '/MyCart' ? 'active' : ''}`}
+                to="/MyCart"
               >
-                comming soon
+                ตะกร้าของฉัน
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
+                className={`nav-link ${location.pathname === '/Payment' ? 'active' : ''}`}
+                to="/Payment"
+              >
+                การชำระเงิน
+              </Link>
+            </li>
+            
+            <li className="nav-item">
+              <Link
+                className={`nav-link ${location.pathname === '/MyProfile' ? 'active' : ''}`}
+                to="/MyProfile"
+              >
+                ข้อมูลส่วนตัว
               </Link>
             </li>
             {/* เพิ่มลิงก์อื่น ๆ ที่ต้องการ */}
