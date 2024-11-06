@@ -25,16 +25,16 @@ const Products = () => {
   }, []);
 
   const categories = [
-    { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png' },
-    { name: 'บอร์ดเกมเดี่ยว', icon: 'assets/images/solo_BoardGame.png' },
-    { name: 'บอร์ดเกมเล่นหลายคน', icon: 'assets/images/Multi_BoardGame.png' },
-    { name: 'บอร์ดเกมปาร์ตี้', icon: 'assets/images/party_BoardGame.png' },
-    { name: 'บอร์ดเกมกลยุทธ์', icon: 'assets/images/strategy_BoardGame.png' },
-    { name: 'บอร์ดเกมเด็กและครอบครัว', icon: 'assets/images/Family_BoardGame.png' },
-    { name: 'บอร์ดเกมแนวสงคราม', icon: 'assets/images/War_BoardGame.png' },
-    { name: 'บอร์ดเกม co-op', icon: 'assets/images/Co-op_BoardGame.png' },
-    { name: 'บอร์ดเกม gateway', icon: 'assets/images/Gateway_BoardGame.png' },
-    { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'assets/images/Management_BoardGame.png' }
+    { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png', category_id: '' },
+    { name: 'บอร์ดเกมเดี่ยว', icon: 'assets/images/solo_BoardGame.png', category_id: 1 },
+    { name: 'บอร์ดเกมเล่นหลายคน', icon: 'assets/images/Multi_BoardGame.png', category_id: 2 },
+    { name: 'บอร์ดเกมปาร์ตี้', icon: 'assets/images/party_BoardGame.png', category_id: 3 },
+    { name: 'บอร์ดเกมกลยุทธ์', icon: 'assets/images/strategy_BoardGame.png', category_id: 4 },
+    { name: 'บอร์ดเกมเด็กและครอบครัว', icon: 'assets/images/Family_BoardGame.png', category_id: 5 },
+    { name: 'บอร์ดเกมแนวสงคราม', icon: 'assets/images/War_BoardGame.png', category_id: 6 },
+    { name: 'บอร์ดเกม co-op', icon: 'assets/images/Co-op_BoardGame.png', category_id: 7 },
+    { name: 'บอร์ดเกม gateway', icon: 'assets/images/Gateway_BoardGame.png', category_id: 8 },
+    { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'assets/images/Management_BoardGame.png', category_id: 9 }
   ];
 
   const handleCategoryClick = (category) => {
@@ -42,17 +42,17 @@ const Products = () => {
   };
 
   const filteredProducts = products
-  .filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    product.price >= minPrice &&
-    (maxPrice ? product.price <= maxPrice : true) &&
-    (selectedCategory && selectedCategory !== 'บอร์ดเกมทั้งหมด' ? product.category === selectedCategory : true)
-  )
-  .sort((a, b) => {
-    if (sortOrder === 'price-asc') return a.price - b.price;
-    if (sortOrder === 'price-desc') return b.price - a.price;
-    return 0;
-  });
+    .filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      product.price >= minPrice &&
+      (maxPrice ? product.price <= maxPrice : true) &&
+      (selectedCategory && selectedCategory !== 'บอร์ดเกมทั้งหมด' ? product.category_id === selectedCategory.category_id : true)
+    )
+    .sort((a, b) => {
+      if (sortOrder === 'price-asc') return a.price - b.price;
+      if (sortOrder === 'price-desc') return b.price - a.price;
+      return 0;
+    });
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -68,7 +68,7 @@ const Products = () => {
             <Button 
               variant={selectedCategory === category.name ? 'primary' : 'outline-primary'}
               className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category.name ? 'selected' : 'default'}`}
-              onClick={() => setSelectedCategory(category.name === selectedCategory ? '' : category.name)}
+              onClick={() => setSelectedCategory(category === selectedCategory ? '' : category)}
               style={{
                 backgroundColor: selectedCategory === category.name ? '#8BD2EC' : 'transparent',
                 height: '100px',
@@ -98,7 +98,7 @@ const Products = () => {
 
       {/* แสดงหมวดหมู่ที่เลือก */}
       <h3 className="text-center mt-5">
-        {selectedCategory ? `บอร์ดเกมในหมวดหมู่: ${selectedCategory}` : 'เลือกหมวดหมู่เพื่อเริ่มค้นหา'}
+        {selectedCategory ? `บอร์ดเกมในหมวดหมู่: ${selectedCategory.name}` : 'เลือกหมวดหมู่เพื่อเริ่มค้นหา'}
       </h3>
 
       {/* ตัวกรองและการค้นหา */}
@@ -165,6 +165,10 @@ const Products = () => {
                       <Card.Title>{product.name}</Card.Title>
                       <Card.Text>
                         <strong>Price: ฿{product.price}</strong>
+                      </Card.Text>
+                      {/* เพิ่มการแสดง category_id */}
+                      <Card.Text>
+                        <small>Category ID: {product.category_id}</small>
                       </Card.Text>
                     </Card.Body>
                   </Card>

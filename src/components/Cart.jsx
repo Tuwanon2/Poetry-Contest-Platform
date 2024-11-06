@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 
 const MyCart = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const placeholderImage = "https://via.placeholder.com/100"; // URL ของ placeholder image ขนาดเล็กลง
+    const [discountPercentage, setDiscountPercentage] = useState(3); // Default 3% discount
+    const placeholderImage = "https://via.placeholder.com/100";
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -24,42 +25,125 @@ const MyCart = () => {
         fetchProducts();
     }, []);
 
-    const discount = 2000; 
-    const shipping = 90; 
+    // Determine if shipping should be applied
+    const shipping = products.length > 0 ? 90 : 0;  // No shipping if no products
 
-    // คำนวณยอดรวม
+    // Calculate subtotal
     const subtotal = products.reduce((acc, product) => {
-        const quantity = product.quantity || 1; // ถ้าไม่มี quantity ให้ใช้เป็น 1
+        const quantity = product.quantity || 1; // Default to 1 if quantity is undefined
         return acc + (product.price * quantity);
     }, 0);
 
-    const total = subtotal - discount + shipping;
+    // Check if discount is applicable
+    const isDiscountApplicable = (percentage) => {
+        if (percentage === 3) return true;
+        if (percentage === 5) return subtotal >= 1500;
+        if (percentage === 10) return subtotal >= 4000;
+        return false;
+    };
+
+    // Apply discount
+    const applyDiscount = (percentage) => {
+        if (isDiscountApplicable(percentage)) {
+            setDiscountPercentage(percentage);
+        }
+    };
+
+    // Calculate discount
+    const discount = isDiscountApplicable(discountPercentage)
+        ? (subtotal * discountPercentage / 100)
+        : 0;
+
+    const total = subtotal - discount + shipping;  // Total includes shipping only if products exist
+
+    // Handle removing a product
+    const removeProduct = (productId) => {
+        setProducts(products.filter(product => product.id !== productId));
+    };
+
+    // Handle changing product quantity
+    const changeQuantity = (productId, action) => {
+        setProducts(prevProducts => prevProducts.map(product => {
+            if (product.id === productId) {
+                const updatedQuantity = action === 'increase' 
+                    ? (product.quantity || 1) + 1 
+                    : Math.max((product.quantity || 1) - 1, 1); // Prevent going below 1
+                return { ...product, quantity: updatedQuantity };
+            }
+            return product;
+        }));
+    };
 
     return (
         <Container className="my-cart">
-            <h1>ทำการสั่งซื้อ</h1>
-            <div className="order-summary">
-                <h2>รายการคำสั่งซื้อ</h2>
+            {/* Total and Confirm Order Button at the Top */}
+            <div className="cart-total" style={{ marginBottom: '20px', textAlign: 'right' }}>
+                <div>
+                    <span>ยอดรวม</span>
+                    <span>฿{subtotal.toFixed(2)}</span>
+                </div>
+                <div>
+                    <span>ส่วนลด ({discountPercentage}% {isDiscountApplicable(discountPercentage) ? '' : '(ใช้ไม่ได้)'})</span>
+                    <span>-฿{discount.toFixed(2)}</span>
+                </div>
+                {products.length > 0 && (
+                    <div>
+                        <span>ค่าจัดส่ง</span>
+                        <span>฿{shipping}</span>
+                    </div>
+                )}
+                <div>
+                    <strong>ยอดรวมสุทธิ</strong>
+                    <strong>฿{total.toFixed(2)}</strong>
+                </div>
+                <Button variant="success" size="lg" className="checkout-button" style={{ width: '100%' }}>
+                    ยืนยันการสั่งซื้อ
+                </Button>
+            </div>
+
+            <div className="discount-options" style={{ marginBottom: '20px' }}>
+                <h3>เลือกส่วนลด</h3>
+                {[3, 5, 10].map((percentage) => (
+                    <div key={percentage} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                        <Button
+                            variant={isDiscountApplicable(percentage) ? 'primary' : 'danger'}
+                            onClick={() => applyDiscount(percentage)}
+                            disabled={!isDiscountApplicable(percentage)}
+                        >
+                            ใช้โค้ดลด {percentage}%
+                        </Button>
+                        <Button
+                            variant="info"
+                            style={{ marginLeft: '10px' }}
+                            onClick={() => alert(`โค้ดลด ${percentage}% ${percentage === 5 ? 'ใช้ได้เมื่อยเลือกซื้อสินค้าครบ 1500 บาท' : percentage === 10 ? 'ใช้ได้เมื่อยเลือกซื้อสินค้าครบ 4000 บาท' : 'ใช้ได้ทุกยอดรวม'}`)}
+                        >
+                            เงื่อนไข
+                        </Button>
+                    </div>
+                ))}
+            </div>
+
+            <div className="order-summary" style={{ marginBottom: '20px' }}>
+                <h2>รายละเอียดคำสั่งซื้อ</h2>
                 {loading ? (
                     <p>กำลังโหลด...</p>
                 ) : error ? (
                     <p>เกิดข้อผิดพลาดในการดึงข้อมูล: {error.message}</p>
                 ) : products.length > 0 ? (
                     products.map((product) => {
-                        // หา primary image จาก product.images
                         const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
 
                         return (
                             <Row className="cart-item mb-4" key={product.id} style={{ alignItems: 'center' }}>
                                 <Col xs={4} className="d-flex justify-content-center">
-                                    <img 
-                                        src={primaryImage || placeholderImage} 
-                                        alt={product.name} 
-                                        style={{ width: '80%', borderRadius: '5px' }} 
+                                    <img
+                                        src={primaryImage || placeholderImage}
+                                        alt={product.name}
+                                        style={{ width: '80%', borderRadius: '5px' }}
                                         onError={(e) => {
-                                            e.target.onerror = null; 
-                                            e.target.src = placeholderImage; 
-                                        }} 
+                                            e.target.onerror = null;
+                                            e.target.src = placeholderImage;
+                                        }}
                                     />
                                 </Col>
                                 <Col xs={8}>
@@ -68,12 +152,30 @@ const MyCart = () => {
                                             <Card.Title>{product.name}</Card.Title>
                                             <Card.Text>{product.description}</Card.Text>
                                             <Card.Text>
-                                                <strong>จำนวน: {product.quantity || 1}</strong> {/* แสดงจำนวนสินค้า */}
+                                                <strong>จำนวน: {product.quantity || 1}</strong>
+                                                <Button variant="secondary" size="sm" onClick={() => changeQuantity(product.id, 'decrease')} style={{ marginLeft: '10px' }}>
+                                                    -
+                                                </Button>
+                                                <Button variant="secondary" size="sm" onClick={() => changeQuantity(product.id, 'increase')} style={{ marginLeft: '10px' }}>
+                                                    +
+                                                </Button>
                                             </Card.Text>
                                         </div>
                                         <Card.Text style={{ textAlign: 'right' }}>
-                                            <strong>ราคา: ฿{product.price * (product.quantity || 1)}</strong> {/* คำนวณราคาทั้งหมด */}
+                                            <strong>ราคา: ฿{product.price * (product.quantity || 1)}</strong>
                                         </Card.Text>
+                                        {/* Clickable Text for Removing Product */}
+                                        <span
+                                            onClick={() => removeProduct(product.id)}
+                                            style={{
+                                                color: 'red',
+                                                cursor: 'pointer',
+                                                textDecoration: 'underline',
+                                                fontSize: '0.9rem',
+                                            }}
+                                        >
+                                            นำสินค้าออก
+                                        </span>
                                     </Card.Body>
                                 </Col>
                             </Row>
@@ -82,22 +184,7 @@ const MyCart = () => {
                 ) : (
                     <p>ไม่มีผลิตภัณฑ์ในตะกร้า</p>
                 )}
-                <div className="cart-total">
-                    <div>
-                        <span>ส่วนลด</span>
-                        <span>฿{discount}</span>
-                    </div>
-                    <div>
-                        <span>ค่าจัดส่ง</span>
-                        <span>฿{shipping}</span>
-                    </div>
-                    <div>
-                        <strong>ยอดรวม</strong>
-                        <strong>฿{total}</strong> {/* ใช้ total ที่คำนวณแล้ว */}
-                    </div>
-                </div>
             </div>
-            <button className="checkout-button">ยืนยันการสั่งซื้อ</button>
         </Container>
     );
 };
