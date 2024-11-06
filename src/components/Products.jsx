@@ -26,15 +26,15 @@ const Products = () => {
 
   const categories = [
     { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png' },
-    { name: 'บอร์ดเกมเดี่ยว', icon: 'path/to/icon-single.png' },
-    { name: 'บอร์ดเกมเล่นหลายคน', icon: 'path/to/icon-multiplayer.png' },
-    { name: 'บอร์ดเกมปาร์ตี้', icon: 'path/to/icon-party.png' },
-    { name: 'บอร์ดเกมกลยุทธ์', icon: 'path/to/icon-strategy.png' },
-    { name: 'บอร์ดเกมเด็กและครอบครัว', icon: 'path/to/icon-family.png' },
-    { name: 'บอร์ดเกมแนวสงคราม', icon: 'path/to/icon-family.png' },
-    { name: 'บอร์ดเกม co-op', icon: 'path/to/icon-family.png' },
-    { name: 'บอร์ดเกม gateway', icon: 'path/to/icon-family.png' },
-    { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'path/to/icon-family.png' }
+    { name: 'บอร์ดเกมเดี่ยว', icon: 'assets/images/solo_BoardGame.png' },
+    { name: 'บอร์ดเกมเล่นหลายคน', icon: 'assets/images/Multi_BoardGame.png' },
+    { name: 'บอร์ดเกมปาร์ตี้', icon: 'assets/images/party_BoardGame.png' },
+    { name: 'บอร์ดเกมกลยุทธ์', icon: 'assets/images/strategy_BoardGame.png' },
+    { name: 'บอร์ดเกมเด็กและครอบครัว', icon: 'assets/images/Family_BoardGame.png' },
+    { name: 'บอร์ดเกมแนวสงคราม', icon: 'assets/images/War_BoardGame.png' },
+    { name: 'บอร์ดเกม co-op', icon: 'assets/images/Co-op_BoardGame.png' },
+    { name: 'บอร์ดเกม gateway', icon: 'assets/images/Gateway_BoardGame.png' },
+    { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'assets/images/Management_BoardGame.png' }
   ];
 
   const handleCategoryClick = (category) => {
