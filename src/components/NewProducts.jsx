@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Card, Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+
 const NewProducts = () => {
   const [products, setProducts] = useState([]);
 
@@ -30,6 +31,8 @@ const NewProducts = () => {
         {products.length > 0 ? (
           products.map((product) => {
             const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
+
+            console.log("Primary Image URL:", primaryImage);
 
             return (
               <Col md={3} key={product.id}> {/* เปลี่ยนเป็น md={3} เพื่อให้มี 4 คอลัมน์ */}
