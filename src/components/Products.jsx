@@ -37,9 +37,7 @@ const Products = () => {
     { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'assets/images/Management_BoardGame.png', category_id: 9 }
   ];
 
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category === selectedCategory ? '' : category);
-  };
+  
 
   const filteredProducts = products
     .filter(product => {
