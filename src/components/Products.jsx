@@ -11,11 +11,11 @@ const Products = () => {
   const [sortOrder, setSortOrder] = useState('price-asc');
   const [selectedCategory, setSelectedCategory] = useState('');
 
-  const placeholderImage = '../assets/images/Splendor.jpg'; // เปลี่ยนเป็น URL ของ placeholder ที่เหมาะสม
+  const placeholderImage = '../assets/images/Splendor.jpg';
 
   useEffect(() => {
     axios
-      .get('/api/v1/products?sort=created_at&order=desc') // ดึงสินค้าทั้งหมด
+      .get('/api/v1/products?sort=created_at&order=desc')
       .then((response) => {
         setProducts(response.data.items);
       })
@@ -42,12 +42,18 @@ const Products = () => {
   };
 
   const filteredProducts = products
-    .filter(product =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      product.price >= minPrice &&
-      (maxPrice ? product.price <= maxPrice : true) &&
-      (selectedCategory && selectedCategory !== 'บอร์ดเกมทั้งหมด' ? product.category_id === selectedCategory.category_id : true)
-    )
+    .filter(product => {
+      const skuEndsWithCategoryId = selectedCategory && selectedCategory.category_id 
+        ? product.sku.endsWith(selectedCategory.category_id.toString())
+        : true;
+        
+      return (
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        product.price >= minPrice &&
+        (maxPrice ? product.price <= maxPrice : true) &&
+        skuEndsWithCategoryId
+      );
+    })
     .sort((a, b) => {
       if (sortOrder === 'price-asc') return a.price - b.price;
       if (sortOrder === 'price-desc') return b.price - a.price;
@@ -60,7 +66,6 @@ const Products = () => {
 
   return (
     <Container>
-      {/* หมวดหมู่ */}
       <h2 className="text-center mt-5">หมวดหมู่</h2>
       <Row className="text-center my-4">
         {categories.map((category, index) => (
@@ -96,12 +101,10 @@ const Products = () => {
         ))}
       </Row>
 
-      {/* แสดงหมวดหมู่ที่เลือก */}
       <h3 className="text-center mt-5">
         {selectedCategory ? `บอร์ดเกมในหมวดหมู่: ${selectedCategory.name}` : 'เลือกหมวดหมู่เพื่อเริ่มค้นหา'}
       </h3>
 
-      {/* ตัวกรองและการค้นหา */}
       <Form onSubmit={handleSearch} className="d-flex justify-content-center my-4">
         <Form.Group className="mx-2">
           <Form.Label>ค้นหาสินค้า</Form.Label>
@@ -138,7 +141,6 @@ const Products = () => {
         </Form.Group>
       </Form>
 
-      {/* สินค้า */}
       <Container className="my-5">
         <h2 className="text-center mb-4">สินค้าทั้งหมด</h2>
         <Row>
@@ -147,14 +149,14 @@ const Products = () => {
               const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
 
               return (
-                <Col md={3} key={product.id}> {/* เปลี่ยนเป็น md={3} เพื่อให้มี 4 คอลัมน์ */}
+                <Col md={3} key={product.id}>
                   <Card className="mb-4">
                     <Link to={`/product/${product.id}`}>
                       <Card.Img 
                         variant="top" 
                         src={primaryImage || placeholderImage} 
                         alt={product.name} 
-                        style={{ height: '300px', objectFit: 'cover' }} // ปรับขนาดและการแสดงผลของรูปภาพ
+                        style={{ height: '300px', objectFit: 'cover' }}
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = placeholderImage;
@@ -166,9 +168,8 @@ const Products = () => {
                       <Card.Text>
                         <strong>Price: ฿{product.price}</strong>
                       </Card.Text>
-                      {/* เพิ่มการแสดง category_id */}
                       <Card.Text>
-                        <small>Category ID: {product.category_id}</small>
+                        <small>Seller: {product.seller?.name || 'Unknown'}</small>
                       </Card.Text>
                     </Card.Body>
                   </Card>
