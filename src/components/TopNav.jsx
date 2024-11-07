@@ -1,22 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
-import { Button, Modal, Dropdown } from 'react-bootstrap'; // เพิ่ม Dropdown จาก react-bootstrap
+import { Button, Modal, Dropdown } from 'react-bootstrap';
 import GoogleAuth from './GoogleAuth';
 
 const TopNav = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showLogin, setShowLogin] = useState(false);
-  const [user, setUser] = useState(null); // เก็บข้อมูลผู้ใช้
+  const [user, setUser] = useState(null);
+  const [cartCount, setCartCount] = useState(0); // State for cart item count
   const navigate = useNavigate();
 
+
+
   useEffect(() => {
-    // ดึงข้อมูลผู้ใช้จาก sessionStorage เมื่อหน้าเว็บถูกโหลดหรือรีเฟรช
     const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser)); // กำหนดข้อมูลผู้ใช้ใน state
+      setUser(JSON.parse(storedUser));
     }
-  }, []);
+  
+    // Initially set the cart count
+    updateCartCount();
+  
+    // Listen for custom 'cart-updated' event to update the cart count
+    const handleCartUpdated = () => {
+      updateCartCount(); // Update the count when the event is triggered
+    };
+  
+    window.addEventListener('cart-updated', handleCartUpdated);
+  
+    // Cleanup listener on component unmount
+    return () => {
+      window.removeEventListener('cart-updated', handleCartUpdated);
+    };
+  }, []); // The empty array ensures this effect runs only once when the component mounts
+  
+  const updateCartCount = () => {
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    setCartCount(storedCart.length); // Set cart count based on number of items
+  };
+  
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -29,10 +52,9 @@ const TopNav = () => {
   const handleClose = () => setShowLogin(false);
 
   const handleLogout = () => {
-    // ลบข้อมูลผู้ใช้จาก sessionStorage
     sessionStorage.removeItem('user');
-    setUser(null); // รีเซ็ต state
-    navigate('/'); // เปลี่ยนเส้นทางกลับไปที่หน้าหลัก
+    setUser(null);
+    navigate('/');
   };
 
   return (
@@ -58,15 +80,15 @@ const TopNav = () => {
         </form>
 
         <div className="d-flex">
-          <Link className="btn btn-light" to="/cart">
-            <FaShoppingCart /> <span className="badge bg-danger">2</span>
+          <Link className="btn btn-light" to="/MyCart">
+            <FaShoppingCart /> <span className="badge bg-danger">{cartCount}</span>
           </Link>
 
           {user ? (
             <Dropdown>
               <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center">
                 <img
-                  src={user.picture} // รูปภาพจาก Google
+                  src={user.picture}
                   alt="user-profile"
                   style={{ borderRadius: '50%', width: '40px' }}
                   referrerPolicy="no-referrer"
@@ -86,7 +108,6 @@ const TopNav = () => {
         </div>
       </div>
 
-      {/* Modal สำหรับเข้าสู่ระบบ */}
       <Modal show={showLogin} onHide={handleClose} centered>
         <Modal.Header closeButton>
           <Modal.Title>เข้าสู่ระบบ</Modal.Title>
@@ -95,7 +116,7 @@ const TopNav = () => {
           <GoogleAuth
             setUser={(user) => {
               setUser(user);
-              sessionStorage.setItem('user', JSON.stringify(user)); // เก็บข้อมูลผู้ใช้ใน sessionStorage
+              sessionStorage.setItem('user', JSON.stringify(user));
             }}
             handleClose={handleClose}
           />

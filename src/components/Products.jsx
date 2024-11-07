@@ -37,21 +37,6 @@ const Products = () => {
     { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'assets/images/Management_BoardGame.png', category_id: 9 }
   ];
 
-  const sellerNames = {
-    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
-    'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
-    '940256ba-a9de-4aa9-bad8-604468cb6af3': 'TIME TO PLAY',
-    '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'Towertactic',
-    'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'DiceCUP',
-    // เพิ่ม UUID ของผู้ขายอื่นๆ ตามที่คุณต้องการ
-  };
-  
-  const getSellerName = (sellerId) => {
-    return sellerNames[sellerId] || 'Unknown';
-  };
-  
-
-
   const handleCategoryClick = (category) => {
     setSelectedCategory(category === selectedCategory ? '' : category);
   };
@@ -184,7 +169,7 @@ const Products = () => {
                         <strong>Price: ฿{product.price}</strong>
                       </Card.Text>
                       <Card.Text>
-                        <small>Seller: {getSellerName(product.seller_id)}</small>
+                        <small>Seller: {product.seller?.name || 'Unknown'}</small>
                       </Card.Text>
                     </Card.Body>
                   </Card>

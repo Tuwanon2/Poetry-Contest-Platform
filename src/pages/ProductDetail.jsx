@@ -76,9 +76,30 @@ const ProductDetail = () => {
   }
 
   const addToCart = () => {
+    // Get the current cart from localStorage
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+  
+    // Check if the product is already in the cart
+    const existingProduct = storedCart.find((item) => item.id === product.id);
+  
+    if (existingProduct) {
+      // If the product is already in the cart, update the quantity
+      existingProduct.quantity += quantity;
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    } else {
+      // If the product is not in the cart, add it
+      storedCart.push({ ...product, quantity });
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    }
+  
+    // Dispatch the custom event to update the cart count in TopNav
+    window.dispatchEvent(new Event('cart-updated'));
+  
     console.log(`Added ${quantity} of ${product.name} to the cart.`);
-    // คุณสามารถเรียก API เพื่อเพิ่มในรถเข็นได้ที่นี่
   };
+  
+  
+  
 
   return (
     <div>
