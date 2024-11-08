@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Products = () => {
+  const { sellerId } = useParams(); // ใช้ URL parameter
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [minPrice, setMinPrice] = useState(0);
@@ -13,16 +14,30 @@ const Products = () => {
 
   const placeholderImage = '../assets/images/Splendor.jpg';
 
+  const getSellerImage = (sellerId) => {
+    const images = {
+      'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
+      'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
+      '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
+      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.png',
+      'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
+    };
+    return images[sellerId] || '/assets/default_image.png';
+  };
+  
+  
+
   useEffect(() => {
     axios
       .get('/api/v1/products?sort=created_at&order=desc')
       .then((response) => {
-        setProducts(response.data.items);
+        const filteredProducts = response.data.items.filter(product => product.seller_id === sellerId);
+        setProducts(filteredProducts);
       })
       .catch((error) => {
         console.error('Error fetching the products:', error);
       });
-  }, []);
+  }, [sellerId]); // โหลดสินค้าตาม sellerId
 
   const categories = [
     { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png', category_id: '' },
@@ -36,7 +51,6 @@ const Products = () => {
     { name: 'บอร์ดเกม gateway', icon: 'assets/images/Gateway_BoardGame.png', category_id: 8 },
     { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'assets/images/Management_BoardGame.png', category_id: 9 }
   ];
-
   const sellerNames = {
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
     'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
@@ -45,23 +59,22 @@ const Products = () => {
     'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'DiceCUP',
     // เพิ่ม UUID ของผู้ขายอื่นๆ ตามที่คุณต้องการ
   };
-  
+
   const getSellerName = (sellerId) => {
-    return sellerNames[sellerId] || 'Unknown';
+    return sellerNames[sellerId] || 'ไม่ทราบชื่อผู้ขาย';
   };
-  
-  
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category === selectedCategory ? '' : category);
   };
 
   const filteredProducts = products
-    .filter(product => {
-      const skuEndsWithCategoryId = selectedCategory && selectedCategory.category_id 
-        ? product.sku.endsWith(selectedCategory.category_id.toString())
-        : true;
-        
+    .filter((product) => {
+      const skuEndsWithCategoryId =
+        selectedCategory && selectedCategory.category_id
+          ? product.sku.endsWith(selectedCategory.category_id.toString())
+          : true;
+
       return (
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         product.price >= minPrice &&
@@ -85,7 +98,7 @@ const Products = () => {
       <Row className="text-center my-4">
         {categories.map((category, index) => (
           <Col key={index} xs={6} md={4} className="mb-3">
-            <Button 
+            <Button
               variant={selectedCategory === category.name ? 'primary' : 'outline-primary'}
               className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category.name ? 'selected' : 'default'}`}
               onClick={() => setSelectedCategory(category === selectedCategory ? '' : category)}
@@ -96,7 +109,7 @@ const Products = () => {
                 borderRadius: '10px',
               }}
             >
-              <div 
+              <div
                 style={{
                   width: '95%',
                   height: '90%',
@@ -157,7 +170,7 @@ const Products = () => {
       </Form>
 
       <Container className="my-5">
-        <h2 className="text-center mb-4">สินค้าทั้งหมด</h2>
+        <h2 className="text-center mb-4">สินค้าของร้าน</h2>
         <Row>
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => {
@@ -165,34 +178,45 @@ const Products = () => {
 
               return (
                 <Col md={3} key={product.id}>
-                  <Card className="mb-4">
-                    <Link to={`/product/${product.id}`}>
-                      <Card.Img 
-                        variant="top" 
-                        src={primaryImage || placeholderImage} 
-                        alt={product.name} 
-                        style={{ height: '300px', objectFit: 'cover' }}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = placeholderImage;
-                        }} 
-                      />
-                    </Link>
-                    <Card.Body>
-                      <Card.Title>{product.name}</Card.Title>
-                      <Card.Text>
-                        <strong>Price: ฿{product.price}</strong>
-                      </Card.Text>
-                      <Card.Text>
-                        <small>Seller: {getSellerName(product.seller_id)}</small>
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
+                <Card className="mb-4">
+                  <Link to={`/product/${product.id}`}>
+                    <Card.Img 
+                      variant="top" 
+                      src={primaryImage || placeholderImage} 
+                      alt={product.name} 
+                      style={{ height: '300px', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = placeholderImage;
+                      }} 
+                    />
+                  </Link>
+                  <Card.Body>
+                    <Card.Title>{product.name}</Card.Title>
+                    <Card.Text>
+                      <strong>ราคา: ฿{product.price}</strong>
+                    </Card.Text>
+                    <Card.Text className="d-flex align-items-center">
+                    <Link to={`/seller/${product.seller_id}`} className="d-flex align-items-center">
+                         <img
+                     src={getSellerImage(product.seller_id)}
+                             alt={getSellerName(product.seller_id)}
+                                     style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '8px' }}
+                               />
+                                     <small>{getSellerName(product.seller_id)}</small>
+                                      </Link>
+                            </Card.Text>
+
+                  </Card.Body>
+                </Card>
+              </Col>
+              
               );
             })
           ) : (
-            <p className="text-center">ไม่พบสินค้าที่ค้นหา</p>
+            <Col md={12}>
+              <p className="text-center">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
+            </Col>
           )}
         </Row>
       </Container>
