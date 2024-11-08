@@ -9,7 +9,7 @@ const Shop= () => {
     <div>
       <TopNav /> {/* ส่วนค้นหาจะอยู่ใน TopNav */}
       <TopMenu />
-      <Products/>
+      
       <Footer />
 
     </div>

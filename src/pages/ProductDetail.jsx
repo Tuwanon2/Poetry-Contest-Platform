@@ -1,12 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { Link,useParams } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
 
 const placeholderImage = '../assets/images/placeholder.jpg';
+const sellerNames = {
+  'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
+  'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
+  '940256ba-a9de-4aa9-bad8-604468cb6af3': 'TIME TO PLAY',
+  '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'Towertactic',
+  'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'DiceCUP',
+};
+
+const getSellerImage = (sellerId) => {
+  const images = {
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
+    'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
+    '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.png',
+    '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.png',
+    'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
+  };
+  return images[sellerId] || '/assets/default_image.png';
+};
+
+const getSellerName = (sellerId) => {
+  return sellerNames[sellerId] || 'Unknown';
+};
 
 const QuantitySelector = ({ quantity, setQuantity }) => {
   const handleChange = (e) => {
@@ -108,6 +130,7 @@ const ProductDetail = () => {
 
       <Container className="my-5">
         <Row>
+        
           <Col md={6}>
             {/* แสดงรูปภาพสินค้า */}
             <Card.Img
@@ -134,8 +157,21 @@ const ProductDetail = () => {
           </Col>
         </Row>
       </Container>
-              
-      <Footer />
+      
+      
+      <Card.Text className="d-flex align-items-center mt-3 mb-5">
+        <img
+          src={getSellerImage(product.seller_id)}
+          alt={getSellerName(product.seller_id)}
+          style={{ width: '70px', height: '70px', borderRadius: '50%', marginRight: '8px' }}
+        />
+        <Link to={`/seller/${product.seller_id}`}>
+          <Button variant="outline-primary" style={{ fontSize: '18px' }}>
+            {getSellerName(product.seller_id)}
+          </Button>
+        </Link>
+      </Card.Text>
+      
     </div>
   );
 };

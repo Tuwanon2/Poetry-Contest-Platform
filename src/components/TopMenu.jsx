@@ -29,8 +29,8 @@ const TopMenu = () => {
           <ul className="navbar-nav">
             <li className="nav-item">
               <Link
-                className={`nav-link ${location.pathname === '/AllMarket' ? 'active' : ''}`}
-                to="/AllMarket"
+                className={`nav-link ${location.pathname === '/Shop' ? 'active' : ''}`}
+                to="/Shop"
               >
                 ร้านค้า
               </Link>
