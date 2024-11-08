@@ -55,38 +55,67 @@ const PopularProducts = () => {
 
             return (
               <Col md={3} key={product.id}> {/* เปลี่ยนเป็น md={3} เพื่อให้มี 4 คอลัมน์ */}
-                <Card className="mb-4">
-                  <Link to={`/product/${product.id}`}>
-                    <Card.Img 
-                      variant="top" 
-                      src={primaryImage || placeholderImage} 
-                      alt={product.name} 
-                      style={{ height: '300px', objectFit: 'cover' }} // ปรับขนาดและการแสดงผลของรูปภาพ
-                      onError={(e) => {
-                        e.target.onerror = null; // ป้องกันการเรียก onError ซ้ำ
-                        e.target.src = placeholderImage; // เปลี่ยนไปใช้รูปภาพสำรอง
-                      }} 
-                    />
-                  </Link>
-                  <Card.Body>
-                    <Card.Title>{product.name}</Card.Title>
-                    <Card.Text>
-                      <strong>Price: ฿{product.price}</strong>
-                    </Card.Text>
-                    <Card.Text className="d-flex align-items-center">
-  <Link to={`/seller/${product.seller_id}`} className="d-flex align-items-center">
-    <img
-      src={getSellerImage(product.seller_id)}
-      alt={getSellerName(product.seller_id)}
-      style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '8px' }}
+                <Card className="product-card mb-4 shadow-sm border-light rounded">
+  <Link to={`/product/${product.id}`}>
+    <Card.Img 
+      variant="top" 
+      src={primaryImage || placeholderImage} 
+      alt={product.name} 
+      style={{ height: '300px', objectFit: 'cover', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+      onError={(e) => {
+        e.target.onerror = null;
+        e.target.src = placeholderImage;
+      }}
     />
-    <small style={{ fontWeight: 'bold', fontSize: '16px', color: '#007bff', textDecoration: 'underline' }}>
-      {getSellerName(product.seller_id)}
-    </small>
   </Link>
-</Card.Text>
-                  </Card.Body>
-                </Card>
+  <Card.Body className="d-flex flex-column">
+    <Card.Title className="text-truncate" style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#333' }}>
+      {product.name}
+    </Card.Title>
+    <div className="d-flex justify-content-between align-items-center">
+      <Card.Text style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#28a745' }}>
+        ฿{product.price}
+      </Card.Text>
+      <div className="d-flex align-items-center">
+        {/* กรอบโลโก้ร้านทำให้เป็นปุ่มที่สามารถกดได้ */}
+        <div 
+          onClick={() => window.location.href = `/seller/${product.seller_id}`} // กดแล้วไปยังหน้าโปรไฟล์ร้าน
+          className="d-flex align-items-center clickable-logo-card"
+          style={{
+            border: '2px solid #007bff', 
+            borderRadius: '5px', 
+            padding: '5px 10px', 
+            backgroundColor: '#f8f9fa',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',  // เพิ่ม transition สำหรับการเคลื่อนไหว
+          }}
+        >
+          <img
+            src={getSellerImage(product.seller_id)}
+            alt={getSellerName(product.seller_id)}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              marginRight: '8px',
+              border: '2px solid #fff',
+              boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+            }}
+          />
+          <small style={{
+            fontSize: '0.9rem', 
+            color: '#007bff', 
+            fontWeight: 'bold', 
+            textDecoration: 'none',
+            cursor: 'pointer',
+          }}>
+            {getSellerName(product.seller_id)}
+          </small>
+        </div>
+      </div>
+    </div>
+  </Card.Body>
+</Card>
               </Col>
             );
           })

@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Products = () => {
-  const { sellerId } = useParams(); // ใช้ URL parameter
+  const { sellerId } = useParams();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [minPrice, setMinPrice] = useState(0);
@@ -13,31 +13,6 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
 
   const placeholderImage = '../assets/images/Splendor.jpg';
-
-  const getSellerImage = (sellerId) => {
-    const images = {
-      'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
-      'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
-      '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
-      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.png',
-      'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
-    };
-    return images[sellerId] || '/assets/default_image.png';
-  };
-  
-  
-
-  useEffect(() => {
-    axios
-      .get('/api/v1/products?sort=created_at&order=desc')
-      .then((response) => {
-        const filteredProducts = response.data.items.filter(product => product.seller_id === sellerId);
-        setProducts(filteredProducts);
-      })
-      .catch((error) => {
-        console.error('Error fetching the products:', error);
-      });
-  }, [sellerId]); // โหลดสินค้าตาม sellerId
 
   const categories = [
     { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png', category_id: '' },
@@ -51,18 +26,37 @@ const Products = () => {
     { name: 'บอร์ดเกม gateway', icon: '/assets/images/Gateway_BoardGame.png', category_id: 8 },
     { name: 'บอร์ดเกมบริหารทรัพยากร', icon: '/assets/images/Management_BoardGame.png', category_id: 9 }
   ];
+
   const sellerNames = {
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
     'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
     '940256ba-a9de-4aa9-bad8-604468cb6af3': 'TIME TO PLAY',
     '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'Towertactic',
     'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'DiceCUP',
-    // เพิ่ม UUID ของผู้ขายอื่นๆ ตามที่คุณต้องการ
   };
 
-  const getSellerName = (sellerId) => {
-    return sellerNames[sellerId] || 'ไม่ทราบชื่อผู้ขาย';
+  const getSellerImage = (sellerId) => {
+    const images = {
+      'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
+      'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
+      '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
+      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.png',
+      'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
+    };
+    return images[sellerId] || '/assets/default_image.png';
   };
+
+  useEffect(() => {
+    axios
+      .get('/api/v1/products?sort=created_at&order=desc')
+      .then((response) => {
+        const filteredProducts = response.data.items.filter(product => product.seller_id === sellerId);
+        setProducts(filteredProducts);
+      })
+      .catch((error) => {
+        console.error('Error fetching the products:', error);
+      });
+  }, [sellerId]);
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category === selectedCategory ? '' : category);
@@ -82,30 +76,40 @@ const Products = () => {
         skuEndsWithCategoryId
       );
     })
-    .sort((a, b) => {
-      if (sortOrder === 'price-asc') return a.price - b.price;
-      if (sortOrder === 'price-desc') return b.price - a.price;
-      return 0;
-    });
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-  };
+    .sort((a, b) => (sortOrder === 'price-asc' ? a.price - b.price : b.price - a.price));
 
   return (
     <Container>
+      {/* Seller Section */}
+      <Container fluid style={{ backgroundColor: '#343a40', color: '#ffffff', padding: '2rem' }}>
+        <h2 className="text-center">{sellerNames[sellerId]}</h2>
+        <div className="text-center mb-4">
+        <img
+  src={getSellerImage(sellerId)}
+  alt={sellerNames[sellerId]}
+  style={{
+    width: '150px',  // Increased size
+    height: '150px', // Increased size
+    borderRadius: '50%',
+    border: '3px solid white',
+  }}
+/>
+        
+        </div>
+      </Container>
+
+      {/* Category Selection */}
       <h2 className="text-center mt-5">หมวดหมู่</h2>
       <Row className="text-center my-4">
         {categories.map((category, index) => (
           <Col key={index} xs={6} md={4} className="mb-3">
             <Button
-              variant={selectedCategory === category.name ? 'primary' : 'outline-primary'}
-              className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category.name ? 'selected' : 'default'}`}
-              onClick={() => setSelectedCategory(category === selectedCategory ? '' : category)}
+              variant={selectedCategory === category ? 'primary' : 'outline-primary'}
+              className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'}`}
+              onClick={() => handleCategoryClick(category)}
               style={{
-                backgroundColor: selectedCategory === category.name ? '#8BD2EC' : 'transparent',
+                backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
                 height: '100px',
-                transition: 'background-color 0.2s ease-in-out',
                 borderRadius: '10px',
               }}
             >
@@ -129,46 +133,46 @@ const Products = () => {
         ))}
       </Row>
 
-      <h3 className="text-center mt-5">
-        {selectedCategory ? `บอร์ดเกมในหมวดหมู่: ${selectedCategory.name}` : 'เลือกหมวดหมู่เพื่อเริ่มค้นหา'}
-      </h3>
-
-      <Form onSubmit={handleSearch} className="d-flex justify-content-center my-4">
-        <Form.Group className="mx-2">
-          <Form.Label>ค้นหาสินค้า</Form.Label>
-          <Form.Control
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </Form.Group>
-        <Form.Group className="mx-2">
-          <Form.Label>ราคาเริ่มต้น</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="0"
-            value={minPrice}
-            onChange={(e) => setMinPrice(Number(e.target.value))}
-          />
-        </Form.Group>
-        <Form.Group className="mx-2">
-          <Form.Label>ถึง</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="สูงสุด"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(Number(e.target.value) || '')}
-          />
-        </Form.Group>
-        <Form.Group className="mx-2">
-          <Form.Label>จัดเรียงสินค้าตาม</Form.Label>
-          <Form.Control as="select" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-            <option value="price-asc">ราคาน้อย-มาก</option>
-            <option value="price-desc">ราคามาก-น้อย</option>
-          </Form.Control>
-        </Form.Group>
+      {/* Search, Price Range, and Sort Options */}
+      <Form className="my-4">
+        <Row>
+          <Col md={4} className="mb-3">
+            <Form.Control
+              type="text"
+              placeholder="ค้นหาสินค้า..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </Col>
+          <Col md={3} className="mb-3">
+            <Form.Control
+              type="number"
+              placeholder="ราคาขั้นต่ำ"
+              value={minPrice}
+              onChange={(e) => setMinPrice(Number(e.target.value))}
+            />
+          </Col>
+          <Col md={3} className="mb-3">
+            <Form.Control
+              type="number"
+              placeholder="ราคาสูงสุด"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+            />
+          </Col>
+          <Col md={2} className="mb-3">
+            <Form.Select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="price-asc">ราคาน้อยไปมาก</option>
+              <option value="price-desc">ราคามากไปน้อย</option>
+            </Form.Select>
+          </Col>
+        </Row>
       </Form>
 
+      {/* Product Listings */}
       <Container className="my-5">
         <h2 className="text-center mb-4">สินค้าของร้าน</h2>
         <Row>
@@ -178,44 +182,31 @@ const Products = () => {
 
               return (
                 <Col md={3} key={product.id}>
-                <Card className="mb-4">
-                  <Link to={`/product/${product.id}`}>
-                    <Card.Img 
-                      variant="top" 
-                      src={primaryImage || placeholderImage} 
-                      alt={product.name} 
-                      style={{ height: '300px', objectFit: 'cover' }}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = placeholderImage;
-                      }} 
-                    />
-                  </Link>
-                  <Card.Body>
-                    <Card.Title>{product.name}</Card.Title>
-                    <Card.Text>
-                      <strong>ราคา: ฿{product.price}</strong>
-                    </Card.Text>
-                    <Card.Text className="d-flex align-items-center">
-                    <Link to={`/seller/${product.seller_id}`} className="d-flex align-items-center">
-                         <img
-                     src={getSellerImage(product.seller_id)}
-                             alt={getSellerName(product.seller_id)}
-                                     style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '8px' }}
-                               />
-                                     <small>{getSellerName(product.seller_id)}</small>
-                                      </Link>
-                            </Card.Text>
-
-                  </Card.Body>
-                </Card>
-              </Col>
-              
+                  <Card className="product-card mb-4 shadow-sm border-light rounded">
+                    <Link to={`/product/${product.id}`}>
+                      <Card.Img
+                        variant="top"
+                        src={primaryImage || placeholderImage}
+                        alt={product.name}
+                        style={{ height: '300px', objectFit: 'cover' }}
+                        onError={(e) => { e.target.src = placeholderImage; }}
+                      />
+                    </Link>
+                    <Card.Body>
+                      <Card.Title className="text-truncate" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                        {product.name}
+                      </Card.Title>
+                      <Card.Text style={{ fontSize: '1.1rem', color: '#28a745' }}>
+                        ฿{product.price}
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                </Col>
               );
             })
           ) : (
             <Col md={12}>
-              <p className="text-center">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
+              <p className="text-center text-muted">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
             </Col>
           )}
         </Row>

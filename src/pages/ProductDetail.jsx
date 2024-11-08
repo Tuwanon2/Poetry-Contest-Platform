@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link,useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
@@ -52,7 +52,6 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
   );
 };
 
-// ปรับสไตล์ให้ใหญ่ขึ้น
 const buttonStyle = {
   width: '40px',
   height: '40px',
@@ -73,19 +72,31 @@ const inputStyle = {
 };
 
 const ProductDetail = () => {
-  const { productId } = useParams(); // รับ productId จาก URL
+  const { productId } = useParams();
   const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1); // จัดการจำนวนสินค้า
+  const [quantity, setQuantity] = useState(1);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
-  // ฟังก์ชันดึงข้อมูลรายละเอียดสินค้าจาก API
   const fetchProductDetails = (id) => {
     axios
       .get(`/api/v1/products/${id}`)
       .then((response) => {
         setProduct(response.data);
+        fetchSellerProducts(response.data.seller_id);
       })
       .catch((error) => {
         console.error('Error fetching product details:', error);
+      });
+  };
+
+  const fetchSellerProducts = (sellerId) => {
+    axios
+      .get(`/api/v1/products?seller_id=${sellerId}&limit=5`)
+      .then((response) => {
+        setRelatedProducts(response.data.items);
+      })
+      .catch((error) => {
+        console.error('Error fetching seller products:', error);
       });
   };
 
@@ -94,34 +105,24 @@ const ProductDetail = () => {
   }, [productId]);
 
   if (!product) {
-    return <div>Loading...</div>; // แสดง Loading ระหว่างดึงข้อมูล
+    return <div>Loading...</div>;
   }
 
   const addToCart = () => {
-    // Get the current cart from localStorage
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-  
-    // Check if the product is already in the cart
     const existingProduct = storedCart.find((item) => item.id === product.id);
   
     if (existingProduct) {
-      // If the product is already in the cart, update the quantity
       existingProduct.quantity += quantity;
       localStorage.setItem('cart', JSON.stringify(storedCart));
     } else {
-      // If the product is not in the cart, add it
       storedCart.push({ ...product, quantity });
       localStorage.setItem('cart', JSON.stringify(storedCart));
     }
   
-    // Dispatch the custom event to update the cart count in TopNav
     window.dispatchEvent(new Event('cart-updated'));
-  
     console.log(`Added ${quantity} of ${product.name} to the cart.`);
   };
-  
-  
-  
 
   return (
     <div>
@@ -130,17 +131,17 @@ const ProductDetail = () => {
 
       <Container className="my-5">
         <Row>
-        
           <Col md={6}>
-            {/* แสดงรูปภาพสินค้า */}
-            <Card.Img
-              src={product.images.find((img) => img.is_primary)?.image_url || placeholderImage}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = placeholderImage;
-              }}
-              style={{ maxHeight: '500px', objectFit: 'contain' }}
-            />
+            <Link to={`/product/${product.id}`}>
+              <Card.Img
+                src={product.images.find((img) => img.is_primary)?.image_url || placeholderImage}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = placeholderImage;
+                }}
+                style={{ maxHeight: '500px', objectFit: 'contain', cursor: 'pointer' }}
+              />
+            </Link>
           </Col>
           <Col md={6}>
             <h2 style={{ fontSize: '32px' }}>{product.name}</h2>
@@ -149,29 +150,61 @@ const ProductDetail = () => {
             <p style={{ fontSize: '18px' }}><strong>ผู้ออกแบบ:</strong> {product.brand}</p>
             <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
 
-            {/* จำนวนสินค้า */}
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
 
-            {/* ปุ่มเพิ่มในรถเข็น */}
-            <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' }}>เพิ่มในรถเข็น</Button>
+            <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' }}>
+              เพิ่มในรถเข็น
+            </Button>
           </Col>
         </Row>
       </Container>
-      
-      
-      <Card.Text className="d-flex align-items-center mt-3 mb-5">
-        <img
-          src={getSellerImage(product.seller_id)}
-          alt={getSellerName(product.seller_id)}
-          style={{ width: '70px', height: '70px', borderRadius: '50%', marginRight: '8px' }}
-        />
-        <Link to={`/seller/${product.seller_id}`}>
-          <Button variant="outline-primary" style={{ fontSize: '18px' }}>
+
+      <Container>
+        <Card.Text className="d-flex align-items-center mb-5">
+          <Link to={`/seller/${product.seller_id}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            <img
+              src={getSellerImage(product.seller_id)}
+              alt={getSellerName(product.seller_id)}
+              style={{ width: '90px', height: '90px', borderRadius: '50%', marginRight: '8px', cursor: 'pointer' }}
+            />
+          </Link>
+          <h3 className="ml-3" style={{ marginLeft: '30px', fontSize: '34px', fontWeight: 'bold' }}>
             {getSellerName(product.seller_id)}
-          </Button>
-        </Link>
-      </Card.Text>
-      
+          </h3>
+        </Card.Text>
+        <h3 className="ml-3" style={{ marginLeft: '20px', fontSize: '24px', fontWeight: 'bold' }}>
+          สินค้าอื่นๆที่คุณอาจสนใจจากร้าน
+        </h3>
+
+        <Row>
+          {relatedProducts.map((relatedProduct) => (
+            <Col key={relatedProduct.id} md={3} className="mb-4">
+              <Card>
+                <Link to={`/product/${relatedProduct.id}`}>
+                  <Card.Img
+                    variant="top"
+                    src={relatedProduct.images[0]?.image_url || placeholderImage}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = placeholderImage;
+                    }}
+                    style={{ height: '200px', objectFit: 'contain', cursor: 'pointer' }}
+                  />
+                </Link>
+                <Card.Body>
+                  <Card.Title>{relatedProduct.name}</Card.Title>
+                  <Card.Text style={{ fontSize: '1.5rem', color: '#28a745' }}>
+                        ฿{product.price}
+                      </Card.Text>
+                      
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Container>
+
+      <Footer />
     </div>
   );
 };

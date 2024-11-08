@@ -42,6 +42,31 @@ const SearchResults = () => {
     fetchProducts(searchQuery);
   }, [searchQuery]);
 
+  // ฟังก์ชันเพิ่มสินค้าในตะกร้า
+  const addToCart = (product) => {
+    const quantity = 1; // ตั้งค่าเริ่มต้นจำนวนสินค้าเป็น 1
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // เช็คว่ามีสินค้านี้ในตะกร้าอยู่แล้วหรือไม่
+    const existingProduct = storedCart.find((item) => item.id === product.id);
+
+    if (existingProduct) {
+      // หากสินค้าถูกเพิ่มแล้ว เพิ่มจำนวนสินค้า
+      existingProduct.quantity += quantity;
+    } else {
+      // หากยังไม่มีสินค้าในตะกร้า ให้เพิ่มสินค้าใหม่
+      storedCart.push({ ...product, quantity });
+    }
+
+    // บันทึกตะกร้าใน localStorage
+    localStorage.setItem('cart', JSON.stringify(storedCart));
+
+    // ส่งเหตุการณ์เพื่ออัพเดตจำนวนสินค้าที่แสดงใน TopNav
+    window.dispatchEvent(new Event('cart-updated'));
+
+    console.log(`Added ${quantity} of ${product.name} to the cart.`);
+  };
+
   return (
     <div>
       <TopNav />
@@ -91,7 +116,7 @@ const SearchResults = () => {
                       </Col>
                       <Col md={3} className="d-flex align-items-center justify-content-center">
                         <div>
-                          <Button variant="primary" className="me-2">
+                          <Button variant="primary" className="me-2" onClick={() => addToCart(product)}>
                             เพิ่มลงในตะกร้า
                           </Button>
                           <Link to={`/product/${product.id}`}>

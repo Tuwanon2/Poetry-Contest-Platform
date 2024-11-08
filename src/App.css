@@ -115,3 +115,45 @@ h1 {
 .checkout-button:hover {
   background-color: #0056b3;
 }
+
+.clickable-logo-card:hover {
+  background-color: #007bff; /* เปลี่ยนสีพื้นหลังเมื่อโฮเวอร์ */
+  border-color: #0056b3; /* เปลี่ยนสีกรอบเมื่อโฮเวอร์ */
+}
+
+.clickable-logo-card:hover small {
+  color: white; /* เปลี่ยนสีของชื่อร้านเมื่อโฮเวอร์ */
+}
+
+.clickable-logo-card:hover img {
+  transform: scale(1.1); /* ทำให้โลโก้ใหญ่ขึ้นเมื่อโฮเวอร์ */
+  transition: transform 0.3s ease; /* เพิ่มการเปลี่ยนแปลงขนาดของโลโก้ */
+}
+@media (max-width: 768px) {
+  .product-detail-container {
+    display: block;
+    padding: 0 15px;
+  }
+
+  .product-detail-title {
+    font-size: 28px;
+  }
+
+  .product-detail-price {
+    font-size: 20px;
+  }
+
+  .quantity-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .related-products {
+    margin-top: 30px;
+  }
+
+  .related-product-card {
+    margin-bottom: 20px;
+  }
+}
