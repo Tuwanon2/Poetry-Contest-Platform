@@ -74,15 +74,17 @@ const NewProducts = () => {
                       <strong>Price: ฿{product.price}</strong>
                     </Card.Text>
                     <Card.Text className="d-flex align-items-center">
-                    <Link to={`/seller/${product.seller_id}`} className="d-flex align-items-center">
-                         <img
-                     src={getSellerImage(product.seller_id)}
-                             alt={getSellerName(product.seller_id)}
-                                     style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '8px' }}
-                               />
-                                     <small>{getSellerName(product.seller_id)}</small>
-                                      </Link>
-                            </Card.Text>
+  <Link to={`/seller/${product.seller_id}`} className="d-flex align-items-center">
+    <img
+      src={getSellerImage(product.seller_id)}
+      alt={getSellerName(product.seller_id)}
+      style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '8px' }}
+    />
+    <small style={{ fontWeight: 'bold', fontSize: '16px', color: '#007bff', textDecoration: 'underline' }}>
+      {getSellerName(product.seller_id)}
+    </small>
+  </Link>
+</Card.Text>
 
                   </Card.Body>
                 </Card>

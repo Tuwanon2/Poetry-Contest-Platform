@@ -41,15 +41,15 @@ const Products = () => {
 
   const categories = [
     { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png', category_id: '' },
-    { name: 'บอร์ดเกมเดี่ยว', icon: 'assets/images/solo_BoardGame.png', category_id: 1 },
-    { name: 'บอร์ดเกมเล่นหลายคน', icon: 'assets/images/Multi_BoardGame.png', category_id: 2 },
-    { name: 'บอร์ดเกมปาร์ตี้', icon: 'assets/images/party_BoardGame.png', category_id: 3 },
-    { name: 'บอร์ดเกมกลยุทธ์', icon: 'assets/images/strategy_BoardGame.png', category_id: 4 },
-    { name: 'บอร์ดเกมเด็กและครอบครัว', icon: 'assets/images/Family_BoardGame.png', category_id: 5 },
-    { name: 'บอร์ดเกมแนวสงคราม', icon: 'assets/images/War_BoardGame.png', category_id: 6 },
-    { name: 'บอร์ดเกม co-op', icon: 'assets/images/Co-op_BoardGame.png', category_id: 7 },
-    { name: 'บอร์ดเกม gateway', icon: 'assets/images/Gateway_BoardGame.png', category_id: 8 },
-    { name: 'บอร์ดเกมบริหารทรัพยากร', icon: 'assets/images/Management_BoardGame.png', category_id: 9 }
+    { name: 'บอร์ดเกมเดี่ยว', icon: '/assets/images/solo_BoardGame.png', category_id: 1 },
+    { name: 'บอร์ดเกมเล่นหลายคน', icon: '/assets/images/Multi_BoardGame.png', category_id: 2 },
+    { name: 'บอร์ดเกมปาร์ตี้', icon: '/assets/images/party_BoardGame.png', category_id: 3 },
+    { name: 'บอร์ดเกมกลยุทธ์', icon: '/assets/images/strategy_BoardGame.png', category_id: 4 },
+    { name: 'บอร์ดเกมเด็กและครอบครัว', icon: '/assets/images/Family_BoardGame.png', category_id: 5 },
+    { name: 'บอร์ดเกมแนวสงคราม', icon: '/assets/images/War_BoardGame.png', category_id: 6 },
+    { name: 'บอร์ดเกม co-op', icon: '/assets/images/Co-op_BoardGame.png', category_id: 7 },
+    { name: 'บอร์ดเกม gateway', icon: '/assets/images/Gateway_BoardGame.png', category_id: 8 },
+    { name: 'บอร์ดเกมบริหารทรัพยากร', icon: '/assets/images/Management_BoardGame.png', category_id: 9 }
   ];
   const sellerNames = {
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
@@ -201,7 +201,7 @@ const Products = () => {
                          <img
                      src={getSellerImage(product.seller_id)}
                              alt={getSellerName(product.seller_id)}
-                                     style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '8px' }}
+                                     style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '8px' }}
                                />
                                      <small>{getSellerName(product.seller_id)}</small>
                                       </Link>

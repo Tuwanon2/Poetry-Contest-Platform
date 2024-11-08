@@ -11,7 +11,7 @@ const MyCart = () => {
       <TopNav /> {/* ส่วนค้นหาจะอยู่ใน TopNav */}
       <TopMenu />
       <Cart />
-      <Footer />
+      
 
     </div>
   );
