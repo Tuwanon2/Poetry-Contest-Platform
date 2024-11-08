@@ -134,7 +134,7 @@ const ProductDetail = () => {
           </Col>
         </Row>
       </Container>
-
+              
       <Footer />
     </div>
   );

@@ -12,7 +12,7 @@ const PromotionProducts = () => {
   useEffect(() => {
     // เรียก API สำหรับสินค้าโปรโมชั่นแทนสินค้ายอดฮิต
     axios
-      .get('/api/v1/products?sort=promotion&order=desc&limit=4') // สมมติว่า sort=promotion ใช้สำหรับดึงสินค้าโปรโมชั่น
+      .get('/api/v1/products?sort=name&order=desc&limit=4') // สมมติว่า sort=promotion ใช้สำหรับดึงสินค้าโปรโมชั่น
       .then((response) => {
         setProducts(response.data.items);
       })
