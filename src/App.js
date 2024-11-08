@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import SearchResults from './pages/SearchResults';
 import ProductDetail from './pages/ProductDetail';
-import AllMarket from './components/AllMarket';
+import Seller from './pages/Seller';
 import MyCart from './pages/MyCart';
 import Payment from './pages/Payment';
 import MyProfile from './pages/MyProfile';
@@ -13,7 +13,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/seller/:sellerId" element={<AllMarket />} /> {/* แก้เส้นทางให้รับ sellerId */}
+        <Route path="/seller/:sellerId" element={<Seller />} /> {/* แก้เส้นทางให้รับ sellerId */}
         <Route path="/MyCart" element={<MyCart />} />
         <Route path="/Payment" element={<Payment />} />
         <Route path="/MyProfile" element={<MyProfile />} />
