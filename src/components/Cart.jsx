@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const MyCart = () => {
     const [products, setProducts] = useState([]);
@@ -9,12 +9,12 @@ const MyCart = () => {
     const [discountPercentage, setDiscountPercentage] = useState(3); // Default 3% discount
     const [cartCount, setCartCount] = useState(0); // ใช้สำหรับจัดการจำนวนสินค้าตะกร้า
     const placeholderImage = "https://via.placeholder.com/100";
+    const navigate = useNavigate(); // Initialize navigation function
 
     useEffect(() => {
-        // Load cart data from localStorage when the component mounts
         const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
         setProducts(savedCart);
-        setCartCount(savedCart.length); // อัพเดตจำนวนสินค้าตะกร้า
+        setCartCount(savedCart.length); 
         setLoading(false);
     }, []);
 
@@ -24,7 +24,6 @@ const MyCart = () => {
 
     const shipping = products.length > 0 ? 90 : 0;
 
-    // คำนวณ subtotal
     const subtotal = products.reduce((acc, product) => {
         const quantity = product.quantity || 1;
         return acc + (product.price * quantity);
@@ -49,29 +48,32 @@ const MyCart = () => {
 
     const total = subtotal - discount + shipping;
 
-    // Handle removing a product
     const removeProduct = (productId) => {
         const updatedProducts = products.filter(product => product.id !== productId);
         setProducts(updatedProducts);
-        setCartCount(updatedProducts.length); // อัพเดตจำนวนสินค้าหลังจากลบ
+        setCartCount(updatedProducts.length); 
         updateLocalStorage(updatedProducts);
-        window.dispatchEvent(new Event('cart-updated')); // ส่งเหตุการณ์ให้ TopNav อัพเดต
+        window.dispatchEvent(new Event('cart-updated')); 
     };
 
-    // Handle changing product quantity
     const changeQuantity = (productId, action) => {
         const updatedProducts = products.map(product => {
             if (product.id === productId) {
                 const updatedQuantity = action === 'increase'
                     ? (product.quantity || 1) + 1
-                    : Math.max((product.quantity || 1) - 1, 1); // Prevent going below 1
+                    : Math.max((product.quantity || 1) - 1, 1); 
                 return { ...product, quantity: updatedQuantity };
             }
             return product;
         });
         setProducts(updatedProducts);
-        setCartCount(updatedProducts.length); // อัพเดตจำนวนสินค้าหลังจากเพิ่มหรือลด
+        setCartCount(updatedProducts.length); 
         updateLocalStorage(updatedProducts);
+    };
+
+    const handleCheckout = () => {
+        // Navigate to Payment page
+        navigate('/payment');
     };
 
     return (
@@ -180,7 +182,13 @@ const MyCart = () => {
                     <strong>ยอดรวมสุทธิ</strong>
                     <strong>฿{total.toFixed(2)}</strong>
                 </div>
-                <Button variant="success" size="lg" className="checkout-button" style={{ width: '100%' }}>
+                <Button
+                    variant="success"
+                    size="lg"
+                    className="checkout-button"
+                    style={{ width: '100%' }}
+                    onClick={handleCheckout}
+                >
                     ยืนยันการสั่งซื้อ
                 </Button>
             </div>
