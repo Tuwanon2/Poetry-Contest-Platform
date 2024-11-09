@@ -5,8 +5,6 @@ import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
-import IntroduceProduct from '../components/IntroduceProduct';
-
 
 const placeholderImage = '../assets/images/placeholder.jpg';
 const sellerNames = {
@@ -54,6 +52,7 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
   );
 };
 
+// ปรับสไตล์ให้ใหญ่ขึ้น
 const buttonStyle = {
   width: '40px',
   height: '40px',
@@ -74,11 +73,11 @@ const inputStyle = {
 };
 
 const ProductDetail = () => {
-  const { productId } = useParams();
-  const navigate = useNavigate(); // ใช้งาน useNavigate เพื่อเปลี่ยนเส้นทาง
+  const { productId } = useParams(); // รับ productId จาก URL
   const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(1); // จัดการจำนวนสินค้า
 
+  // ฟังก์ชันดึงข้อมูลรายละเอียดสินค้าจาก API
   const fetchProductDetails = (id) => {
     axios
       .get(`/api/v1/products/${id}`)
@@ -95,28 +94,34 @@ const ProductDetail = () => {
   }, [productId]);
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>; // แสดง Loading ระหว่างดึงข้อมูล
   }
 
   const addToCart = () => {
+    // Get the current cart from localStorage
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+  
+    // Check if the product is already in the cart
     const existingProduct = storedCart.find((item) => item.id === product.id);
-
+  
     if (existingProduct) {
+      // If the product is already in the cart, update the quantity
       existingProduct.quantity += quantity;
       localStorage.setItem('cart', JSON.stringify(storedCart));
     } else {
+      // If the product is not in the cart, add it
       storedCart.push({ ...product, quantity });
       localStorage.setItem('cart', JSON.stringify(storedCart));
     }
-
+  
+    // Dispatch the custom event to update the cart count in TopNav
     window.dispatchEvent(new Event('cart-updated'));
+  
     console.log(`Added ${quantity} of ${product.name} to the cart.`);
   };
-
-  const handleBuyNow = () => {
-    navigate('/payment'); // เปลี่ยนเส้นทางไปยังหน้า Payment.jsx
-  };
+  
+  
+  
 
   return (
     <div>
@@ -127,6 +132,7 @@ const ProductDetail = () => {
         <Row>
         
           <Col md={6}>
+            {/* แสดงรูปภาพสินค้า */}
             <Card.Img
               src={product.images.find((img) => img.is_primary)?.image_url || placeholderImage}
               onError={(e) => {
@@ -143,18 +149,11 @@ const ProductDetail = () => {
             <p style={{ fontSize: '18px' }}><strong>ผู้ออกแบบ:</strong> {product.brand}</p>
             <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
 
+            {/* จำนวนสินค้า */}
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-            <Button variant="success" onClick={handleBuyNow} style={{ fontSize: '20px', padding: '10px 20px' }}>
-                ซื้อเลย
-              </Button>
-              <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' }}>
-                เพิ่มในรถเข็น
-              </Button>
-              
-
-            </div>
+            {/* ปุ่มเพิ่มในรถเข็น */}
+            <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' }}>เพิ่มในรถเข็น</Button>
           </Col>
         </Row>
       </Container>
