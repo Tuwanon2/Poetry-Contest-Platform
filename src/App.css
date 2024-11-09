@@ -14,14 +14,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #f8f9fc;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: rgb(129, 30, 30);
 }
 
 .App-link {
@@ -115,6 +115,7 @@ h1 {
 .checkout-button:hover {
   background-color: #0056b3;
 }
+<<<<<<< HEAD
 
 .clickable-logo-card:hover {
   background-color: #007bff; /* เปลี่ยนสีพื้นหลังเมื่อโฮเวอร์ */
@@ -157,3 +158,9 @@ h1 {
     margin-bottom: 20px;
   }
 }
+=======
+.nav-link:hover {
+  color: #FFD700; /* สีทองเมื่อชี้เมาส์ */
+}
+
+>>>>>>> 40704e4310a129cd96b5a4da20ad289e1efade12

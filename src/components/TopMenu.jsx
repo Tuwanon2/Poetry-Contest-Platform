@@ -5,11 +5,16 @@ const TopMenu = () => {
   const location = useLocation();
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark p-0">
+    <nav className="navbar navbar-expand-lg" style={{ backgroundColor: '#CC0066' }}>
       <div className="container-fluid">
         <Link
           className={`navbar-brand ${location.pathname === '/' ? 'active' : ''}`}
           to="/"
+          style={{
+            color: 'white',
+            fontWeight: location.pathname === '/' ? 'bold' : 'normal',
+            fontFamily: 'Roboto, Noto Sans Thai, sans-serif'
+          }}
         >
           หน้าแรก
         </Link>
@@ -25,12 +30,17 @@ const TopMenu = () => {
           <span className="navbar-toggler-icon" />
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav">
+        <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+          <ul className="navbar-nav" style={{ width: '100%', display: 'flex', justifyContent: 'space-evenly' }}>
             <li className="nav-item">
               <Link
                 className={`nav-link ${location.pathname === '/Shop' ? 'active' : ''}`}
                 to="/Shop"
+                style={{
+                  color: 'white',
+                  fontWeight: location.pathname === '/Shop' ? 'bold' : 'normal',
+                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif'
+                }}
               >
                 ร้านค้า
               </Link>
@@ -39,28 +49,28 @@ const TopMenu = () => {
               <Link
                 className={`nav-link ${location.pathname === '/MyCart' ? 'active' : ''}`}
                 to="/MyCart"
+                style={{
+                  color: 'white',
+                  fontWeight: location.pathname === '/MyCart' ? 'bold' : 'normal',
+                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif'
+                }}
               >
                 ตะกร้าของฉัน
               </Link>
             </li>
             <li className="nav-item">
               <Link
-                className={`nav-link ${location.pathname === '/Payment' ? 'active' : ''}`}
-                to="/Payment"
-              >
-                การชำระเงิน
-              </Link>
-            </li>
-            
-            <li className="nav-item">
-              <Link
                 className={`nav-link ${location.pathname === '/MyProfile' ? 'active' : ''}`}
                 to="/MyProfile"
+                style={{
+                  color: 'white',
+                  fontWeight: location.pathname === '/MyProfile' ? 'bold' : 'normal',
+                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif'
+                }}
               >
                 ข้อมูลส่วนตัว
               </Link>
             </li>
-            {/* เพิ่มลิงก์อื่น ๆ ที่ต้องการ */}
           </ul>
         </div>
       </div>
