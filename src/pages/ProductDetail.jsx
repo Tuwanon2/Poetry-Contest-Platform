@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link,useParams } from 'react-router-dom';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import TopNav from '../components/TopNav';
-import TopMenu from '../components/TopMenu';
-import Footer from '../components/Footer';
+import { Link, useParams, useNavigate } from 'react-router-dom'; // For routing
+import { Container, Row, Col, Card, Button } from 'react-bootstrap'; // For UI components
+import TopNav from '../components/TopNav'; // Import TopNav component
+import TopMenu from '../components/TopMenu'; // Import TopMenu component
+import Footer from '../components/Footer'; // Import Footer component
 
 const placeholderImage = '../assets/images/placeholder.jpg';
+
 const sellerNames = {
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
   'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
@@ -76,6 +77,7 @@ const ProductDetail = () => {
   const { productId } = useParams(); // รับ productId จาก URL
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1); // จัดการจำนวนสินค้า
+  const navigate = useNavigate(); // สำหรับการนำทางไปหน้า Payment.jsx
 
   // ฟังก์ชันดึงข้อมูลรายละเอียดสินค้าจาก API
   const fetchProductDetails = (id) => {
@@ -119,9 +121,33 @@ const ProductDetail = () => {
   
     console.log(`Added ${quantity} of ${product.name} to the cart.`);
   };
+
+  const handleBuyNow = () => {
+    // คำนวณยอดรวม (ราคา * จำนวน + ค่าขนส่ง)
+    const total = product.price * quantity + 90;  // ราคา * จำนวน + ค่าขนส่ง 90
+    
+    // หารูปภาพหลักของสินค้า
+    const primaryImage = product.images?.find((img) => img.is_primary)?.image_url || placeholderImage;
+
+
   
-  
-  
+    // ส่งข้อมูลสินค้า, จำนวน, รูปภาพ, และค่าขนส่งไปยังหน้า Payment
+    navigate('/payment', {
+      state: {
+        items: [
+          { 
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: quantity,
+            image_url: primaryImage  // ส่งรูปภาพ
+          }
+        ],
+        shippingCost: 90,  // ค่าขนส่ง
+        total: total        // ยอดรวม (ราคา * จำนวน + ค่าขนส่ง)
+      }
+    });
+  };
 
   return (
     <div>
@@ -130,7 +156,6 @@ const ProductDetail = () => {
 
       <Container className="my-5">
         <Row>
-        
           <Col md={6}>
             {/* แสดงรูปภาพสินค้า */}
             <Card.Img
@@ -151,27 +176,44 @@ const ProductDetail = () => {
 
             {/* จำนวนสินค้า */}
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+            <Button
+              variant="success"
+              onClick={handleBuyNow}
+              style={{
+                fontSize: '20px',
+                padding: '10px 20px',
+                marginRight: '20px',  // เพิ่ม margin เพื่อเพิ่มระยะห่าง
+              }}
+            >
+              ซื้อเลย
+            </Button>
 
-            {/* ปุ่มเพิ่มในรถเข็น */}
-            <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' }}>เพิ่มในรถเข็น</Button>
+            <Button
+              variant="primary"
+              onClick={addToCart}
+              style={{
+                fontSize: '20px',
+                padding: '10px 20px',
+              }}
+            >
+              เพิ่มในรถเข็น
+            </Button>
           </Col>
         </Row>
       </Container>
-      
-      
+
       <Card.Text className="d-flex align-items-center mt-3 mb-5">
         <img
           src={getSellerImage(product.seller_id)}
           alt={getSellerName(product.seller_id)}
           style={{ width: '70px', height: '70px', borderRadius: '50%', marginRight: '8px' }}
         />
-        <Link to={`/seller/${product.seller_id}`}>
-          <Button variant="outline-primary" style={{ fontSize: '18px' }}>
-            {getSellerName(product.seller_id)}
-          </Button>
+        <Link to={`/seller/${product.seller_id}`} style={{ fontSize: '20px' }}>
+          {getSellerName(product.seller_id)}
         </Link>
       </Card.Text>
-      
+
+      <Footer />
     </div>
   );
 };

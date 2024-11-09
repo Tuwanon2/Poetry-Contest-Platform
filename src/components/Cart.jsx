@@ -7,7 +7,7 @@ const MyCart = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [discountPercentage, setDiscountPercentage] = useState(3); // Default 3% discount
-    const [cartCount, setCartCount] = useState(0); // ใช้สำหรับจัดการจำนวนสินค้าตะกร้า
+    const [cartCount, setCartCount] = useState(0); // For managing cart item count
     const placeholderImage = "https://via.placeholder.com/100";
     const navigate = useNavigate(); // Initialize navigation function
 
@@ -72,8 +72,23 @@ const MyCart = () => {
     };
 
     const handleCheckout = () => {
-        // Navigate to Payment page
-        navigate('/payment');
+        const checkoutData = {
+            items: products.map((product) => ({
+                primaryImage: product.images.find((img) => img.is_primary)?.image_url || placeholderImage, // Main image of the product
+                name: product.name, // Product name
+                price: product.price, // Product price
+                quantity: product.quantity || 1, // Product quantity
+                id: product.id, // Product ID
+                description: product.description || 'No description available', // Product description (fallback)
+                category: product.category || 'Uncategorized', // Category fallback if not provided
+            })),
+            shippingCost: shipping, // Shipping cost
+            total: total, // Total amount
+        };
+
+        console.log(checkoutData); // Check the data to be sent
+        // Use navigate to go to the Payment page and pass data through state
+        navigate('/payment', { state: checkoutData });
     };
 
     return (
@@ -105,7 +120,6 @@ const MyCart = () => {
                                     <Card.Body style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'column' }}>
                                         <div>
                                             <Card.Title>{product.name}</Card.Title>
-                                            <Card.Text>{product.description}</Card.Text>
                                             <Card.Text>
                                                 <strong>จำนวน: {product.quantity || 1}</strong>
                                                 <Button variant="secondary" size="sm" onClick={() => changeQuantity(product.id, 'decrease')} style={{ marginLeft: '10px' }}>
@@ -185,11 +199,11 @@ const MyCart = () => {
                 <Button
                     variant="success"
                     size="lg"
-                    className="checkout-button"
-                    style={{ width: '100%' }}
                     onClick={handleCheckout}
+                    disabled={products.length === 0}
+                    style={{ width: '100%' }}
                 >
-                    ยืนยันการสั่งซื้อ
+                    ไปยังหน้าชำระเงิน
                 </Button>
             </div>
         </Container>

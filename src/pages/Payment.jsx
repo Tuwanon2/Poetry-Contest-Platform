@@ -1,29 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
 import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
 
 const Payment = () => {
+  const location = useLocation();
   const [order, setOrder] = useState({
-    items: [
-      { id: 1, name: 'Product 1', price: 1000, quantity: 1 },
-      { id: 2, name: 'Product 2', price: 1000, quantity: 1 }
-    ],
-    shippingCost: 180,
-    tax: 800,
-    total: 4180
+    items: [],
+    shippingCost: 0,
+    total: 0,
   });
-
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
+  const [finalTotal, setFinalTotal] = useState(0);
+
+  const placeholderImage = "/assets/images/placeholder.jpg"; // Placeholder image
+
+  useEffect(() => {
+    const { state } = location; // เข้าถึง location.state
+    
+    if (state) {
+      const { items, shippingCost, total } = state;
+      setOrder({
+        items,
+        shippingCost,
+        total,
+      });
+    } else {
+      const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+      const total = storedCart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+      const shippingCost = 180; // ค่าขนส่งเริ่มต้น
+
+      setOrder({
+        items: storedCart,
+        shippingCost,
+        total: total + shippingCost, // รวมค่าขนส่ง
+      });
+    }
+  }, [location.state]);
+
+  // คำนวณยอดรวมหลังเลือกวิธีการชำระเงิน
+  useEffect(() => {
+    let updatedTotal = order.total;
+    
+    if (paymentMethod === 'cashOnDelivery') {
+      updatedTotal += 50; // ค่าธรรมเนียมการชำระเงินปลายทาง
+    } else if (paymentMethod === 'bankTransfer') {
+      updatedTotal += 20; // ค่าธรรมเนียมการโอนผ่านธนาคาร
+    }
+    
+    setFinalTotal(updatedTotal);
+  }, [paymentMethod, order.total]);
 
   const handlePaymentMethodChange = (e) => {
     setPaymentMethod(e.target.value);
   };
 
   const handleConfirmPayment = () => {
-    alert('การชำระเงินเสร็จสมบูรณ์');
-    // Logic for confirming payment (เช่น การส่งข้อมูลไปยัง API)
+    alert(`การชำระเงินเสร็จสมบูรณ์ ด้วยวิธีการ: ${paymentMethod}`);
   };
 
   return (
@@ -39,22 +74,41 @@ const Payment = () => {
                 <h4>สรุปรายการสั่งซื้อ</h4>
               </Card.Header>
               <Card.Body>
-                {order.items.map((item) => (
-                  <Row key={item.id} className="mb-3">
-                    <Col sm={8}>
-                      <strong>{item.name}</strong> x {item.quantity}
-                    </Col>
-                    <Col sm={4} className="text-end">
-                      ฿{item.price * item.quantity}
-                    </Col>
-                  </Row>
-                ))}
+                {order.items.length > 0 ? (
+                  order.items.map((item) => (
+                    <Row key={item.id} className="mb-3">
+                      <Col sm={4}>
+                        <img
+                          src={item.image_url || placeholderImage}
+                          alt={item.name}
+                          style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '5px' }}
+                        />
+                      </Col>
+                      <Col sm={4}>
+                        <strong>{item.name}</strong> x {item.quantity}
+                      </Col>
+                      <Col sm={4} className="text-end">
+                        ฿{item.price * item.quantity}
+                      </Col>
+                    </Row>
+                  ))
+                ) : (
+                  <p>ไม่มีข้อมูลสินค้า</p>
+                )}
+                <Row>
+                  <Col sm={8}>
+                    <strong>ค่าจัดส่ง</strong>
+                  </Col>
+                  <Col sm={4} className="text-end">
+                    ฿{order.shippingCost}
+                  </Col>
+                </Row>
                 <Row>
                   <Col sm={8}>
                     <strong>ยอดรวม</strong>
                   </Col>
                   <Col sm={4} className="text-end">
-                    <strong>฿{order.total}</strong>
+                    <strong>฿{finalTotal}</strong>
                   </Col>
                 </Row>
               </Card.Body>
