@@ -19,8 +19,17 @@ const MyCart = () => {
     }, []);
 
     const updateLocalStorage = (updatedProducts) => {
-        localStorage.setItem('cart', JSON.stringify(updatedProducts));
+        try {
+            const data = JSON.stringify(updatedProducts);
+            console.log('Updated products:', data); // ตรวจสอบข้อมูลก่อนบันทึก
+            localStorage.setItem('cart', data);
+        } catch (error) {
+            console.error('Error updating localStorage:', error); // แจ้งเตือนหากเกิดข้อผิดพลาด
+        }
     };
+    
+    
+    
 
     const shipping = products.length > 0 ? 90 : 0;
 
@@ -69,7 +78,9 @@ const MyCart = () => {
         setProducts(updatedProducts);
         setCartCount(updatedProducts.length); 
         updateLocalStorage(updatedProducts);
-    };
+    };   
+
+
 
     const handleCheckout = () => {
         const checkoutData = {
@@ -84,12 +95,12 @@ const MyCart = () => {
             })),
             shippingCost: shipping, // Shipping cost
             total: total, // Total amount
-        };
+        };      
+            console.log('Navigating to Payment with:', products, total); // ตรวจสอบข้อมูลก่อนส่ง
+            navigate('/Payment', { state: { order: { items: products, total: total } } });
 
-        console.log(checkoutData); // Check the data to be sent
-        // Use navigate to go to the Payment page and pass data through state
-        navigate('/payment', { state: checkoutData });
     };
+
 
     return (
         <Container className="my-cart">

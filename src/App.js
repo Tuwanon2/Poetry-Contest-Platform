@@ -8,6 +8,8 @@ import MyCart from './pages/MyCart';
 import Payment from './pages/Payment';
 import MyProfile from './pages/MyProfile';
 import Shop from './pages/Shop';
+import EditAddress from './pages/EditAddress';
+
 
 
 function App() {
@@ -22,6 +24,7 @@ function App() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/Shop" element={<Shop />} />
         <Route path="/product/:productId" element={<ProductDetail />} />
+        <Route path="/EditAddress" element={<EditAddress />} />
       </Routes>
     </Router>
   );

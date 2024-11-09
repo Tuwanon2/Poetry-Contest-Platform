@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, useParams, useNavigate } from 'react-router-dom'; // For routing
-import { Container, Row, Col, Card, Button } from 'react-bootstrap'; // For UI components
-import TopNav from '../components/TopNav'; // Import TopNav component
-import TopMenu from '../components/TopMenu'; // Import TopMenu component
-import Footer from '../components/Footer'; // Import Footer component
+import { Link, useParams } from 'react-router-dom';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import TopNav from '../components/TopNav';
+import TopMenu from '../components/TopMenu';
+import Footer from '../components/Footer';
 
 const placeholderImage = '../assets/images/placeholder.jpg';
-
 const sellerNames = {
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
   'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
@@ -75,8 +74,8 @@ const inputStyle = {
 const ProductDetail = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1); // จัดการจำนวนสินค้า
-  const navigate = useNavigate(); // สำหรับการนำทางไปหน้า Payment.jsx
+  const [quantity, setQuantity] = useState(1);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   const fetchProductDetails = (id) => {
     axios
@@ -94,7 +93,7 @@ const ProductDetail = () => {
     axios
       .get(`/api/v1/products?seller_id=${sellerId}&limit=5`)
       .then((response) => {
-       
+        setRelatedProducts(response.data.items);
       })
       .catch((error) => {
         console.error('Error fetching seller products:', error);
@@ -125,33 +124,6 @@ const ProductDetail = () => {
     console.log(`Added ${quantity} of ${product.name} to the cart.`);
   };
 
-  const handleBuyNow = () => {
-    // คำนวณยอดรวม (ราคา * จำนวน + ค่าขนส่ง)
-    const total = product.price * quantity + 90;  // ราคา * จำนวน + ค่าขนส่ง 90
-    
-    // หารูปภาพหลักของสินค้า
-    const primaryImage = product.images?.find((img) => img.is_primary)?.image_url || placeholderImage;
-
-
-  
-    // ส่งข้อมูลสินค้า, จำนวน, รูปภาพ, และค่าขนส่งไปยังหน้า Payment
-    navigate('/payment', {
-      state: {
-        items: [
-          { 
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            quantity: quantity,
-            image_url: primaryImage  // ส่งรูปภาพ
-          }
-        ],
-        shippingCost: 90,  // ค่าขนส่ง
-        total: total        // ยอดรวม (ราคา * จำนวน + ค่าขนส่ง)
-      }
-    });
-  };
-
   return (
     <div>
       <TopNav />
@@ -179,42 +151,58 @@ const ProductDetail = () => {
             <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
 
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
-            <Button
-              variant="success"
-              onClick={handleBuyNow}
-              style={{
-                fontSize: '20px',
-                padding: '10px 20px',
-                marginRight: '20px',  // เพิ่ม margin เพื่อเพิ่มระยะห่าง
-              }}
-            >
-              ซื้อเลย
-            </Button>
 
-            <Button
-              variant="primary"
-              onClick={addToCart}
-              style={{
-                fontSize: '20px',
-                padding: '10px 20px',
-              }}
-            >
+            <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' }}>
               เพิ่มในรถเข็น
             </Button>
           </Col>
         </Row>
       </Container>
 
-      <Card.Text className="d-flex align-items-center mt-3 mb-5">
-        <img
-          src={getSellerImage(product.seller_id)}
-          alt={getSellerName(product.seller_id)}
-          style={{ width: '70px', height: '70px', borderRadius: '50%', marginRight: '8px' }}
-        />
-        <Link to={`/seller/${product.seller_id}`} style={{ fontSize: '20px' }}>
-          {getSellerName(product.seller_id)}
-        </Link>
-      </Card.Text>
+      <Container>
+        <Card.Text className="d-flex align-items-center mb-5">
+          <Link to={`/seller/${product.seller_id}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            <img
+              src={getSellerImage(product.seller_id)}
+              alt={getSellerName(product.seller_id)}
+              style={{ width: '90px', height: '90px', borderRadius: '50%', marginRight: '8px', cursor: 'pointer' }}
+            />
+          </Link>
+          <h3 className="ml-3" style={{ marginLeft: '30px', fontSize: '34px', fontWeight: 'bold' }}>
+            {getSellerName(product.seller_id)}
+          </h3>
+        </Card.Text>
+        <h3 className="ml-3" style={{ marginLeft: '20px', fontSize: '24px', fontWeight: 'bold' }}>
+          สินค้าอื่นๆที่คุณอาจสนใจจากร้าน
+        </h3>
+
+        <Row>
+          {relatedProducts.map((relatedProduct) => (
+            <Col key={relatedProduct.id} md={3} className="mb-4">
+              <Card>
+                <Link to={`/product/${relatedProduct.id}`}>
+                  <Card.Img
+                    variant="top"
+                    src={relatedProduct.images[0]?.image_url || placeholderImage}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = placeholderImage;
+                    }}
+                    style={{ height: '200px', objectFit: 'contain', cursor: 'pointer' }}
+                  />
+                </Link>
+                <Card.Body>
+                  <Card.Title>{relatedProduct.name}</Card.Title>
+                  <Card.Text style={{ fontSize: '1.rem', color: '#28a745' }}>
+                        ฿{product.price}
+                      </Card.Text>
+                      
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Container>
 
       <Footer />
     </div>

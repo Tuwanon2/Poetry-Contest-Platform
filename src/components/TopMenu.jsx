@@ -54,8 +54,22 @@ const TopMenu = () => {
                   fontWeight: location.pathname === '/MyCart' ? 'bold' : 'normal',
                   fontFamily: 'Roboto, Noto Sans Thai, sans-serif'
                 }}
+                
               >
                 ตะกร้าของฉัน
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
+                className={`nav-link ${location.pathname === '/Payment' ? 'active' : ''}`}
+                to="/Payment"
+                style={{
+                  color: 'white',
+                  fontWeight: location.pathname === '/Payment' ? 'bold' : 'normal',
+                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif'
+                }}
+              >
+                ชำระเงิน
               </Link>
             </li>
             <li className="nav-item">
@@ -79,3 +93,4 @@ const TopMenu = () => {
 };
 
 export default TopMenu;
+
