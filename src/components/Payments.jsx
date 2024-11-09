@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Image } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';  // เพิ่มการนำเข้า useNavigate
-
+import { useNavigate } from 'react-router-dom'; 
 
 const Payment = () => {
-  const navigate = useNavigate();  // สร้างตัวแปร navigate ด้วย useNavigate
-  
+  const navigate = useNavigate();  
   const [order, setOrder] = useState({
     items: [],
     total: 0
   });
-  
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
-  const [address, setAddress] = useState({
-    name: '',
-    phone: '',
-    address: ''
-  });
-
-  const [discountPercentage, setDiscountPercentage] = useState(3); // Default 3% discount
-  const [subtotal, setSubtotal] = useState(0);  // คำนวณยอดรวมก่อนหักส่วนลด
+  const [address, setAddress] = useState({});
+  const [discountPercentage, setDiscountPercentage] = useState(3); 
+  const [subtotal, setSubtotal] = useState(0);  
 
   const isDiscountApplicable = (percentage) => {
     if (percentage === 3) return true;
@@ -50,42 +42,10 @@ const Payment = () => {
   const getSellerName = (sellerId) => {
     return sellerNames[sellerId] || 'Unknown';
   };
-
-  const placeholderImage = 'https://via.placeholder.com/100'; // กำหนดรูป Placeholderสำหรับสินค้าที่ไม่มีรูป
-
-  useEffect(() => {
-    const storedOrder = JSON.parse(localStorage.getItem('cart'));
-    if (storedOrder) {
-      const total = storedOrder.reduce((acc, product) => acc + product.price * (product.quantity || 1), 0);
-      setOrder({ items: storedOrder, total: total });
-      setSubtotal(total);
-    }
-  
-    const storedAddress = JSON.parse(localStorage.getItem('address'));
-    if (storedAddress) {
-      console.log(storedAddress); // ตรวจสอบว่าได้ข้อมูลถูกต้องจาก localStorage หรือไม่
-      setAddress(storedAddress);
-    }
-  }, []);
-  
-  const handlePaymentMethodChange = (e) => {
-    setPaymentMethod(e.target.value);
-  };
-
-  const handleConfirmPayment = () => {
-    localStorage.removeItem('cart');
-    alert('การชำระเงินเสร็จสมบูรณ์');
-    navigate('/');
-  };
-
-  const handleNavigateToChooseAddress = () => {
-    navigate('/EditAddress'); // นำทางไปหน้า ChooseAddress
-  };
-
-  // ฟังก์ชันเพื่อจัดกลุ่มสินค้าแต่ละร้าน
+  const placeholderImage = '../assets/images/placeholder.jpg';
   const groupItemsByStore = (items) => {
     return items.reduce((stores, item) => {
-      const store = item.seller_id || 'ไม่ระบุชื่อร้าน'; // ใช้ seller_id แทน storeName
+      const store = item.seller_id || 'ไม่ระบุชื่อร้าน'; 
       if (!stores[store]) {
         stores[store] = [];
       }
@@ -93,38 +53,65 @@ const Payment = () => {
       return stores;
     }, {});
   };
-      
-  
 
-
-
-  const applyDiscount = (percentage) => {
-    if (isDiscountApplicable(percentage)) {
-      setDiscountPercentage(percentage);
-    } else {
-      alert(`ส่วนลด ${percentage}% ไม่สามารถใช้ได้`);
-    }
-  };
-    const calculateGrandTotal = () => {
-        const discount = (subtotal * discountPercentage) / 100;
-        const shippingCosts = Object.keys(groupedItems).map(storeId => calculateShippingCost(groupedItems[storeId]));
-        const totalShipping = shippingCosts.reduce((acc, cost) => acc + cost, 0);
-        const grandTotal = subtotal - discount + totalShipping;
-        return grandTotal;
-      };
-
-    
-  // คำนวณค่าส่งสำหรับแต่ละร้าน
   const calculateShippingCost = (storeItems) => {
-    return storeItems.length > 0 ? 45 : 0; // ร้านละ 45 บาท
+    return storeItems.length > 0 ? 45 : 0;
+  };
+  const isAddressValid = () => {
+    return address.firstName && address.lastName && address.phone && address.address && address.district && address.province && address.postalCode;
+  };
+  
+  const handleConfirmPayment = () => {
+    if (!isAddressValid()) {
+      alert('กรุณากรอกที่อยู่ให้ครบถ้วนก่อนทำการสั่งซื้อ');
+      return;
+    }
+    localStorage.removeItem('cart');
+    alert('การชำระเงินเสร็จสมบูรณ์');
+    navigate('/');
+  };
+  
+  useEffect(() => {
+    const storedOrder = JSON.parse(localStorage.getItem('cart'));
+    if (storedOrder) {
+      const total = storedOrder.reduce((acc, product) => acc + product.price * (product.quantity || 1), 0);
+      setOrder({ items: storedOrder, total: total });
+      setSubtotal(total);
+    }
+
+    const storedAddress = JSON.parse(localStorage.getItem('address'));
+    if (storedAddress) {
+      setAddress(storedAddress);
+    }
+  }, []);
+
+  const handlePaymentMethodChange = (e) => {
+    setPaymentMethod(e.target.value);
+  };
+
+  const handleDiscountChange = (e) => {
+    setDiscountPercentage(Number(e.target.value));
+  };
+
+
+
+  const handleNavigateToChooseAddress = () => {
+    navigate('/EditAddress');
   };
 
   const groupedItems = groupItemsByStore(order.items);
 
-  // คำนวณค่าส่งรวมและยอดรวมทั้งหมด
-  const shippingCosts = Object.keys(groupedItems).map(storeId => calculateShippingCost(groupedItems[storeId]));
-  const totalShipping = shippingCosts.reduce((acc, cost) => acc + cost, 0);
-  const grandTotal = order.total + totalShipping;
+  const calculateGrandTotal = () => {
+    const discount = (subtotal * discountPercentage) / 100;
+    const shippingCosts = Object.keys(groupedItems).map(storeId => calculateShippingCost(groupedItems[storeId]));
+    const totalShipping = shippingCosts.reduce((acc, cost) => acc + cost, 0);
+    const grandTotal = (subtotal - discount) + totalShipping;
+    return grandTotal;
+  };
+
+  const totalShipping = Object.keys(groupedItems).map(storeId => calculateShippingCost(groupedItems[storeId])).reduce((acc, cost) => acc + cost, 0);
+  const discountAmount = (subtotal * discountPercentage) / 100;
+  const grandTotal = calculateGrandTotal();
 
   return (
     <Container className="my-5">
@@ -134,56 +121,30 @@ const Payment = () => {
 
       {/* ส่วนแสดงที่อยู่ */}
       <Row className="mb-4">
-  <Col>
-    <Card>
-      <Card.Body style={{ position: 'relative' }}>
-        <h3>ที่อยู่สำหรับจัดส่ง</h3>
-        {address.firstName && address.lastName && address.phone ? (
-  <div>
-    {/* ชื่อ-นามสกุล │ เบอร์โทรศัพท์ */}
-    <p>
-      {address.firstName} {address.lastName} │ {address.phone}
-    </p>
+        <Col>
+          <Card>
+            <Card.Body style={{ position: 'relative' }}>
+              <h3>ที่อยู่สำหรับจัดส่ง</h3>
+              {address.firstName ? (
+                <div>
+                  <p>{address.firstName} {address.lastName} │ {address.phone}</p>
+                  <p>{address.company}, {address.address}, {address.subDistrict}, {address.street}, {address.district}, {address.province}, {address.country} {address.postalCode}</p>
+                </div>
+              ) : (
+                <p>กรุณากรอกที่อยู่ในการจัดส่ง</p>
+              )}
 
-    {/* ที่อยู่ */}
-    <p>
-    {address.company && address.company + ','} {address.address && address.address + ','} 
-    {address.subDistrict && address.subDistrict + ','} {address.street && address.street + ','} <br />
-    {address.district && address.district + ','} {address.province && address.province + ','} 
-    {address.country && address.country} {address.postalCode && address.postalCode}
-</p>
-
-  </div>
-) : (
-  <p>กรุณากรอกที่อยู่ในการจัดส่ง</p> // กรณีไม่มีข้อมูล
-)}
-
-
-        {/* ปุ่มเลือกที่อยู่ */}
-        <Button 
-          variant="primary" 
-          onClick={handleNavigateToChooseAddress} 
-          style={{ 
-            position: 'absolute', 
-            bottom: '20px',
-            right: '10px', 
-            fontSize: '18px', 
-            padding: '10px 20px', 
-            borderRadius: '5px', 
-            width: 'auto', 
-            height: 'auto',
-            backgroundColor: '#007bff', 
-            border: 'none', 
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
-          }}
-        >
-          แก้ไขที่อยู่
-        </Button>
-      </Card.Body>
-    </Card>
-  </Col>
-</Row>
-
+              <Button 
+                variant="primary" 
+                onClick={handleNavigateToChooseAddress} 
+                style={{ position: 'absolute', bottom: '20px', right: '10px' }}
+              >
+                แก้ไขที่อยู่
+              </Button>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
       {/* ส่วนแสดงรายละเอียดสินค้า */}
       <Row className="mb-4">
@@ -245,104 +206,96 @@ const Payment = () => {
           </Card>
         </Col>
       </Row>
-      <Card>
-        
-        <div className="discount-options" style={{ marginBottom: '20px' }}>
-                <h3>เลือกส่วนลด</h3>
-                {[3, 5, 10].map((percentage) => (
-                    <div key={percentage} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                        <Button
-                            variant={isDiscountApplicable(percentage) ? 'primary' : 'danger'}
-                            onClick={() => applyDiscount(percentage)}
-                            disabled={!isDiscountApplicable(percentage)}
-                        >
-                            ใช้โค้ดลด {percentage}%
-                        </Button>
-                        <Button
-                            variant="info"
-                            style={{ marginLeft: '10px' }}
-                            onClick={() => alert(`โค้ดลด ${percentage}% ${percentage === 5 ? 'ใช้ได้เมื่อเลือกซื้อสินค้าครบ 1500 บาท' : percentage === 10 ? 'ใช้ได้เมื่อเลือกซื้อสินค้าครบ 4000 บาท' : 'ใช้ได้ทุกยอดการสั่งซื้อ ไม่มีขั้นต่ำ'}`)}
-                        >
-                            เงื่อนไข
-                        </Button>
-                    </div>
-                ))}
-            </div>
-      </Card>
-      <Row>
-                <Col sm={8}>
-                  <strong style={{ fontSize: '1.5rem' }}>รวม</strong>
-                </Col>
-                <Col sm={4} className="text-end">
-                  <strong style={{ fontSize: '1.5rem' }}>฿{order.total}</strong>
-                </Col>
-              </Row>
-              <Row>
-                <Col sm={8}>
-                  <strong style={{ fontSize: '1.5rem' }}>ค่าจัดส่ง</strong>
-                </Col>
-                <Col sm={4} className="text-end">
-                  <strong style={{ fontSize: '1.5rem' }}>฿{totalShipping}</strong>
-                </Col>
-              </Row>
-              <Row>
-              <Col sm={8}>
-                  <strong style={{ fontSize: '1.5rem' }}>ส่วนลด {discountPercentage}%</strong>
-                </Col>
-                
-              <Col sm={4} className="text-end">
-                  <strong style={{ fontSize: '1.5rem' }}>฿{order.total-calculateGrandTotal()}</strong>
-                </Col></Row>
-              <Row>
-    <Col sm={8}>
-        <strong style={{ fontSize: '1.5rem' }}>ยอดรวมทั้งหมด</strong>
-    </Col>
-    <Col sm={4} className="text-end">
-        <strong style={{ fontSize: '1.5rem' }}>฿{calculateGrandTotal()}</strong>
-    </Col>
-</Row>
-
-      {/* ส่วนแสดงยอดรวมและค่าส่ง */}
-      <Row>
+              
+      {/* ส่วนเลือกส่วนลด */}
+      <Row className="mb-4">
         <Col>
           <Card>
+          <Card.Body>
+              <h3>เลือกส่วนลด</h3>
+              <Form.Group controlId="discountSelect">
+                <Form.Label>เลือกรหัสส่วนลด (%)</Form.Label>
+                <Form.Control 
+                  as="select" 
+                  value={discountPercentage} 
+                  onChange={handleDiscountChange}>
+                  <option value={3} disabled={!isDiscountApplicable(3)}>3% (ทุกยอดสั่งซื้อ)</option>
+                  <option value={5} disabled={!isDiscountApplicable(5)}>5% (เมื่อยอดเกิน 1,500 บาท)</option>
+                  <option value={10} disabled={!isDiscountApplicable(10)}>10% (เมื่อยอดเกิน 4,000 บาท)</option>
+                </Form.Control>
+                {!isDiscountApplicable(discountPercentage) && (
+                  <p className="text-danger mt-2">ยอดสั่งซื้อไม่ถึงเกณฑ์ในการใช้ส่วนลด {discountPercentage}%</p>
+                )}
+              </Form.Group>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+                
+      {/* ส่วนสรุปยอดการชำระเงิน */}
+      <Row className="mb-4">
+        <Col>
+          <Card>
+            <Card.Header>
+              <h3>สรุปยอดการชำระเงิน</h3>
+            </Card.Header>
             <Card.Body>
-              
-
-              {/* ส่วนการเลือกวิธีการชำระเงิน */}
-              <div className="mb-3">
-                <h4>วิธีการชำระเงิน</h4>
-                <Form.Check
-                  type="radio"
-                  label="บัตรเครดิต"
-                  value="creditCard"
-                  checked={paymentMethod === 'creditCard'}
-                  onChange={handlePaymentMethodChange}
+              <Row className="mb-3">
+                <Col sm={8}>ยอดรวมสินค้า</Col>
+                <Col sm={4} className="text-end">฿{subtotal}</Col>
+              </Row>
+              <Row className="mb-3">
+                <Col sm={8}>ส่วนลด ({discountPercentage}%)</Col>
+                <Col sm={4} className="text-end">฿{discountAmount.toFixed(2)}</Col>
+              </Row>
+              <Row className="mb-3">
+                <Col sm={8}>ค่าจัดส่ง</Col>
+                <Col sm={4} className="text-end">฿{totalShipping}</Col>
+              </Row>
+              <hr />
+              <Row className="mb-3">
+                <Col sm={8}><strong>ยอดชำระทั้งหมด</strong></Col>
+                <Col sm={4} className="text-end"><strong>฿{grandTotal.toFixed(2)}</strong></Col>
+              </Row>
+              <Card>
+            <Card.Body>
+              <h3>เลือกวิธีการชำระเงิน</h3>
+              <Form>
+                <Form.Check 
+                  type="radio" 
+                  label="บัตรเครดิต" 
+                  name="paymentMethod" 
+                  value="creditCard" 
+                  checked={paymentMethod === 'creditCard'} 
+                  onChange={handlePaymentMethodChange} 
                 />
-                <Form.Check
-                  type="radio"
-                  label="พร้อมเพย์"
-                  value="promptpay"
-                  checked={paymentMethod === 'promptpay'}
-                  onChange={handlePaymentMethodChange}
+                <Form.Check 
+                  type="radio" 
+                  label="โอนเงินผ่านธนาคาร" 
+                  name="paymentMethod" 
+                  value="bankTransfer" 
+                  checked={paymentMethod === 'bankTransfer'} 
+                  onChange={handlePaymentMethodChange} 
                 />
-                <Form.Check
-                    type="radio"
-                    label="โอนผ่านธนาคาร"
-                    value="bankTransfer"
-                    checked={paymentMethod === 'bankTransfer'}
-                    onChange={handlePaymentMethodChange}
-                /> 
-              </div>
+                <Form.Check 
+                  type="radio" 
+                  label="เก็บเงินปลายทาง" 
+                  name="paymentMethod" 
+                  value="cashOnDelivery" 
+                  checked={paymentMethod === 'cashOnDelivery'} 
+                  onChange={handlePaymentMethodChange} 
+                />
+              </Form>
+            </Card.Body>
+          </Card>
+          <Button 
+  variant="primary" 
+  onClick={handleConfirmPayment} 
+  disabled={!isAddressValid()}
+>
+  ยืนยันการชำระเงิน
+</Button>
 
-              {/* ปุ่มยืนยันการชำระเงิน */}
-              <Button 
-                variant="success" 
-                onClick={handleConfirmPayment} 
-                style={{ padding: '10px 20px', fontSize: '18px', width: '100%' }}
-            >
-                ยืนยันชำระเงิน
-            </Button>
             </Card.Body>
           </Card>
         </Col>
