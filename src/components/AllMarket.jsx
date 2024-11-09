@@ -20,7 +20,6 @@ const Seller1 = () => {
 
   return (
     <div>
-      <h1>List of Sellers</h1>
       <ul>
         {sellers.map((seller) => (
           <li key={seller.seller_id}>{seller.name}</li>

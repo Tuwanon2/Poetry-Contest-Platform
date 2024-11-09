@@ -19,8 +19,20 @@ const MyCart = () => {
     }, []);
 
     const updateLocalStorage = (updatedProducts) => {
-        localStorage.setItem('cart', JSON.stringify(updatedProducts));
+        try {
+            const data = JSON.stringify(updatedProducts);
+            console.log('Updated products:', data); // ตรวจสอบข้อมูลก่อนบันทึก
+            localStorage.setItem('cart', data);
+        } catch (error) {
+            console.error('Error updating localStorage:', error); // แจ้งเตือนหากเกิดข้อผิดพลาด
+        }
     };
+    
+    const handleCheckout = () => {
+        console.log('Navigating to payment with:', products, total); // ตรวจสอบข้อมูลก่อนส่ง
+        navigate('/payment', { state: { order: { items: products, total: total } } });
+    };
+    
 
     const shipping = products.length > 0 ? 90 : 0;
 
@@ -69,12 +81,8 @@ const MyCart = () => {
         setProducts(updatedProducts);
         setCartCount(updatedProducts.length); 
         updateLocalStorage(updatedProducts);
-    };
+    };   
 
-    const handleCheckout = () => {
-        // Navigate to Payment page
-        navigate('/payment');
-    };
 
     return (
         <Container className="my-cart">

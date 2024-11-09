@@ -1,18 +1,18 @@
 import React from 'react';
 import TopNav from '../components/TopNav'; // ส่วนแสดง Navigation Bar
 import TopMenu from '../components/TopMenu'; // ส่วนแสดงเมนูด้านบน
-import Payments from '../components/Payments';
+import EditAddres from '../components/EditAddres';
 
-const Payment = () => {
+const EditAddress = () => {
   return (
     <div>
       <TopNav /> {/* ส่วนค้นหาจะอยู่ใน TopNav */}
       <TopMenu />
-      <Payments />
+      <EditAddres />
      
 
     </div>
   );
 };
 
-export default Payment;
+export default EditAddress;
