@@ -23,7 +23,7 @@ const BannerCarousel = () => {
       <Carousel.Item>
         <img
           className="d-block w-100"
-          src="/assets/images/Slide_1.png"
+          src="/assets/images/Slide_3.png"
           alt="Third slide"
         />
       </Carousel.Item>
