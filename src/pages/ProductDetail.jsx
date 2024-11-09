@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
@@ -33,8 +33,8 @@ const getSellerName = (sellerId) => {
 const QuantitySelector = ({ quantity, setQuantity }) => {
   const handleChange = (e) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) { // ตรวจสอบว่าเป็นตัวเลข
-      setQuantity(Number(value) || 1); // หากใส่ค่าว่างจะให้เป็น 1
+    if (/^\d*$/.test(value)) {
+      setQuantity(Number(value) || 1);
     }
   };
 
@@ -76,6 +76,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const navigate = useNavigate();
 
   const fetchProductDetails = (id) => {
     axios
@@ -124,6 +125,10 @@ const ProductDetail = () => {
     console.log(`Added ${quantity} of ${product.name} to the cart.`);
   };
 
+  const handleNavigateToChooseAddress = () => {
+    navigate('/Payment');
+  };
+
   return (
     <div>
       <TopNav />
@@ -151,7 +156,13 @@ const ProductDetail = () => {
             <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
 
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
-
+            <Button 
+              variant="success" 
+              onClick={() => { addToCart(); handleNavigateToChooseAddress(); }}
+              style={{ fontSize: '20px', padding: '10px 20px', marginRight: '10px' }}
+            >
+              ซื้อเลย
+            </Button>
             <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' }}>
               เพิ่มในรถเข็น
             </Button>
@@ -188,15 +199,14 @@ const ProductDetail = () => {
                       e.target.onerror = null;
                       e.target.src = placeholderImage;
                     }}
-                    style={{ height: '200px', objectFit: 'contain', cursor: 'pointer' }}
+                    style={{ width: '100%', height: '250px', objectFit: 'contain' }}
                   />
                 </Link>
                 <Card.Body>
-                  <Card.Title>{relatedProduct.name}</Card.Title>
-                  <Card.Text style={{ fontSize: '1.rem', color: '#28a745' }}>
-                        ฿{product.price}
-                      </Card.Text>
-                      
+                  <Link to={`/product/${relatedProduct.id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                    <Card.Title>{relatedProduct.name}</Card.Title>
+                  </Link>
+                  <Card.Text>฿{relatedProduct.price || 'ไม่ระบุ'}</Card.Text>
                 </Card.Body>
               </Card>
             </Col>
