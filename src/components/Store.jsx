@@ -122,73 +122,96 @@ const Store = () => {
             const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
 
             return (
-              <Col md={4} key={product.id}> {/* 4 columns layout */}
-<Card className="product-card mb-4 shadow-sm border-light rounded">
-  <Link to={`/product/${product.id}`}>
-    <Card.Img 
-      variant="top" 
-      src={primaryImage || placeholderImage} 
-      alt={product.name} 
-      style={{ height: '300px', objectFit: 'cover', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
-      onError={(e) => {
-        e.target.onerror = null;
-        e.target.src = placeholderImage;
+<Col md={3} key={product.id}> {/* 4 columns layout */}
+  <Card className="product-card mb-4 shadow-sm border-light rounded">
+    <div 
+      style={{ 
+        height: '250px', 
+        width: '100%', 
+        overflow: 'hidden', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        borderTopLeftRadius: '10px', 
+        borderTopRightRadius: '10px' 
       }}
-    />
-  </Link>
-  <Card.Body className="d-flex flex-column">
-    <Card.Title className="text-truncate" style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#333' }}>
-      {product.name}
-    </Card.Title>
-
-    <div className="d-flex justify-content-between align-items-center">
-      <Card.Text style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#28a745' }}>
-        ฿{product.price}
-      </Card.Text>
-      <div className="d-flex align-items-center">
-        {/* กรอบโลโก้ร้านทำให้เป็นปุ่มที่สามารถกดได้ */}
-        <div 
-          onClick={() => window.location.href = `/seller/${product.seller_id}`} // กดแล้วไปยังหน้าโปรไฟล์ร้าน
-          className="d-flex align-items-center clickable-logo-card"
-          style={{
-            border: '2px solid #007bff', 
-            borderRadius: '5px', 
-            padding: '5px 10px', 
-            backgroundColor: '#f8f9fa',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',  // เพิ่ม transition สำหรับการเคลื่อนไหว
+    >
+      <Link to={`/product/${product.id}`}>
+        <Card.Img 
+          variant="top" 
+          src={primaryImage || placeholderImage} 
+          alt={product.name} 
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            maxWidth: '100%', 
+            maxHeight: '250px',
+            objectFit: 'contain' 
           }}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = placeholderImage;
+          }}
+        />
+      </Link>
+    </div>
+    <Card.Body className="d-flex flex-column">
+      <Card.Title 
+        className="text-truncate" 
+        style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#333' }}
+      >
+        {product.name}
+      </Card.Title>
+      <div className="d-flex justify-content-between align-items-center">
+        <Card.Text 
+          style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#28a745' }}
         >
-          <img
-            src={getSellerImage(product.seller_id)}
-            alt={getSellerName(product.seller_id)}
+          ฿{product.price}
+        </Card.Text>
+        <div className="d-flex align-items-center">
+          {/* Seller logo and link to profile */}
+          <div 
+            onClick={() => window.location.href = `/seller/${product.seller_id}`} 
+            className="d-flex align-items-center clickable-logo-card"
             style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              marginRight: '8px',
-              border: '2px solid #fff',
-              boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+              border: '2px solid #007bff', 
+              borderRadius: '5px', 
+              padding: '5px 10px', 
+              backgroundColor: '#f8f9fa',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
             }}
-          />
-          <small style={{
-            fontSize: '0.9rem', 
-            color: '#007bff', 
-            fontWeight: 'bold', 
-            textDecoration: 'none',
-            cursor: 'pointer',
-          }}>
-            {getSellerName(product.seller_id)}
-          </small>
+          >
+            <img
+              src={getSellerImage(product.seller_id)}
+              alt={getSellerName(product.seller_id)}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                marginRight: '8px',
+                border: '2px solid #fff',
+                boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+              }}
+            />
+            <small style={{
+              fontSize: '0.9rem', 
+              color: '#007bff', 
+              fontWeight: 'bold', 
+              textDecoration: 'none',
+              cursor: 'pointer',
+            }}>
+              {getSellerName(product.seller_id)}
+            </small>
+          </div>
         </div>
       </div>
-    </div>
-  </Card.Body>
-</Card>
+    </Card.Body>
+  </Card>
+</Col>
 
 
 
-              </Col>
             );
           })
         ) : (
