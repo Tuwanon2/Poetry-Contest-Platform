@@ -201,7 +201,7 @@ const Products = () => {
                          <img
                      src={getSellerImage(product.seller_id)}
                              alt={getSellerName(product.seller_id)}
-                                     style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '8px' }}
+                                     style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '8px' }}
                                />
                                      <small>{getSellerName(product.seller_id)}</small>
                                       </Link>
