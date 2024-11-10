@@ -1,5 +1,17 @@
+/* ตั้งค่า fontFamily สำหรับทุกข้อความในเว็บไซต์ */
+* {
+  font-family: 'Roboto', 'Noto Sans Thai', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+
 .App {
   text-align: center;
+}
+/* ในไฟล์ CSS */
+.pre-line-text {
+  white-space: pre-line; /* แสดงผล \n เป็นการขึ้นบรรทัดใหม่ */
 }
 
 .App-logo {
@@ -359,4 +371,20 @@ h1 {
 
 .button-35:hover {
   box-shadow: #000000 0 0 0 3px, transparent 0 0 0 0;
+}
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+}
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
 }

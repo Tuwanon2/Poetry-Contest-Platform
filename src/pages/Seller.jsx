@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom'; // นำเข้า useParams เพื่อดึง sellerId
+import { useParams } from 'react-router-dom';
 import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
@@ -8,14 +8,15 @@ import AllMarket from '../components/AllMarket';
 import '../App.css';
 
 const Seller = () => {
-  const { sellerId } = useParams(); // ดึง sellerId จาก URL
+  const { sellerId } = useParams(); // Get sellerId from URL
 
   return (
     <div>
       <TopNav />
       <TopMenu />
-      <Products />
-      <AllMarket sellerId={sellerId} /> {/* ส่ง sellerId ไปยัง AllMarket */}
+      {/* Pass sellerId to Products if filtering by seller is needed */}
+      <Products sellerId={sellerId} /> 
+      <AllMarket sellerId={sellerId} /> {/* Pass sellerId to AllMarket */}
       <Footer />
     </div>
   );

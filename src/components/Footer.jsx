@@ -9,7 +9,7 @@ const Footer = () => {
         <Row>
           <Col md={4}>
             <h5>NAMO BOARDGAME</h5>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Auctor libero id, in gravida.</p>
+            <p>รวมร้านบอร์ดเกมชื่อดังทั่วประเทศ</p>
           </Col>
           <Col md={2}>
             <h5>About Us</h5>
@@ -33,8 +33,8 @@ const Footer = () => {
             <h5>Contact Us</h5>
             <p>
               Silpakon University<br/>
-              Email: <a href="mailto:Boardgame@gmail.com" className="text-white">me-mart@memartmail.com</a> <br/>
-              Phone: +1 1123 456 780
+              Email: <a href="jaikla_t@silpakorn.edu" className="text-white">jaikla_t@silpakorn.edu</a> <br/>
+              Phone: 0886524782
             </p>
           </Col>
         </Row>

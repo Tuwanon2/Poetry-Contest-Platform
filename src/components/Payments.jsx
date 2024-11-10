@@ -3,6 +3,8 @@ import { Container, Row, Col, Card, Button, Form, Image } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'; 
 import '../App.css';
 
+const placeholderImage = '/assets/images/placeholder.jpg';
+
 const Payment = () => {
   const navigate = useNavigate();  
   const [order, setOrder] = useState({
@@ -67,10 +69,29 @@ const Payment = () => {
       alert('กรุณากรอกที่อยู่ให้ครบถ้วนก่อนทำการสั่งซื้อ');
       return;
     }
-    localStorage.removeItem('cart');
-    alert('การชำระเงินเสร็จสมบูรณ์');
-    navigate('/');
+  
+    // Show confirmation dialog
+    const confirmed = window.confirm('คุณแน่ใจหรือไม่ว่าต้องการยืนยันการชำระเงิน?');
+    if (confirmed) {
+      // Save order details to localStorage
+      const orderDetails = {
+        items: order.items,
+        subtotal: subtotal,
+        discountPercentage: discountPercentage,
+        totalShipping: totalShipping,
+        grandTotal: grandTotal,
+        address: address,
+        paymentMethod: paymentMethod,
+      };
+      localStorage.setItem('orderDetails', JSON.stringify(orderDetails));
+  
+      localStorage.removeItem('cart');
+      alert('การชำระเงินเสร็จสมบูรณ์');
+      navigate('/shipping'); // Navigate to the Shipping page after confirmation
+    }
   };
+  
+
   
   useEffect(() => {
     const storedOrder = JSON.parse(localStorage.getItem('cart'));

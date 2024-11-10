@@ -11,35 +11,32 @@ const TopNav = () => {
   const [cartCount, setCartCount] = useState(0); // State for cart item count
   const navigate = useNavigate();
 
-
-
   useEffect(() => {
     const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-  
+
     // Initially set the cart count
     updateCartCount();
-  
+
     // Listen for custom 'cart-updated' event to update the cart count
     const handleCartUpdated = () => {
       updateCartCount(); // Update the count when the event is triggered
     };
-  
+
     window.addEventListener('cart-updated', handleCartUpdated);
-  
+
     // Cleanup listener on component unmount
     return () => {
       window.removeEventListener('cart-updated', handleCartUpdated);
     };
   }, []); // The empty array ensures this effect runs only once when the component mounts
-  
+
   const updateCartCount = () => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
     setCartCount(storedCart.length); // Set cart count based on number of items
   };
-  
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -61,8 +58,7 @@ const TopNav = () => {
     <nav className="navbar navbar-light bg-light">
       <div className="container-fluid d-flex justify-content-between align-items-center">
         <Link className="navbar-brand" to="/">
-          <img src="/assets/namo-logo.png" alt="Logo" width="65" height="50" />
-          Namo Boardgame
+          <img src="/assets/namo-logo.png" alt="Logo" width="100" height="80" /> {/* Increased size and removed text */}
         </Link>
 
         <form onSubmit={handleSearchSubmit} className="d-flex flex-grow-1 mx-4">
@@ -74,8 +70,7 @@ const TopNav = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             aria-label="Search"
           />
-          <button className="btn btn-outline-success" type="submit" >
-            
+          <button className="btn btn-outline-success" type="submit">
             <FaSearch />
           </button>
         </form>

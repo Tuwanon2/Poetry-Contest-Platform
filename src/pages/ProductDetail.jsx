@@ -132,6 +132,11 @@ const ProductDetail = () => {
     navigate('/Payment');
   };
 
+  // Filter out the currently viewed product from the related products
+  const filteredRelatedProducts = relatedProducts.filter(
+    (relatedProduct) => relatedProduct.id !== product.id
+  );
+
   return (
     <div>
       <TopNav />
@@ -153,11 +158,8 @@ const ProductDetail = () => {
           </Col>
           <Col md={6}>
             <h2 style={{ fontSize: '32px' }}>{product.name}</h2>
-            <p style={{ fontSize: '24px' }}><strong>ราคา:</strong> {product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</p>
-            <p style={{ fontSize: '18px' }}><strong>รายละเอียดสินค้า:</strong> {product.description}</p>
-            <p style={{ fontSize: '18px' }}><strong>ผู้ออกแบบ:</strong> {product.brand}</p>
-            <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
 
+            {/* Buttons */}
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
             <Button 
               variant="success" 
@@ -166,9 +168,22 @@ const ProductDetail = () => {
             >
               ซื้อเลย
             </Button>
-            <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' ,border: '2px solid #CC0066', backgroundColor: '#CC0066'}}>
+            <Button 
+              variant="primary" 
+              onClick={addToCart} 
+              style={{ fontSize: '20px', padding: '10px 20px', border: '2px solid #CC0066', backgroundColor: '#CC0066'}}
+            >
               เพิ่มในรถเข็น
             </Button>
+
+            {/* Product details (moved below the buttons) */}
+            <div style={{ marginTop: '20px' }}>
+              <p style={{ fontSize: '24px' }}><strong>ราคา:</strong> {product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</p>
+              {/* เพิ่ม className เพื่อใช้ CSS pre-line */}
+              <p style={{ fontSize: '18px' }}><strong>รายละเอียดสินค้า:</strong> <div className="pre-line-text">{product.description}</div></p>
+              <p style={{ fontSize: '18px' }}><strong>ผู้ออกแบบ:</strong> {product.brand}</p>
+              <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
+            </div>
           </Col>
         </Row>
       </Container>
@@ -191,7 +206,7 @@ const ProductDetail = () => {
         </h3>
 
         <Row>
-          {relatedProducts.map((relatedProduct) => (
+          {filteredRelatedProducts.map((relatedProduct) => (
             <Col key={relatedProduct.id} md={3} className="mb-4">
               <Card>
                 <Link to={`/product/${relatedProduct.id}`}>
@@ -209,7 +224,7 @@ const ProductDetail = () => {
                   <Link to={`/product/${relatedProduct.id}`} style={{ textDecoration: 'none', color: '#CC0066' }}>
                     <Card.Title>{relatedProduct.name}</Card.Title>
                   </Link>
-                  <Card.Text style ={{fontSize: '1.2rem', color: '#28a745'}}>฿{relatedProduct.price || 'ไม่ระบุ'} </Card.Text>
+                  <Card.Text style={{ fontSize: '1.2rem', color: '#28a745' }}>฿{relatedProduct.price || 'ไม่ระบุ'} </Card.Text>
                 </Card.Body>
               </Card>
             </Col>
