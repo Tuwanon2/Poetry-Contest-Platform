@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import '../App.css'
 
 const Products = () => {
   const { sellerId } = useParams();
@@ -40,7 +41,7 @@ const Products = () => {
       'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
       'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
       '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
-      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.png',
+      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.jpg',
       'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
     };
     return images[sellerId] || '/assets/default_image.png';
@@ -81,7 +82,7 @@ const Products = () => {
   return (
     <Container>
       {/* Seller Section */}
-      <Container fluid style={{ backgroundColor: '#343a40', color: '#ffffff', padding: '2rem' }}>
+      <Container fluid style={{ backgroundColor: '#CC0066', color: '#ffffff', padding: '2rem' }}>
         <h2 className="text-center">{sellerNames[sellerId]}</h2>
         <div className="text-center mb-4">
         <img
@@ -104,31 +105,33 @@ const Products = () => {
         {categories.map((category, index) => (
           <Col key={index} xs={6} md={4} className="mb-3">
             <Button
-              variant={selectedCategory === category ? 'primary' : 'outline-primary'}
-              className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'}`}
-              onClick={() => handleCategoryClick(category)}
-              style={{
-                backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
-                height: '100px',
-                borderRadius: '10px',
-              }}
-            >
-              <div
-                style={{
-                  width: '95%',
-                  height: '90%',
-                  borderRadius: '10px',
-                  border: '2px solid white',
-                  overflow: 'hidden',
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  background: `url(${category.icon}) center/cover no-repeat`,
-                }}
-              />
-              <span className="visually-hidden">{category.name}</span>
-            </Button>
+  className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'} button-35`}
+  onClick={() => handleCategoryClick(category)}
+  style={{
+    backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
+    height: '100px',
+    borderRadius: '10px',
+    border: '2px solid #CC0066', // Custom border color
+  }}
+>
+  <div
+    style={{
+      width: '95%',
+      height: '90%',
+      borderRadius: '10px',
+      border: '2px solid #CC0066', // Custom border color for inner div
+      overflow: 'hidden',
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      background: `url(${category.icon}) center/cover no-repeat`,
+    }}
+  />
+  <span className="visually-hidden">{category.name}</span>
+</Button>
+
+
           </Col>
         ))}
       </Row>

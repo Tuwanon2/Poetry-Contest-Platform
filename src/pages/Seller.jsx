@@ -5,6 +5,7 @@ import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
 import Products from '../components/Products';
 import AllMarket from '../components/AllMarket';
+import '../App.css';
 
 const Seller = () => {
   const { sellerId } = useParams(); // ดึง sellerId จาก URL

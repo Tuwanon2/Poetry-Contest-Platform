@@ -97,30 +97,29 @@ const SearchResults = () => {
                       </Col>
                       <Col md={6}>
                         <Card.Body>
-                          <Card.Title style={{ fontSize: '1.5rem', color: '#007bff' }}>
+                          <Card.Title style={{ fontSize: '1.5rem', color: '#CC0066' }}>
                             {product.name}
                           </Card.Title>
-                          <div style={{ fontSize: '1.2rem', color: '#ff6600' }}>
+                          <div style={{ fontSize: '1.2rem', color: '#28a745' }}>
                             <strong>{product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</strong>
                           </div>
-                          <Card.Text>
-                            {product.description ? product.description : 'ไม่มีคำอธิบายสินค้า'}
-                          </Card.Text>
-                          <div className="d-flex align-items-center">
-                            <span className="badge bg-success me-2">New</span>
-                            {product.price && (
-                              <span className="badge bg-danger me-2">Hot</span>
-                            )}
-                          </div>
+
                         </Card.Body>
                       </Col>
                       <Col md={3} className="d-flex align-items-center justify-content-center">
                         <div>
-                          <Button variant="primary" className="me-2" onClick={() => addToCart(product)}>
+                          <Button class='button-57' variant="primary" className="me-2" onClick={() => addToCart(product)} 
+                          style={{border: '3px solid #CC0066',
+                            borderRadius: '5%',
+                            backgroundColor: '#CC0066',
+                          }}>
                             เพิ่มลงในตะกร้า
                           </Button>
                           <Link to={`/product/${product.id}`}>
-                            <Button variant="outline-secondary">
+                            <Button class='button-57' variant="outline-secondary"
+                            style={{border: '3px solid #CC0066',
+                              
+                            }}>
                               ดูรายละเอียด
                             </Button>
                           </Link>

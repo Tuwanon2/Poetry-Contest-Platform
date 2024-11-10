@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Image } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom'; 
+import '../App.css';
 
 const Payment = () => {
   const navigate = useNavigate();  
@@ -32,8 +33,8 @@ const Payment = () => {
     const images = {
       'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
       'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
-      '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.png',
-      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.png',
+      '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
+      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.jpg',
       'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
     };
     return images[sellerId] || '/assets/default_image.png';
@@ -135,9 +136,10 @@ const Payment = () => {
               )}
 
               <Button 
+                class = 'button-40'
                 variant="primary" 
                 onClick={handleNavigateToChooseAddress} 
-                style={{ position: 'absolute', bottom: '20px', right: '10px' }}
+                style={{ position: 'absolute', bottom: '20px', right: '10px', backgroundColor: '#CC0066' }}
               >
                 แก้ไขที่อยู่
               </Button>
@@ -289,9 +291,11 @@ const Payment = () => {
             </Card.Body>
           </Card>
           <Button 
+  class='button-40'        
   variant="primary" 
   onClick={handleConfirmPayment} 
   disabled={!isAddressValid()}
+  style={{backgroundColor:'#CC0066'}}
 >
   ยืนยันการชำระเงิน
 </Button>

@@ -207,13 +207,14 @@ const EditAddress = () => {
                   />
                 </Form.Group>
 
-                <Button variant="secondary" className="me-2" onClick={() => navigate('/payment')}>
+                <Button class ='button-40'variant="secondary" className="me-2" onClick={() => navigate('/payment')}>
                   ยกเลิก
                 </Button>
                 <Button 
                   variant="primary" 
                   onClick={handleSubmit} 
                   disabled={!isFormValid()} // ปิดปุ่มเมื่อข้อมูลไม่ครบ
+                  style={{backgroundColor: '#CC0066'}}
                 >
                   ยืนยัน
                 </Button>

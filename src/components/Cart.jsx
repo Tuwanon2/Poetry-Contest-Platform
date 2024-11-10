@@ -144,17 +144,17 @@ const MyCart = () => {
                                         <Card.Text style={{ textAlign: 'right' }}>
                                             <strong>ราคา: ฿{product.price * (product.quantity || 1)}</strong>
                                         </Card.Text>
-                                        <span
+                                        <button
                                             onClick={() => removeProduct(product.id)}
                                             style={{
-                                                color: 'red',
+                                                color: 'white',
+                                                backgroundColor: 'red',
                                                 cursor: 'pointer',
-                                                textDecoration: 'underline',
                                                 fontSize: '0.9rem',
                                             }}
                                         >
                                             นำสินค้าออก
-                                        </span>
+                                        </button>
                                     </Card.Body>
                                 </Col>
                             </Row>
@@ -163,7 +163,7 @@ const MyCart = () => {
                 ) : (
                     <div>
                         <p>ไม่มีสินค้าที่อยู่ในตะกร้า</p>
-                        <Link to="/Seller">กลับไปเลือกสินค้าต่อ</Link>
+                        <Link to="/Shop" ><button class='button-57'style={{ border:'3px solid #CC0066', borderRadius: '6%'}}>กลับไปเลือกสินค้าต่อ <span>กลับไปเลือกสินค้าต่อ</span></button></Link>
                     </div>
                 )}
             </div>

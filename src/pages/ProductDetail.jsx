@@ -19,8 +19,8 @@ const getSellerImage = (sellerId) => {
   const images = {
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
     'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
-    '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.png',
-    '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.png',
+    '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
+    '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.jpg',
     'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
   };
   return images[sellerId] || '/assets/default_image.png';
@@ -58,17 +58,20 @@ const buttonStyle = {
   fontSize: '24px',
   fontWeight: 'bold',
   border: '1px solid #ddd',
-  backgroundColor: '#f0f0f0',
+  backgroundColor: '#CC0066',
   cursor: 'pointer',
+  borderRadius: '50%',
 };
 
 const inputStyle = {
   width: '60px',
   height: '40px',
   textAlign: 'center',
-  border: '1px solid #ddd',
+  border: '1px solid #CC0066',
   fontSize: '20px',
   outline: 'none',
+  fontSize: '1.2rem',
+  borderRadius: '50%',
 };
 
 const ProductDetail = () => {
@@ -163,7 +166,7 @@ const ProductDetail = () => {
             >
               ซื้อเลย
             </Button>
-            <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' }}>
+            <Button variant="primary" onClick={addToCart} style={{ fontSize: '20px', padding: '10px 20px' ,border: '2px solid #CC0066', backgroundColor: '#CC0066'}}>
               เพิ่มในรถเข็น
             </Button>
           </Col>
@@ -203,10 +206,10 @@ const ProductDetail = () => {
                   />
                 </Link>
                 <Card.Body>
-                  <Link to={`/product/${relatedProduct.id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                  <Link to={`/product/${relatedProduct.id}`} style={{ textDecoration: 'none', color: '#CC0066' }}>
                     <Card.Title>{relatedProduct.name}</Card.Title>
                   </Link>
-                  <Card.Text>฿{relatedProduct.price || 'ไม่ระบุ'}</Card.Text>
+                  <Card.Text style ={{fontSize: '1.2rem', color: '#28a745'}}>฿{relatedProduct.price || 'ไม่ระบุ'} </Card.Text>
                 </Card.Body>
               </Card>
             </Col>

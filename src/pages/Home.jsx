@@ -7,6 +7,7 @@ import Footer from '../components/Footer'; // ส่วนแสดง Footer
 import PopularProducts from'../components/PopularProducts';
 import PromotionProducts from'../components/PromotionProducts';
 
+
 const Home = () => {
   return (
     <div>
