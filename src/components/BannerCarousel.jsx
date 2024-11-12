@@ -9,9 +9,9 @@ const BannerCarousel = () => {
         <Link to="/product/Edeeabd1-da23-4ce2-b4aa-5ed00994e2b1"> {/* ลิงก์ไปยังหน้า ProductDetail ของ Slide 1 */}
           <img
             className="d-block w-100"
-            src="/assets/images/FartFurious-Banner.jpg"
+            src="/assets/images/Slide_1.jpg"
             alt="First slide"
-            style={{ maxWidth: '80%', height: 'auto', margin: '0 auto' }} // ปรับขนาดภาพ
+            style={{ maxWidth: '100%', height: '90%', margin: '0 auto' }} // ปรับขนาดภาพ
           />
         </Link>
       </Carousel.Item>
@@ -22,7 +22,7 @@ const BannerCarousel = () => {
             className="d-block w-100"
             src="/assets/images/Slide_2.gif"
             alt="Second slide"
-            style={{ maxWidth: '80%', height: 'auto', margin: '0 auto' }} // ปรับขนาดภาพ
+            style={{ maxWidth: '100%', height: 'auto', margin: '0 auto' }} // ปรับขนาดภาพ
           />
         </Link>
       </Carousel.Item>
@@ -33,7 +33,7 @@ const BannerCarousel = () => {
             className="d-block w-100"
             src="/assets/images/Slide_3.png"
             alt="Third slide"
-            style={{ maxWidth: '80%', height: 'auto', margin: '0 auto' }} // ปรับขนาดภาพ
+            style={{ maxWidth: '100%', height: 'auto', margin: '0 auto' }} // ปรับขนาดภาพ
           />
         </Link>
       </Carousel.Item>

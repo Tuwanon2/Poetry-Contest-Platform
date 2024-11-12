@@ -3,6 +3,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import {jwtDecode} from 'jwt-decode'; // ตรวจสอบว่าใช้งาน jwt-decode แบบ default import
 import axios from 'axios';
 
+
 const GoogleAuth = ({ setUser, handleClose }) => {
   const [clientId, setClientId] = useState(''); // State สำหรับเก็บ client-id
 
@@ -14,7 +15,7 @@ const GoogleAuth = ({ setUser, handleClose }) => {
       console.log('Decoded token:', decodedToken);
 
       // ส่ง token ไปยัง backend เพื่อตรวจสอบและรับข้อมูลผู้ใช้
-      const backendResponse = await axios.post('http://localhost:8085 /api/v1/auth/google/verify', {
+      const backendResponse = await axios.post('http://localhost:8085/api/v1/auth/google/verify', {
         id_token: credentialResponse.credential,
       });
 

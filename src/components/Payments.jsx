@@ -281,36 +281,73 @@ const Payment = () => {
                 <Col sm={4} className="text-end"><strong>฿{grandTotal.toFixed(2)}</strong></Col>
               </Row>
               <Card>
-            <Card.Body>
-              <h3>เลือกวิธีการชำระเงิน</h3>
-              <Form>
-                <Form.Check 
-                  type="radio" 
-                  label="บัตรเครดิต" 
-                  name="paymentMethod" 
-                  value="creditCard" 
-                  checked={paymentMethod === 'creditCard'} 
-                  onChange={handlePaymentMethodChange} 
-                />
-                <Form.Check 
-                  type="radio" 
-                  label="โอนเงินผ่านธนาคาร" 
-                  name="paymentMethod" 
-                  value="bankTransfer" 
-                  checked={paymentMethod === 'bankTransfer'} 
-                  onChange={handlePaymentMethodChange} 
-                />
-                <Form.Check 
-                  type="radio" 
-                  label="เก็บเงินปลายทาง" 
-                  name="paymentMethod" 
-                  value="cashOnDelivery" 
-                  checked={paymentMethod === 'cashOnDelivery'} 
-                  onChange={handlePaymentMethodChange} 
-                />
-              </Form>
-            </Card.Body>
-          </Card>
+  <Card.Body>
+    <h3>เลือกวิธีการชำระเงิน</h3>
+    <Form>
+      <div className="checkbox-wrapper-4">
+        <input 
+          className="inp-cbx" 
+          id="creditCard" 
+          type="radio" 
+          name="paymentMethod" 
+          value="creditCard" 
+          checked={paymentMethod === 'creditCard'} 
+          onChange={handlePaymentMethodChange}
+        />
+        <label className="cbx" htmlFor="creditCard">
+          <span>
+            <svg width="12px" height="10px">
+              <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path>
+            </svg>
+          </span>
+          <span className="custom-radio-label">บัตรเครดิต</span>
+        </label>
+      </div>
+
+      <div className="checkbox-wrapper-4">
+        <input 
+          className="inp-cbx" 
+          id="bankTransfer" 
+          type="radio" 
+          name="paymentMethod" 
+          value="bankTransfer" 
+          checked={paymentMethod === 'bankTransfer'} 
+          onChange={handlePaymentMethodChange}
+        />
+        <label className="cbx" htmlFor="bankTransfer">
+          <span>
+            <svg width="12px" height="10px">
+              <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path>
+            </svg>
+          </span>
+          <span className="custom-radio-label">โอนเงินผ่านธนาคาร</span>
+        </label>
+      </div>
+
+      <div className="checkbox-wrapper-4">
+        <input 
+          className="inp-cbx" 
+          id="cashOnDelivery" 
+          type="radio" 
+          name="paymentMethod" 
+          value="cashOnDelivery" 
+          checked={paymentMethod === 'cashOnDelivery'} 
+          onChange={handlePaymentMethodChange}
+        />
+        <label className="cbx" htmlFor="cashOnDelivery">
+          <span>
+            <svg width="12px" height="10px">
+              <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path>
+            </svg>
+          </span>
+          <span className="custom-radio-label">เก็บเงินปลายทาง</span>
+        </label>
+      </div>
+    </Form>
+  </Card.Body>
+</Card>
+
+
           <Button 
   class='button-40'        
   variant="primary" 

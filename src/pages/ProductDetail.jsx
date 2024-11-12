@@ -80,6 +80,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchProductDetails = (id) => {
     axios
@@ -105,12 +106,65 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    fetchProductDetails(productId);
+    const fetchProductDetails = async () => {
+      try {
+        setIsLoading(true); // ตั้งค่าให้เป็น loading ก่อน
+        const response = await axios.get(`/api/v1/products/${productId}`);
+        setProduct(response.data);
+        fetchSellerProducts(response.data.seller_id);
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+      } finally {
+        // หน่วงเวลา 1 วินาทีเพื่อให้หน้าโหลดอยู่
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 900); // หน่วงเวลา 1000ms = 1 วินาที
+      }
+    };
+  
+    fetchProductDetails();
   }, [productId]);
-
-  if (!product) {
-    return <div>Loading...</div>;
+  
+  if (isLoading) {
+    return (
+      <div 
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <img 
+          src="../assets/images/Namo_loding.gif" 
+        />
+      </div>
+    );
   }
+  
+  if (!product) {
+    return (
+      <div 
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <img src="../assets/images/Namo_loding.gif" alt="Loading..." />
+      </div>
+    );
+  }
+  
 
   const addToCart = () => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -173,7 +227,7 @@ const ProductDetail = () => {
               onClick={addToCart} 
               style={{ fontSize: '20px', padding: '10px 20px', border: '2px solid #CC0066', backgroundColor: '#CC0066'}}
             >
-              เพิ่มในรถเข็น
+              เพิ่มในตระกร้า
             </Button>
 
             {/* Product details (moved below the buttons) */}
