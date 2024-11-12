@@ -47,6 +47,18 @@ const Products = () => {
     return images[sellerId] || '/assets/default_image.png';
   };
 
+  const getBGSellerImage = (sellerId) => {
+    const images = {
+      'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'https://scontent.fbkk22-2.fna.fbcdn.net/v/t39.30808-6/422859534_925811232882066_2178207251347500122_n.png?stp=dst-jpg&_nc_cat=106&ccb=1-7&_nc_sid=86c6b0&_nc_eui2=AeFpoT1-o3ZBugbi1LptSYlo4TzEtm7pO8ThPMS2buk7xC17bCbztsUxsA_l2w8iMYtqNul0Dlub3Ndgyio7AuVX&_nc_ohc=DbYYm5DEGo8Q7kNvgHSJa6b&_nc_zt=23&_nc_ht=scontent.fbkk22-2.fna&_nc_gid=Aiv1zZIy0zZsRnLovqFeQyx&oh=00_AYA-vBzuEsMO-gaLIfQ_71h97LJ_Vx2yAmZUn7RHJ6ZAsg&oe=6739988D',
+      'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'https://scontent.fbkk22-8.fna.fbcdn.net/v/t1.6435-9/66903773_2873489199359619_1737719127734222848_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeEp2lQnC5GjtCMqviReU-vHU94QNsuaqpxT3hA2y5qqnPjU2CqRUDcvVD08WxhJ78kjvAJFRLNT96Y_K2OcN1mH&_nc_ohc=0woLgdhtWAMQ7kNvgEKyGul&_nc_zt=23&_nc_ht=scontent.fbkk22-8.fna&_nc_gid=A5D4HA55TLcegFClB_1cKfO&oh=00_AYDe9_p8QuAVEJWk28Gibm00dO_1y_uw2df2Q3yXszkhjw&oe=675B4CC6',
+      '940256ba-a9de-4aa9-bad8-604468cb6af3': 'https://scontent.fbkk22-8.fna.fbcdn.net/v/t39.30808-6/463604309_3230839817058130_1637667488835137061_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=86c6b0&_nc_eui2=AeHYasC1yLNuNou-YivmQxHzK8efDGNOxssrx58MY07Gy3NO2ddIe3goteZd7EiVSAGxYUSAJvtO-NEY7-4GI2hh&_nc_ohc=qy03ye2CUW0Q7kNvgFGYkHx&_nc_zt=23&_nc_ht=scontent.fbkk22-8.fna&_nc_gid=AR8Ieei8tzKPbIbH-VTN2Ap&oh=00_AYBX9gCfHJyZ9j5DcaiFW13fJEHqREL0uYUOQPSQGR6gaw&oe=67398C19',
+      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'https://scontent.fbkk22-6.fna.fbcdn.net/v/t39.30808-6/291624361_160843586498687_5274141732395249719_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeGKQSxT2x_WX2kVLupOS7bJkCSsxTAJKfaQJKzFMAkp9i-0bu15KjbAsIzu-Bk2DOWxmWRiFPpAVNUYAuBVLT-c&_nc_ohc=xjoEYS2Uui0Q7kNvgFizO1P&_nc_zt=23&_nc_ht=scontent.fbkk22-6.fna&_nc_gid=AV2kJZ-DXMqpE6qICMz0rqm&oh=00_AYARTndco40mvepNrJLkgLHVKVS6HpKPNCHjx2MlgxMilw&oe=6739AA0E',
+      'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'https://scontent.fbkk22-1.fna.fbcdn.net/v/t39.30808-6/462282249_3871596779754053_3452236430483136336_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=86c6b0&_nc_eui2=AeEwir5QgQIQEOvzj7VTKJ4-2mdKyLY1Y5zaZ0rItjVjnHEPaLBYp0uBIPvC0n2UiqR_opDgCtnaZRet6sD3atTX&_nc_ohc=0ZRe0p33Pe8Q7kNvgHvzsg6&_nc_zt=23&_nc_ht=scontent.fbkk22-1.fna&_nc_gid=AATGKhZgvrhPQNPK6VKF1nT&oh=00_AYDO3Ij7iGDCGRvYysn0uvpl-gIr2VQqrWg0O0HUaB29Lg&oe=67398BD9',
+    };
+    return images[sellerId] || '/assets/default_image.png';
+  };
+  
+
   useEffect(() => {
     axios
       .get('/api/v1/products?sort=created_at&order=desc')
@@ -82,22 +94,36 @@ const Products = () => {
   return (
     <Container>
       {/* Seller Section */}
-      <Container fluid style={{ backgroundColor: '#CC0066', color: '#ffffff', padding: '2rem' }}>
-        <h2 className="text-center">{sellerNames[sellerId]}</h2>
-        <div className="text-center mb-4">
-        <img
-  src={getSellerImage(sellerId)}
-  alt={sellerNames[sellerId]}
-  style={{
-    width: '150px',  // Increased size
-    height: '150px', // Increased size
-    borderRadius: '50%',
-    border: '3px solid white',
-  }}
-/>
-        
-        </div>
-      </Container>
+      <Container fluid style={{ 
+  backgroundImage: `url(${getBGSellerImage(sellerId)})`, 
+  backgroundSize: 'cover', 
+  backgroundPosition: 'center', 
+  color: '#ffffff', 
+  padding: '2rem', 
+  minHeight: '400px', // เพิ่มความสูงของ BG
+  display: 'flex', 
+  flexDirection: 'column', 
+  alignItems: 'center', 
+  justifyContent: 'center'
+}}>
+  <div className="text-center mb-4" style={{ marginTop: '50px' }}> {/* ปรับระยะห่างด้านบน */}
+    <img
+      src={getSellerImage(sellerId)}
+      alt={sellerNames[sellerId]}
+      style={{
+        width: '150px',  // Increased size
+        height: '150px', // Increased size
+        borderRadius: '50%',
+        border: '5px solid #ffffff', // ขอบสีขาว 5px
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)', // เพิ่มเงาให้ขอบ
+      }}
+    />
+  </div>
+</Container>
+
+
+
+
 
       {/* Category Selection */}
       <h2 className="text-center mt-5">หมวดหมู่</h2>
