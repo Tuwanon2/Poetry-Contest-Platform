@@ -285,12 +285,13 @@ h1 {
 
 /* styles.css */
 body {
-  background-image: url('/public/assets/images/Background_1.png'); /* Replace with your image path */
-  background-size: cover;  /* Ensure the image covers the entire viewport */
+  background-color: #ffffff !important; /* ใช้ !important เพื่อให้มีผลสูงสุด */
+  background-size: cover;
   background-position: center;
-  background-attachment: fixed; /* Keep the background fixed on scroll */
+  background-attachment: fixed;
   background-repeat: no-repeat;
 }
+
 
 @font-face {
   font-family: 'Rocher';
@@ -388,3 +389,364 @@ h1 {
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
 }
+/* From Uiverse.io by cssbuttons-io */ 
+.custom-button {
+  width: 170px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background: red;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+  background: #e62222;
+}
+
+.custom-button, .custom-button span {
+  transition: 200ms;
+}
+
+.custom-button .custom-text {
+  transform: translateX(35px);
+  color: white;
+  font-weight: bold;
+}
+
+.custom-button .custom-icon {
+  position: absolute;
+  border-left: 1px solid #c41b1b;
+  transform: translateX(110px);
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-button svg {
+  width: 15px;
+  fill: #eee;
+}
+
+.custom-button:hover {
+  background: #ff3636;
+}
+
+.custom-button:hover .custom-text {
+  color: transparent;
+}
+
+.custom-button:hover .custom-icon {
+  width: 150px;
+  border-left: none;
+  transform: translateX(0);
+}
+
+.custom-button:focus {
+  outline: none;
+}
+
+.custom-button:active .custom-icon svg {
+  transform: scale(0.8);
+}
+.checkbox-wrapper-4 * {
+  box-sizing: border-box;
+  color: white;
+}
+
+.checkbox-wrapper-4 .cbx {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.checkbox-wrapper-4 .cbx:not(:last-child) {
+  margin-right: 6px;
+}
+
+.checkbox-wrapper-4 .cbx:hover {
+  background: rgba(0,119,255,0.06);
+}
+
+.checkbox-wrapper-4 .cbx span {
+  float: left;
+  vertical-align: middle;
+  transform: translate3d(0, 0, 0);
+}
+
+.checkbox-wrapper-4 .cbx span:first-child {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  transform: scale(1);
+  border: 1px solid #cccfdb;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 1px rgba(0,16,75,0.05);
+}
+
+.checkbox-wrapper-4 .cbx span:first-child svg {
+  position: absolute;
+  top: 3px;
+  left: 2px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 16px;
+  stroke-dashoffset: 16px;
+  transition: all 0.3s ease;
+  transition-delay: 0.1s;
+  transform: translate3d(0, 0, 0);
+}
+
+.checkbox-wrapper-4 .cbx span:last-child {
+  padding-left: 8px;
+  line-height: 18px;
+}
+
+.checkbox-wrapper-4 .cbx:hover span:first-child {
+  border-color: #07f;
+}
+
+.checkbox-wrapper-4 .inp-cbx {
+  position: absolute;
+  visibility: hidden;
+}
+
+.checkbox-wrapper-4 .inp-cbx:checked + .cbx span:first-child {
+  background: #07f;
+  border-color: #07f;
+  animation: wave-4 0.4s ease;
+}
+
+.checkbox-wrapper-4 .inp-cbx:checked + .cbx span:first-child svg {
+  stroke-dashoffset: 0;
+}
+
+.checkbox-wrapper-4 .inline-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media screen and (max-width: 640px) {
+  .checkbox-wrapper-4 .cbx {
+    width: 100%;
+    display: inline-block;
+  }
+}
+
+@-moz-keyframes wave-4 {
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@-webkit-keyframes wave-4 {
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@-o-keyframes wave-4 {
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes wave-4 {
+  50% {
+    transform: scale(0.9);
+  }
+}
+.custom-radio-label {
+  color: black; /* เปลี่ยนสีข้อความเป็นสีดำ */
+}
+.product-card {
+  position: relative;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.074);
+  border: 1px solid rgba(255, 255, 255, 0.222);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 0.7rem;
+  transition: all ease 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* เงาเบาๆ */
+}
+
+.product-card:hover {
+  transform: translateY(-15px); /* ขยับการ์ดขึ้นเมื่อเอาเมาส์จ่อ */
+  box-shadow: 0px 10px 15px rgba(193, 0, 0, 0.1) !important; /* เพิ่มเงาดำเข้ม */
+  border: 1px solid rgba(255, 255, 255, 0.454); /* ขอบการ์ดเปลี่ยนเมื่อโฮเวอร์ */
+}
+
+
+.product-card .product-image-container {
+  height: 250px;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.product-card .product-image-container img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-card .product-card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+.product-card .product-card-body .product-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #CC0066;
+  margin-bottom: 10px;
+  text-truncate: ellipsis;
+}
+
+.product-card .product-card-body .price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.product-card .product-card-body .seller-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.product-card .product-card-body .seller-info .button-57 {
+  padding: 5px 15px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: 5px;
+  border: 2px solid #CC0066;
+}
+
+.product-card .product-card-body .seller-info .button-57 img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: 2px solid #CC0066;
+}
+
+.product-card .product-card-body .seller-info small {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #CC0066;
+  cursor: pointer;
+}
+
+.product-card .product-card-body .seller-info .hover-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  visibility: hidden;
+  color: #CC0066;
+  font-size: 0.8rem;
+  font-weight: normal;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  white-space: nowrap;
+}
+
+.product-card .product-card-body .seller-info:hover .hover-text {
+  opacity: 1;
+  visibility: visible;
+}
+
+.product-card .product-card-body .seller-info .store-name {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+/* From Uiverse.io by vinodjangid07 */ 
+.button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgb(20, 20, 20);
+  border: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+  cursor: pointer;
+  transition-duration: 0.3s;
+  overflow: hidden;
+  position: relative;
+}
+
+.svgIcon {
+  width: 12px;
+  transition-duration: 0.3s;
+}
+
+.svgIcon path {
+  fill: white;
+}
+
+.button:hover {
+  width: 140px;
+  border-radius: 50px;
+  background-color: rgb(255, 69, 69);
+}
+
+.button:hover .svgIcon {
+  width: 50px;
+  transform: translateY(60%);
+}
+
+.button::before {
+  position: absolute;
+  top: -20px;
+  content: "ลบสินค้า";
+  color: rgb(255, 255, 255);
+  font-size: 2px;
+  transition-duration: 0.3s;
+}
+
+.button:hover::before {
+  font-size: 13px;
+  opacity: 1;
+  transform: translateY(30px);
+}
+
+
