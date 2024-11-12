@@ -285,11 +285,12 @@ h1 {
 
 /* styles.css */
 body {
-  background-image: url('/public/assets/images/Background_1.png'); /* Replace with your image path */
+  
   background-size: cover;  /* Ensure the image covers the entire viewport */
   background-position: center;
   background-attachment: fixed; /* Keep the background fixed on scroll */
   background-repeat: no-repeat;
+  background-color: #000000;
 }
 
 @font-face {
@@ -387,4 +388,66 @@ h1 {
 
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
+}
+
+/* From Uiverse.io by cssbuttons-io */ 
+.custom-button {
+  width: 150px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background: red;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+  background: #e62222;
+}
+
+.custom-button, .custom-button span {
+  transition: 200ms;
+}
+
+.custom-button .custom-text {
+  transform: translateX(35px);
+  color: white;
+  font-weight: bold;
+}
+
+.custom-button .custom-icon {
+  position: absolute;
+  border-left: 1px solid #c41b1b;
+  transform: translateX(110px);
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-button svg {
+  width: 15px;
+  fill: #eee;
+}
+
+.custom-button:hover {
+  background: #ff3636;
+}
+
+.custom-button:hover .custom-text {
+  color: transparent;
+}
+
+.custom-button:hover .custom-icon {
+  width: 150px;
+  border-left: none;
+  transform: translateX(0);
+}
+
+.custom-button:focus {
+  outline: none;
+}
+
+.custom-button:active .custom-icon svg {
+  transform: scale(0.8);
 }
