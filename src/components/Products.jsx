@@ -125,42 +125,43 @@ const Products = () => {
 
 
 
-      {/* Category Selection */}
-      <h2 className="text-center mt-5">หมวดหมู่</h2>
-      <Row className="text-center my-4">
-        {categories.map((category, index) => (
-          <Col key={index} xs={6} md={4} className="mb-3">
-            <Button
-  className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'} button-35`}
-  onClick={() => handleCategoryClick(category)}
-  style={{
-    backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
-    height: '100px',
-    borderRadius: '10px',
-    border: '2px solid #CC0066', // Custom border color
-  }}
->
-  <div
-    style={{
-      width: '95%',
-      height: '90%',
-      borderRadius: '10px',
-      border: '2px solid #CC0066', // Custom border color for inner div
-      overflow: 'hidden',
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      background: `url(${category.icon}) center/cover no-repeat`,
-    }}
-  />
-  <span className="visually-hidden">{category.name}</span>
-</Button>
+{/* Category Selection */}
+<h2 className="text-center mt-5">หมวดหมู่</h2>
+<Row className="text-center my-4">
+  {categories.map((category, index) => (
+    <Col key={index} xs={6} md={3} className="mb-3">
+      <Button
+        className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'} button-35`}
+        onClick={() => handleCategoryClick(category)}
+        style={{
+          backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
+          height: '60px',  // ลดขนาดความสูง
+          width: '120px',  // ลดขนาดความกว้าง
+          borderRadius: '10px',
+          border: '2px solid #CC0066', // Custom border color on Button
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '10px',
+            overflow: 'hidden',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: `url(${category.icon}) center/cover no-repeat`,
+            border: 'none',
+          }}
+        />
+        <span className="visually-hidden">{category.name}</span>
+      </Button>
+    </Col>
+  ))}
+</Row>
 
 
-          </Col>
-        ))}
-      </Row>
 
       {/* Search, Price Range, and Sort Options */}
       <Form className="my-4">
