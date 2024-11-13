@@ -57,6 +57,14 @@ const Payment = () => {
     }, {});
   };
 
+  const initialStatus = {
+    statusMessages: [
+      { message: "สั่งซื้อสินค้าสำเร็จ", time: new Date().toLocaleString('th-TH') }
+    ],
+  };
+  localStorage.setItem('orderStatus', JSON.stringify(initialStatus));
+  
+
   const calculateShippingCost = (storeItems) => {
     return storeItems.length > 0 ? 45 : 0;
   };
@@ -87,8 +95,14 @@ const Payment = () => {
   
       localStorage.removeItem('cart');
       alert('การชำระเงินเสร็จสมบูรณ์');
-      navigate('/shipping'); // Navigate to the Shipping page after confirmation
+      navigate('/Ship1'); // Navigate to the Shipping page after confirmation
     }
+  };
+
+  const handlePaymentCompletion = (orderData) => {
+    const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
+    existingOrders.push(orderData);
+    localStorage.setItem('orders', JSON.stringify(existingOrders));
   };
   
 

@@ -11,7 +11,10 @@ import Shop from './pages/Shop';
 import EditAddress from './pages/EditAddress';
 import Contact from './pages/Contact';
 import Shipping from './pages/Shipping';
-
+import Ship1 from './pages/Ship1';
+import Ship2 from './pages/Ship2';
+import Upstatus from './pages/Upstatus';
+import Delivery from './pages/Delivery';
 
 
 function App() {
@@ -29,6 +32,10 @@ function App() {
         <Route path="/EditAddress" element={<EditAddress />} />
         <Route path="/Contact" element={<Contact />} /> 
         <Route path="/shipping" element={<Shipping />} />
+        <Route path="/ship1" element={<Ship1 />} />
+        <Route path="/ship2" element={<Ship2 />} />
+        <Route path="/Upstatus" element={<Upstatus />} />
+        <Route path="/Delivery" element={<Delivery />} />
 
       </Routes>
     </Router>
