@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 const MyCart = () => {
     const [products, setProducts] = useState([]);
@@ -187,7 +189,26 @@ const MyCart = () => {
                     </Col>
                 </Row>
             ) : (
-                <p>ไม่มีสินค้าในตะกร้าของคุณ</p>
+                <button className="cta">
+                <Link to="/Shop" style={{ textDecoration: 'none' }}>
+                  <span className="hover-underline-animation"> Shop now </span>
+                  <svg
+                    id="arrow-horizontal"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="30"
+                    height="100"
+                    viewBox="0 0 46 16"
+                  >
+                    <path
+                      id="Path_10"
+                      data-name="Path 10"
+                      d="M8,0,6.545,1.455l5.506,5.506H-30V9.039H12.052L6.545,14.545,8,16l8-8Z"
+                      transform="translate(30)"
+                    ></path>
+                  </svg>
+                </Link>
+              </button>
+
             )}
         </Container>
     );

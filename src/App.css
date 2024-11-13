@@ -838,6 +838,116 @@ h1 {
     left: 100%;
   }
 }
+/* From Uiverse.io by alexmaracinaru */ 
+.cta {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.cta span {
+  padding-bottom: 7px;
+  letter-spacing: 4px;
+  font-size: 14px;
+  padding-right: 15px;
+  text-transform: uppercase;
+}
+
+.cta svg {
+  transform: translateX(-8px);
+  transition: all 0.3s ease;
+}
+
+.cta:hover svg {
+  transform: translateX(0);
+}
+
+.cta:active svg {
+  transform: scale(0.9);
+}
+
+.hover-underline-animation {
+  position: relative;
+  color: black;
+  padding-bottom: 20px;
+}
+
+.hover-underline-animation:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #000000;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.cta:hover .hover-underline-animation:after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+/* From Uiverse.io by absoluteSTrange */
+.custom-btn {
+  padding: 17px 40px;
+  border-radius: 10px;
+  border: 0;
+  background-color: rgb(255, 56, 86);
+  letter-spacing: 1.5px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-shadow: rgb(195, 187, 188) 0px 10px 0px 0px;
+  color: hsl(0, 0%, 100%);
+  cursor: pointer;
+}
+
+.custom-btn:hover {
+  box-shadow: rgb(199, 185, 187) 0px 7px 0px 0px;
+}
+
+.custom-btn:active {
+  background-color: rgb(255, 56, 86);
+  /*50, 168, 80*/
+  box-shadow: rgb(201, 46, 70) 0px 0px 0px 0px;
+  transform: translateY(5px);
+  transition: 200ms;
+}
+.cart-icon {
+  position: relative;
+  display: outline-flex;
+  align-items: center;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.cart-icon.animate {
+  animation: cartAnimation 0.6s ease-in-out;
+}
+
+@keyframes cartAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-icon .badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.8rem;
+  color: white;
+  background-color: rgb(15, 11, 11);
+}
+
+
+
 
 /* CSS สำหรับการทำ fade-in */
 .fade-in {
@@ -904,4 +1014,5 @@ h1 {
 .styled-button:hover::before {
   box-shadow: inset 0 0 0 10em rgb(24, 119, 242);
 }
+
 

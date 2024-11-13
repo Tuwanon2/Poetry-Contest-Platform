@@ -9,6 +9,7 @@ const TopNav = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0); // State for cart item count
+  const [cartAnimate, setCartAnimate] = useState(false); // Track animation trigger
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +24,7 @@ const TopNav = () => {
     // Listen for custom 'cart-updated' event to update the cart count
     const handleCartUpdated = () => {
       updateCartCount(); // Update the count when the event is triggered
+      triggerCartAnimation(); // Trigger animation
     };
 
     window.addEventListener('cart-updated', handleCartUpdated);
@@ -36,6 +38,14 @@ const TopNav = () => {
   const updateCartCount = () => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
     setCartCount(storedCart.length); // Set cart count based on number of items
+  };
+
+  const triggerCartAnimation = () => {
+    setCartAnimate(true);
+    // Remove the animation class after animation is complete
+    setTimeout(() => {
+      setCartAnimate(false);
+    }, 600); // Duration of the animation (600ms)
   };
 
   const handleSearchSubmit = (e) => {
@@ -58,7 +68,7 @@ const TopNav = () => {
     <nav className="navbar navbar-light bg-light">
       <div className="container-fluid d-flex justify-content-between align-items-center">
         <Link className="navbar-brand" to="/">
-          <img src="/assets/namo-logo.png" alt="Logo" width="100" height="80" /> {/* Increased size and removed text */}
+          <img src="/assets/namo-logo.png" alt="Logo" width="100" height="80" />
         </Link>
 
         <form onSubmit={handleSearchSubmit} className="d-flex flex-grow-1 mx-4">
@@ -76,8 +86,9 @@ const TopNav = () => {
         </form>
 
         <div className="d-flex">
-          <Link className="btn btn-light" to="/MyCart">
-            <FaShoppingCart /> <span className="badge bg-danger">{cartCount}</span>
+          <Link className={`btn btn-light cart-icon ${cartAnimate ? 'animate' : ''}`} to="/MyCart">
+            <FaShoppingCart />
+            <span className={`badge bg-danger ${cartAnimate ? 'animate' : ''}`}>{cartCount}</span>
           </Link>
 
           {user ? (

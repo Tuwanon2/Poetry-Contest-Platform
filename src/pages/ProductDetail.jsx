@@ -94,7 +94,6 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
 
   const fetchProductDetails = (id) => {
     axios
@@ -120,65 +119,12 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    const fetchProductDetails = async () => {
-      try {
-        setIsLoading(true); // ตั้งค่าให้เป็น loading ก่อน
-        const response = await axios.get(`/api/v1/products/${productId}`);
-        setProduct(response.data);
-        fetchSellerProducts(response.data.seller_id);
-      } catch (error) {
-        console.error('Error fetching product details:', error);
-      } finally {
-        // หน่วงเวลา 1 วินาทีเพื่อให้หน้าโหลดอยู่
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 900); // หน่วงเวลา 1000ms = 1 วินาที
-      }
-    };
-  
-    fetchProductDetails();
+    fetchProductDetails(productId);
   }, [productId]);
-  
-  if (isLoading) {
-    return (
-      <div 
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        <img 
-          src="../assets/images/Namo_loding.gif" 
-        />
-      </div>
-    );
-  }
-  
+
   if (!product) {
-    return (
-      <div 
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        <img src="../assets/images/Namo_loding.gif" alt="Loading..." />
-      </div>
-    );
+    return <div>Loading...</div>;
   }
-  
 
   const addToCart = () => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -238,20 +184,24 @@ const ProductDetail = () => {
   
             {/* Quantity Selector and Buttons */}
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+            <Button
+  variant="success"
+  onClick={() => { addToCart(); handleNavigateToChooseAddress(); }}
+  className="custom-btn" // ใช้คลาสใหม่
+  style={{ fontSize: '20px', padding: '10px 20px', marginRight: '10px', backgroundColor: 'rgb(0, 204, 68)' }}
+>
+  ซื้อเลย
+</Button>
+
             <Button 
-              variant="success" 
-              onClick={() => { addToCart(); handleNavigateToChooseAddress(); }}
-              style={{ fontSize: '20px', padding: '10px 20px', marginRight: '10px' }}
-            >
-              ซื้อเลย
-            </Button>
-            <Button 
-              variant="primary" 
-              onClick={addToCart} 
-              style={{ fontSize: '20px', padding: '10px 20px', border: '2px solid #CC0066', backgroundColor: '#CC0066'}}
-            >
-              เพิ่มในตระกร้า
-            </Button>
+  variant="primary" 
+  onClick={addToCart} 
+  className="custom-btn" // ใช้ชื่อคลาสใหม่ที่กำหนด
+  style={{ fontSize: '17px', padding: '10px 20px', border: '2px solid #CC0066', backgroundColor: '#CC0066' }}
+>
+  เพิ่มในรถเข็น
+</Button>
+
   
             <p style={{ fontSize: '24px', marginTop: '20px' }}><strong>ราคา:</strong> {product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</p>
           </Col>

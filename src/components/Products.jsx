@@ -90,157 +90,180 @@ const Products = () => {
       );
     })
     .sort((a, b) => (sortOrder === 'price-asc' ? a.price - b.price : b.price - a.price));
+return (
 
-  return (
-    <Container>
+    <Container fluid>
+      
       {/* Seller Section */}
       <Container fluid style={{ 
-  backgroundImage: `url(${getBGSellerImage(sellerId)})`, 
-  backgroundSize: 'cover', 
-  backgroundPosition: 'center', 
-  color: '#ffffff', 
-  padding: '2rem', 
-  minHeight: '400px', // เพิ่มความสูงของ BG
-  display: 'flex', 
-  flexDirection: 'column', 
-  alignItems: 'center', 
-  justifyContent: 'center'
-}}>
-  <div className="text-center mb-4" style={{ marginTop: '50px' }}> {/* ปรับระยะห่างด้านบน */}
-    <img
-      src={getSellerImage(sellerId)}
-      alt={sellerNames[sellerId]}
-      style={{
-        width: '150px',  // Increased size
-        height: '150px', // Increased size
-        borderRadius: '50%',
-        border: '5px solid #ffffff', // ขอบสีขาว 5px
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)', // เพิ่มเงาให้ขอบ
-      }}
-    />
-  </div>
-</Container>
-
-
-
-
-
-{/* Category Selection */}
-<h2 className="text-center mt-5">หมวดหมู่</h2>
-<Row className="text-center my-4">
-  {categories.map((category, index) => (
-    <Col key={index} xs={6} md={3} className="mb-3">
-      <Button
-        className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'} button-35`}
-        onClick={() => handleCategoryClick(category)}
-        style={{
-          backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
-          height: '60px',  // ลดขนาดความสูง
-          width: '120px',  // ลดขนาดความกว้าง
-          borderRadius: '10px',
-          border: '2px solid #CC0066', // Custom border color on Button
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: '10px',
-            overflow: 'hidden',
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: `url(${category.icon}) center/cover no-repeat`,
-            border: 'none',
-          }}
-        />
-        <span className="visually-hidden">{category.name}</span>
-      </Button>
-    </Col>
-  ))}
-</Row>
-
-
-
-      {/* Search, Price Range, and Sort Options */}
-      <Form className="my-4">
-        <Row>
-          <Col md={4} className="mb-3">
-            <Form.Control
-              type="text"
-              placeholder="ค้นหาสินค้า..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </Col>
-          <Col md={3} className="mb-3">
-            <Form.Control
-              type="number"
-              placeholder="ราคาขั้นต่ำ"
-              value={minPrice}
-              onChange={(e) => setMinPrice(Number(e.target.value))}
-            />
-          </Col>
-          <Col md={3} className="mb-3">
-            <Form.Control
-              type="number"
-              placeholder="ราคาสูงสุด"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
-            />
-          </Col>
-          <Col md={2} className="mb-3">
-            <Form.Select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option value="price-asc">ราคาน้อยไปมาก</option>
-              <option value="price-desc">ราคามากไปน้อย</option>
-            </Form.Select>
-          </Col>
-        </Row>
-      </Form>
-
-      {/* Product Listings */}
-      <Container className="my-5">
-        <h2 className="text-center mb-4">สินค้าของร้าน</h2>
-        <Row>
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => {
-              const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
-
-              return (
-                <Col md={3} key={product.id}>
-                  <Card className="product-card mb-4 shadow-sm border-light rounded">
-                    <Link to={`/product/${product.id}`}>
-                      <Card.Img
-                        variant="top"
-                        src={primaryImage || placeholderImage}
-                        alt={product.name}
-                        style={{ height: '300px', objectFit: 'cover' }}
-                        onError={(e) => { e.target.src = placeholderImage; }}
-                      />
-                    </Link>
-                    <Card.Body>
-                      <Card.Title className="text-truncate" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                        {product.name}
-                      </Card.Title>
-                      <Card.Text style={{ fontSize: '1.1rem', color: '#28a745' }}>
-                        ฿{product.price}
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              );
-            })
-          ) : (
-            <Col md={12}>
-              <p className="text-center text-muted">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
-            </Col>
-          )}
-        </Row>
+        backgroundImage: `url(${getBGSellerImage(sellerId)})`, 
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center', 
+        color: '#ffffff', 
+        padding: '2rem', 
+        minHeight: '400px', 
+        display: 'flex', 
+        flexDirection: 'column-reverse', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        width: '80%', // ทำให้ความกว้างลดลง
+        margin: '0 auto', // จัดกลางในกรณีที่เป็น fluid container
+        
+      }}>
+        <div className="text-center mb-4" style={{ marginTop: '50px' }}>
+        
+          <img
+            src={getSellerImage(sellerId)}
+            alt={sellerNames[sellerId]}
+            style={{
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              border: '5px solid #ffffff',
+              boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
+            }}
+          />
+        </div>
+        
       </Container>
+      <h2 className="text-center mb-4"></h2>
+      <h1 className="text-center mb-4">สินค้าของร้าน</h1>
+      <div className="container" style={{ position: 'relative' }}>
+        
+  {/* Sidebar for Categories */}
+  <div className="sidebar" style={{
+    position: 'absolute',  // ทำให้มันอยู่ในตำแหน่งที่กำหนดใน container
+    top: '0px',           // ระยะห่างจากด้านบนของ container
+    left: '-5%',             // ระยะห่างจากด้านซ้ายของ container
+    width: '250px',        // ความกว้าง
+    backgroundColor: '#f8f9fa',
+    padding: '10px',
+    zIndex: '10',          // เพื่อให้แถบหมวดหมู่ไม่ถูกทับ
+  }}>
+
+    <h2 className="text-center mt-5">หมวดหมู่</h2>
+    <Row className="text-center my-4">
+      {categories.map((category, index) => (
+        <Col key={index} xs={12} className="mb-3">
+          <Button
+            className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'} button-35`}
+            onClick={() => handleCategoryClick(category)}
+            style={{
+              backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
+              height: '60px',
+              width: '100%',
+              borderRadius: '10px',
+              border: '2px solid #CC0066',
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: `url(${category.icon}) center/cover no-repeat`,
+                border: 'none',
+              }}
+            />
+            <span className="visually-hidden">{category.name}</span>
+          </Button>
+        </Col>
+      ))}
+    </Row>
+  </div>
+
+
+  {/* Main Content */}
+  <div className="content" style={{
+    marginLeft: '220px',   // พื้นที่ขวางจากแถบหมวดหมู่
+    padding: '20px',
+    backgroundColor: '#fff',
+  }}>
+    {/* Search, Price Range, and Sort Options */}
+    <Form className="my-4">
+      <Row>
+        <Col md={4} className="mb-3">
+          <Form.Control
+            type="text"
+            placeholder="ค้นหาสินค้า..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </Col>
+        <Col md={3} className="mb-3">
+          <Form.Control
+            type="number"
+            placeholder="ราคาขั้นต่ำ"
+            value={minPrice}
+            onChange={(e) => setMinPrice(Number(e.target.value))}
+          />
+        </Col>
+        <Col md={3} className="mb-3">
+          <Form.Control
+            type="number"
+            placeholder="ราคาสูงสุด"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+          />
+        </Col>
+        <Col md={2} className="mb-3">
+          <Form.Select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="price-asc">ราคาน้อยไปมาก</option>
+            <option value="price-desc">ราคามากไปน้อย</option>
+          </Form.Select>
+        </Col>
+      </Row>
+    </Form>
+
+    {/* Product Listings */}
+    <Container className="my-5">
+      
+      <Row>
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => {
+            const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
+
+            return (
+              <Col md={3} key={product.id}>
+                <Card className="product-card mb-4 shadow-sm border-light rounded">
+                  <Link to={`/product/${product.id}`}>
+                    <Card.Img
+                      variant="top"
+                      src={primaryImage || placeholderImage}
+                      alt={product.name}
+                      style={{ height: '300px', objectFit: 'contain', }}
+                      onError={(e) => { e.target.src = placeholderImage; }}
+                    />
+                  </Link>
+                  <Card.Body>
+                    <Card.Title className="text-truncate" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                      {product.name}
+                    </Card.Title>
+                    <Card.Text style={{ fontSize: '1.1rem', color: '#28a745' }}>
+                      ฿{product.price}
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+            );
+          })
+        ) : (
+          <Col md={12}>
+            <p className="text-center text-muted">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
+          </Col>
+        )}
+      </Row>
+    </Container>
+  </div>
+</div>
     </Container>
   );
 };
