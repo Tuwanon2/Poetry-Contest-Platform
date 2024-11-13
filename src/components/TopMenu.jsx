@@ -122,11 +122,11 @@ const TopMenu = () => {
             </li>
             <li className="nav-item">
               <Link
-                className={`nav-link ${location.pathname === '/shipping' ? 'active' : ''}`}
-                to="/shipping"
+                className={`nav-link ${location.pathname === '/Ship1' ? 'active' : ''}`}
+                to="/Ship1"
                 style={{
                   color: 'white',
-                  fontWeight: location.pathname === '/shipping' ? 'bold' : 'normal',
+                  fontWeight: location.pathname === '/Ship1' ? 'bold' : 'normal',
                   fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
                 }}
               >
