@@ -184,20 +184,24 @@ const ProductDetail = () => {
   
             {/* Quantity Selector and Buttons */}
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+            <Button
+  variant="success"
+  onClick={() => { addToCart(); handleNavigateToChooseAddress(); }}
+  className="custom-btn" // ใช้คลาสใหม่
+  style={{ fontSize: '20px', padding: '10px 20px', marginRight: '10px', backgroundColor: 'rgb(0, 204, 68)' }}
+>
+  ซื้อเลย
+</Button>
+
             <Button 
-              variant="success" 
-              onClick={() => { addToCart(); handleNavigateToChooseAddress(); }}
-              style={{ fontSize: '20px', padding: '10px 20px', marginRight: '10px' }}
-            >
-              ซื้อเลย
-            </Button>
-            <Button 
-              variant="primary" 
-              onClick={addToCart} 
-              style={{ fontSize: '20px', padding: '10px 20px', border: '2px solid #CC0066', backgroundColor: '#CC0066'}}
-            >
-              เพิ่มในรถเข็น
-            </Button>
+  variant="primary" 
+  onClick={addToCart} 
+  className="custom-btn" // ใช้ชื่อคลาสใหม่ที่กำหนด
+  style={{ fontSize: '17px', padding: '10px 20px', border: '2px solid #CC0066', backgroundColor: '#CC0066' }}
+>
+  เพิ่มในรถเข็น
+</Button>
+
   
             <p style={{ fontSize: '24px', marginTop: '20px' }}><strong>ราคา:</strong> {product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</p>
           </Col>

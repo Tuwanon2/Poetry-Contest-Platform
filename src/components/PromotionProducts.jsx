@@ -166,7 +166,7 @@ const PromotionProducts = () => {
                             transform: 'translate(-50%, -50%)', // Center perfectly
                             textAlign: 'center',
                           }}>
-                            ร้านค้า>>
+                            ร้านค้า
                           </span>
                         </Link>
                       </div>
