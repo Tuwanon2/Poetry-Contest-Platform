@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Row, Col } from 'react-bootstrap';
+import TopNav from '../components/TopNav';
+import TopMenu from '../components/TopMenu';
+import Footer from '../components/Footer';
+
 
 const Profile = () => {
   const [userProfile, setUserProfile] = useState(null); // เก็บข้อมูลผู้ใช้
@@ -56,7 +60,9 @@ const Profile = () => {
         </Col>
       </Row>
     </Container>
+    
   );
+  <Footer />
 };
 
 export default Profile;
