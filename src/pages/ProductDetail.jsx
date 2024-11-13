@@ -40,14 +40,28 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px', marginBottom: '20px' }}>
-      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={buttonStyle}>-</button>
-      <input
-        type="text"
-        value={quantity}
-        onChange={handleChange}
-        style={inputStyle}
-      />
-      <button onClick={() => setQuantity(quantity + 1)} style={buttonStyle}>+</button>
+      <Button
+    size="sm"
+    variant="outline-dark"
+    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+    className="round-button"
+  >
+    -
+  </Button>
+  <input
+    type="text"
+    value={quantity}
+    onChange={handleChange}
+    style={{ width: '40px', textAlign: 'center', margin: '0 10px', border: '1px solid #ced4da', borderRadius: '4px' }}
+  />
+  <Button
+    size="sm"
+    variant="outline-dark"
+    onClick={() => setQuantity(quantity + 1)}
+    className="round-button"
+  >
+    +
+  </Button>
     </div>
   );
 };
@@ -195,25 +209,34 @@ const ProductDetail = () => {
     <div>
       <TopNav />
       <TopMenu />
-
+  
       <Container className="my-5">
         <Row>
           <Col md={6}>
             <Link to={`/product/${product.id}`}>
-              <Card.Img
-                src={product.images.find((img) => img.is_primary)?.image_url || placeholderImage}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = placeholderImage;
-                }}
-                style={{ maxHeight: '500px', objectFit: 'contain', cursor: 'pointer' }}
-              />
+            <Card.Img
+  src={product.images.find((img) => img.is_primary)?.image_url || placeholderImage}
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src = placeholderImage;
+  }}
+  style={{ maxHeight: '300px', objectFit: 'contain', cursor: 'pointer', width: '100%' }}
+/>
             </Link>
+            
+            {/* Product details (moved below the image) */}
+            <div style={{ marginTop: '20px' }}>
+             
+              <p style={{ fontSize: '18px' }}><strong>รายละเอียดสินค้า:</strong> <div className="pre-line-text">{product.description}</div></p>
+              <p style={{ fontSize: '18px' }}><strong>ผู้ออกแบบ:</strong> {product.brand}</p>
+              <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
+            </div>
           </Col>
+  
           <Col md={6}>
             <h2 style={{ fontSize: '32px' }}>{product.name}</h2>
-
-            {/* Buttons */}
+  
+            {/* Quantity Selector and Buttons */}
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
             <Button 
               variant="success" 
@@ -229,36 +252,30 @@ const ProductDetail = () => {
             >
               เพิ่มในตระกร้า
             </Button>
-
-            {/* Product details (moved below the buttons) */}
-            <div style={{ marginTop: '20px' }}>
-              <p style={{ fontSize: '24px' }}><strong>ราคา:</strong> {product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</p>
-              {/* เพิ่ม className เพื่อใช้ CSS pre-line */}
-              <p style={{ fontSize: '18px' }}><strong>รายละเอียดสินค้า:</strong> <div className="pre-line-text">{product.description}</div></p>
-              <p style={{ fontSize: '18px' }}><strong>ผู้ออกแบบ:</strong> {product.brand}</p>
-              <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
-            </div>
+  
+            <p style={{ fontSize: '24px', marginTop: '20px' }}><strong>ราคา:</strong> {product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</p>
           </Col>
         </Row>
       </Container>
-
+  
       <Container>
         <Card.Text className="d-flex align-items-center mb-5">
-          <Link to={`/seller/${product.seller_id}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-            <img
-              src={getSellerImage(product.seller_id)}
-              alt={getSellerName(product.seller_id)}
-              style={{ width: '90px', height: '90px', borderRadius: '50%', marginRight: '8px', cursor: 'pointer' }}
-            />
-          </Link>
-          <h3 className="ml-3" style={{ marginLeft: '30px', fontSize: '34px', fontWeight: 'bold' }}>
-            {getSellerName(product.seller_id)}
-          </h3>
+        <Link to={`/seller/${product.seller_id}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+  <img
+    src={getSellerImage(product.seller_id)}
+    alt={getSellerName(product.seller_id)}
+    style={{ width: '90px', height: '90px', borderRadius: '50%', marginRight: '8px', cursor: 'pointer' }}
+  />
+  <h3 className="ml-3" style={{ marginLeft: '30px', fontSize: '34px', fontWeight: 'bold', color: 'black' }}>
+    {getSellerName(product.seller_id)}
+  </h3>
+</Link>
+
         </Card.Text>
         <h3 className="ml-3" style={{ marginLeft: '20px', fontSize: '24px', fontWeight: 'bold' }}>
           สินค้าอื่นๆที่คุณอาจสนใจจากร้าน
         </h3>
-
+  
         <Row>
           {filteredRelatedProducts.map((relatedProduct) => (
             <Col key={relatedProduct.id} md={3} className="mb-4">
@@ -285,10 +302,11 @@ const ProductDetail = () => {
           ))}
         </Row>
       </Container>
-
+  
       <Footer />
     </div>
   );
+  
 };
 
 export default ProductDetail;
