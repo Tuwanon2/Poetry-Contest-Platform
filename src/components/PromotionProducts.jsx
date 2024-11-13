@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Card, Container, Row, Col, Form } from 'react-bootstrap';
+import { Card, Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import '../App.css';
 
@@ -29,12 +29,11 @@ const getSellerName = (sellerId) => {
 
 const PromotionProducts = () => {
   const [products, setProducts] = useState([]);
+  const productRefs = useRef([]);
 
-  // Use placeholder for image if needed
   const placeholderImage = '../assets/images/Splendor.jpg';
 
   useEffect(() => {
-    // Fetch promotion products
     axios
       .get('/api/v1/products?sort=name&order=desc&limit=4')
       .then((response) => {
@@ -43,20 +42,45 @@ const PromotionProducts = () => {
       .catch((error) => {
         console.error('Error fetching the promotion products:', error);
       });
-  }, []);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in'); // เพิ่มคลาส fade-in เมื่อสินค้าปรากฏในมุมมอง
+            observer.unobserve(entry.target); // หยุดสังเกตการณ์หลังจากแสดงผลแล้ว
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    // สังเกตการณ์สินค้าทุกตัว
+    productRefs.current.forEach((productRef) => {
+      if (productRef) {
+        observer.observe(productRef);
+      }
+    });
+
+    // ลบ observer เมื่อคอมโพเนนต์ถูกถอดออก
+    return () => observer.disconnect();
+  }, [products]);
 
   return (
-    <Container className="my-5">
+    <Container className="my-5 product">
       <h1 className="text-center mb-4">โปรโมชั่น</h1>
 
       <Row>
         {products.length > 0 ? (
-          products.map((product) => {
+          products.map((product, index) => {
             const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
 
             return (
               <Col md={3} key={product.id}>
-                <Card className="product-card mb-4 shadow-sm border-light rounded">
+                <Card 
+                  className="product-card mb-4 shadow-sm border-light rounded product" 
+                  ref={(el) => (productRefs.current[index] = el)} // เก็บการอ้างอิงของสินค้า
+                >
                   <div 
                     style={{ 
                       height: '250px', 
@@ -166,7 +190,7 @@ const PromotionProducts = () => {
                             transform: 'translate(-50%, -50%)', // Center perfectly
                             textAlign: 'center',
                           }}>
-                            ร้านค้า>>
+                            ร้านค้า
                           </span>
                         </Link>
                       </div>

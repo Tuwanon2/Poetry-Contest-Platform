@@ -122,15 +122,15 @@ const TopMenu = () => {
             </li>
             <li className="nav-item">
               <Link
-                className={`nav-link ${location.pathname === '/MyProfile' ? 'active' : ''}`}
-                to="/MyProfile"
+                className={`nav-link ${location.pathname === '/shipping' ? 'active' : ''}`}
+                to="/shipping"
                 style={{
                   color: 'white',
-                  fontWeight: location.pathname === '/MyProfile' ? 'bold' : 'normal',
+                  fontWeight: location.pathname === '/shipping' ? 'bold' : 'normal',
                   fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
                 }}
               >
-                ข้อมูลส่วนตัว
+                การจัดส่ง
               </Link>
             </li>
             <li className="nav-item">
@@ -146,19 +146,6 @@ const TopMenu = () => {
                 ติดต่อเรา
               </Link>
               
-            </li>
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === '/Ship1' ? 'active' : ''}`}
-                to="/Ship1"
-                style={{
-                  color: 'white',
-                  fontWeight: location.pathname === '/Ship1' ? 'bold' : 'normal',
-                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
-                }}
-              >
-                การจัดส่ง
-              </Link>
             </li>
           </ul>
         </div>
