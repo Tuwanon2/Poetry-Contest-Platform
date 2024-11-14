@@ -164,7 +164,7 @@ const Payment = () => {
               {address.firstName ? (
                 <div>
                   <p>{address.firstName} {address.lastName} │ {address.phone}</p>
-                  <p>{address.company}, {address.address}, {address.subDistrict}, {address.street}, {address.district}, {address.province}, {address.country} {address.postalCode}</p>
+                  <p>{address.company} {address.address}, {address.subDistrict}, {address.street}, {address.district}, {address.province}, {address.country}, {address.postalCode}</p>
                 </div>
               ) : (
                 <p>กรุณากรอกที่อยู่ในการจัดส่ง</p>

@@ -15,9 +15,11 @@ const Home = () => {
       <TopNav /> {/* ส่วนค้นหาจะอยู่ใน TopNav */}
       <TopMenu />
       <BannerCarousel />
+      <PromotionProducts/>
+      
       <NewProducts /> {/* แสดงสินค้ามาใหม่ */}
       <PopularProducts/>
-      <PromotionProducts/>
+      
       <div className="elgy-tooltip-container">
   <a target="_blank" rel="noopener noreferrer">
     <span className="elgy-text">

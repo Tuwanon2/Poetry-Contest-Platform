@@ -7,6 +7,23 @@ import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
 
 const placeholderImage = '../assets/images/placeholder.jpg';
+
+const getCategory = (sku) => {
+  const lastDigit = sku.slice(-1);
+  const categories = {
+    '1': 'บอร์ดเกมผู้เล่น 1 คน',
+    '2': 'บอร์ดเกมเล่นหลายคน',
+    '3': 'บอร์ดเกมปาร์ตี้',
+    '4': 'บอร์ดเกมกลยุทธ์',
+    '5': 'บอร์ดเกมเด็กและครอบครัว',
+    '6': 'บอร์ดเกมแนวสงคราม',
+    '7': 'บอร์ดเกม co-op',
+    '8': 'บอร์ดเกม gateway',
+    '9': 'บอร์ดเกมบริหารทรัพยากร'
+  };
+  return categories[lastDigit] || 'ประเภทไม่ระบุ';
+};
+
 const sellerNames = {
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
   'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
@@ -100,13 +117,14 @@ const ProductDetail = () => {
     axios
       .get(`/api/v1/products/${id}`)
       .then((response) => {
-        setProduct(response.data);
+        setProduct(response.data); // ตรวจสอบว่า response.data มีค่า created_at ด้วย
         fetchSellerProducts(response.data.seller_id);
       })
       .catch((error) => {
         console.error('Error fetching product details:', error);
       });
   };
+  
 
   const fetchSellerProducts = (sellerId) => {
     axios
@@ -177,6 +195,10 @@ const ProductDetail = () => {
               <p style={{ fontSize: '18px' }}><strong>รายละเอียดสินค้า:</strong> <div className="pre-line-text">{product.description}</div></p>
               <p style={{ fontSize: '18px' }}><strong>ผู้ออกแบบ:</strong> {product.brand}</p>
               <p style={{ fontSize: '18px' }}><strong>คลัง:</strong> {product.inventory.quantity}</p>
+              <p style={{ fontSize: '18px' }}><strong>ประเภทบอร์ดเกม:</strong> {getCategory(product.sku)}</p>
+              {product.created_at && (
+  <p style={{ fontSize: '18px' }}><strong>วันที่เพิ่มสินค้า:</strong> {new Date(product.created_at).toLocaleDateString('th-TH')}</p>
+)}
             </div>
           </Col>
   
@@ -200,7 +222,7 @@ const ProductDetail = () => {
   className="custom-btn" // ใช้ชื่อคลาสใหม่ที่กำหนด
   style={{ fontSize: '17px', padding: '10px 20px', border: '2px solid #CC0066', backgroundColor: '#CC0066' }}
 >
-  เพิ่มในรถเข็น
+  เพิ่มลงตะกร้า
 </Button>
 
   
