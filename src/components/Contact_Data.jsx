@@ -1,76 +1,137 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import '../App.css';
 
 const Contact_Data = () => {
+    // Initialize state for each input field
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        issue: ''
+    });
+
+    // Handle form field change
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    // Handle form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        alert('ทาง Namo จะรีบแก้ไขปัญหานะคะ');
+
+        // Reset the form after submission
+        setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            issue: ''
+        });
+    };
+
     return (
-        <Container fluid className="p-4">
+        <Container fluid className="p-4" style={{ backgroundColor: '#f8f9fa' }}>
             <Row className="border border-dark">
-                {/* Contact Info Section */}
-                <Col md={6} className="p-4 border-end border-dark">
-                    <h5>เบอร์ติดต่อ</h5>
-                    <p>012-xxx-xxxx</p>
-                    <h5>ที่อยู่อีเมล</h5>
-                    <p>abc@gmail.com</p>
-                </Col>
+                {/* Left Section: Student Info */}
+                <Col md={6} className="p-4 border-end border-dark" style={{ backgroundColor: '#ffffff', borderRadius: '10px' }}>
+    <h5 className="text-center mb-4" style={{ fontSize: '1.25rem', fontWeight: '600', color: '#007bff' }}>รายชื่อนักศึกษา</h5>
+    <ul className="list-unstyled">
+        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+            <strong>ชื่อ:</strong> นาย ธุวานนท์ ใจกล้า - <strong>รหัส:</strong> 650710159
+        </li>
+        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+            <strong>ชื่อ:</strong> นางสาว จิราพร ศรีใสสุข - <strong>รหัส:</strong> 650710676
+        </li>
+        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+            <strong>ชื่อ:</strong> นางสาว.ปภาดา ไชยพงษ์ - <strong>รหัส:</strong> 650710699
+        </li>
+        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+            <strong>ชื่อ:</strong> นางสาวอาทิตยา แสงกระจ่าง - <strong>รหัส:</strong> 650710733
+        </li>
+        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+            <strong>ชื่อ:</strong> นาย ชนกันต์ กิตติวิริยะ - <strong>รหัส:</strong> 650710862
+        </li>
+    </ul>
+</Col>
 
-                {/* Form Section */}
-                <Col md={6} className="p-4">
-                    <Row className="mb-3">
-                        <Col md={4} className="text-center">
-                            <div >
-                                {/* Placeholder for Image */}
-                                <p className="text-center">Image</p>
-                            </div>
-                        </Col>
-                        <Col>
-                            {/* Facebook Button */}
-                            <button className="styled-button">
-                                <svg
-                                    viewBox="0 0 26 26"
-                                    fill="currentColor"
-                                    height="28"
-                                    width="28"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M12.001 2C6.47813 2 2.00098 6.47715 2.00098 12C2.00098 16.9913 5.65783 21.1283 10.4385 21.8785V14.8906H7.89941V12H10.4385V9.79688C10.4385 7.29063 11.9314 5.90625 14.2156 5.90625C15.3097 5.90625 16.4541 6.10156 16.4541 6.10156V8.5625H15.1931C13.9509 8.5625 13.5635 9.33334 13.5635 10.1242V12H16.3369L15.8936 14.8906H13.5635V21.8785C18.3441 21.1283 22.001 16.9913 22.001 12C22.001 6.47715 17.5238 2 12.001 2Z"
-                                    ></path>
-                                </svg>
-                                <span>Facebook</span>
-                            </button>
 
-                            <div style={{ border: '1px solid black', height: '50px', marginBottom: '10px' }}></div>
-                            <div style={{ border: '1px solid black', height: '50px' }}></div>
-                        </Col>
-                    </Row>
-                    <Form>
+                {/* Right Section: Request Form */}
+                <Col md={6} className="p-4" style={{ backgroundColor: '#ffffff' }}>
+                    {/* GIF at the top of the form */}
+                    <div className="text-center mb-3">
+                        <img src="/assets/images/bug_fix.gif" alt="request gif" style={{ width: '128px', maxHeight: '128px', objectFit: 'cover' }} />
+                    </div>
+                    <h5 className="text-center"> <strong>คำร้อง</strong>  </h5>
+                    <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3" controlId="formName">
                             <Form.Label>ชื่อ</Form.Label>
-                            <Form.Control type="text" placeholder="ชื่อ" />
+                            <Form.Control
+                                type="text"
+                                placeholder="ชื่อ"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            />
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formEmail">
                             <Form.Label>อีเมล</Form.Label>
-                            <Form.Control type="email" placeholder="อีเมล" />
+                            <Form.Control
+                                type="email"
+                                placeholder="อีเมล"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId="formPhone">
                             <Form.Label>เบอร์โทร</Form.Label>
-                            <Form.Control type="text" placeholder="เบอร์โทร" />
+                            <Form.Control
+                                type="text"
+                                placeholder="เบอร์โทร"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                required
+                            />
                         </Form.Group>
 
-                        <Form.Group className="mb-3" controlId="formMessage">
-                            <Form.Label>ข้อความ</Form.Label>
-                            <Form.Control as="textarea" rows={3} placeholder="ข้อความ" />
+                        <Form.Group className="mb-3" controlId="formIssue">
+                            <Form.Label>ปัญหา</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                placeholder="อธิบายปัญหาที่เกิดขึ้น"
+                                name="issue"
+                                value={formData.issue}
+                                onChange={handleChange}
+                                required
+                            />
                         </Form.Group>
-
-                        <Button variant="danger" type="submit">ส่ง</Button>
+                        
+  <div class="gradient-btn-1"  variant="danger" type="submit">
+    <div class="gradient-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path fill="none" d="M0 0h24v24H0z"></path>
+        <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+      </svg>
+      <span>ส่ง</span>
+    </div>
+  </div>
+  
                     </Form>
                 </Col>
             </Row>
         </Container>
     );
-}
+};
 
 export default Contact_Data;

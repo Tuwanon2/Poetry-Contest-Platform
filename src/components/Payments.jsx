@@ -170,14 +170,15 @@ const Payment = () => {
                 <p>กรุณากรอกที่อยู่ในการจัดส่ง</p>
               )}
 
-              <Button 
-                class = 'button-40'
-                variant="primary" 
-                onClick={handleNavigateToChooseAddress} 
-                style={{ position: 'absolute', bottom: '20px', right: '10px', backgroundColor: '#CC0066' }}
-              >
-                แก้ไขที่อยู่
-              </Button>
+              
+   <button class="Btn" onClick={handleNavigateToChooseAddress} style={{ position: 'absolute', bottom: '20px', right: '10px', backgroundColor: '#CC0066' }} >แก้ไข
+      <svg class="svg" viewBox="0 0 512 512">
+        <path d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"></path></svg>
+    </button>
+
+
+
+
             </Card.Body>
           </Card>
         </Col>
@@ -362,15 +363,45 @@ const Payment = () => {
 </Card>
 
 
-          <Button 
-  class='button-40'        
-  variant="primary" 
-  onClick={handleConfirmPayment} 
-  disabled={!isAddressValid()}
-  style={{backgroundColor:'#CC0066'}}
->
-  ยืนยันการชำระเงิน
-</Button>
+
+
+<div 
+    className="btn-container" 
+    onClick={() => isAddressValid() && handleConfirmPayment()} 
+    style={{ 
+        backgroundColor: '#CC0066', 
+        padding: '4px 10px', 
+        borderRadius: '20px',
+        height: '50px', 
+        width: '250px', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        transition: 'transform 0.2s ease, background-color 0.2s ease'  // เพิ่ม transition เพื่อทำให้แอนิเมชันราบรื่น
+    }}
+    >
+    <a 
+        className="btn-content" 
+        href="#"
+        style={{ padding: '4px 10px', display: 'flex', alignItems: 'center' }}
+        onClick={(e) => { 
+            e.preventDefault();
+            isAddressValid() && handleConfirmPayment();
+        }}
+    >
+        <span className="btn-title" style={{ fontSize: "80%", marginRight: '10px' }}>ยืนยันการชำระเงิน</span>
+        <span className="icon-arrow">
+            <svg width="30px" height="30px" viewBox="0 0 66 43">
+                <g id="arrow" fill="none" fillRule="evenodd">
+                    <path id="arrow-icon-one" d="M40.1543933,3.89485454 L43.9763149,0.139296592 C44.1708311,-0.0518420739 44.4826329,-0.0518571125 44.6771675,0.139262789 L65.6916134,20.7848311 C66.0855801,21.1718824 66.0911863,21.8050225 65.704135,22.1989893 C65.7000188,22.2031791 65.6958657,22.2073326 65.6916762,22.2114492 L44.677098,42.8607841 C44.4825957,43.0519059 44.1708242,43.0519358 43.9762853,42.8608513 L40.1545186,39.1069479 C39.9575152,38.9134427 39.9546793,38.5968729 40.1481845,38.3998695 C40.1502893,38.3977268 40.1524132,38.395603 40.1545562,38.3934985 L56.9937789,21.8567812 C57.1908028,21.6632968 57.193672,21.3467273 57.0001876,21.1497035 C56.9980647,21.1475418 56.9959223,21.1453995 56.9937605,21.1432767 L40.1545208,4.60825197 C39.9574869,4.41477773 39.9546013,4.09820839 40.1480756,3.90117456 C40.1501626,3.89904911 40.1522686,3.89694235 40.1543933,3.89485454 Z" fill="#FFFFFF"></path>
+                </g>
+            </svg>
+        </span> 
+    </a>
+</div>
+
+
+      
 
             </Card.Body>
           </Card>

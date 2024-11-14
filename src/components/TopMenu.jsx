@@ -76,6 +76,7 @@ const TopMenu = () => {
                         alignItems: 'center', 
                         color: 'black', 
                         textDecoration: 'none' // Remove underline
+                        
                       }}
                     >
                       <img
@@ -141,6 +142,7 @@ const TopMenu = () => {
                   color: 'white',
                   fontWeight: location.pathname === '/Contact' ? 'bold' : 'normal',
                   fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
+                 
                 }}
               >
                 ติดต่อเรา
