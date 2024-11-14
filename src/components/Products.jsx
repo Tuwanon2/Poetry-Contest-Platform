@@ -14,6 +14,7 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
 
   const placeholderImage = '../assets/images/Splendor.jpg';
+  
 
   const categories = [
     { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png', category_id: '' },

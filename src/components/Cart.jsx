@@ -35,8 +35,9 @@ const MyCart = () => {
     const removeProduct = (productId) => {
         const updatedProducts = products.filter(product => product.id !== productId);
         setProducts(updatedProducts);
-        updateLocalStorage(updatedProducts);
+        updateLocalStorage(updatedProducts); // อัปเดต localStorage
     };
+    
 
     const changeQuantity = (productId, action) => {
         const updatedProducts = products.map(product => {
@@ -153,10 +154,7 @@ const MyCart = () => {
                         <div className="cart-summary" style={{ padding: '20px', backgroundColor: '#f1f1f1', borderRadius: '15px', marginTop: '0px' }}>
                             <h5 style={{ fontWeight: 'bold', backgroundColor: '#e0e0e0', padding: '10px', borderRadius: '15px 15px 0 0' }}>รวมเป็นเงินทั้งหมด</h5>
                             <div style={{ padding: '20px' }}>
-                                <p style={{ fontWeight: 'bold' }}>ยอดรวม <span style={{ float: 'right' }}>฿{subtotal.toFixed(2)}</span></p>
-                                <p>ส่วนลด ({discountPercentage}%): <span style={{ float: 'right' }}>-฿{discount.toFixed(2)}</span></p>
-                                {products.length > 0 && <p>ค่าส่ง <span style={{ float: 'right' }}>฿{shipping}</span></p>}
-                                <h4>ราคารวม <span style={{ float: 'right' }}>฿{total.toFixed(2)}</span></h4>
+                                <p style={{ fontWeight: 'bold' }}>ราคารวม <span style={{ float: 'right' }}>฿{subtotal.toFixed(2)}</span></p>
                                 
                                 <Button
                                     className="styled-checkout-button"

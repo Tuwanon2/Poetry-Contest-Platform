@@ -1,16 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Card, Container, Row, Col } from 'react-bootstrap';
+import { Card, Container, Row, Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const sellerNames = {
-  'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
-  'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
-  '940256ba-a9de-4aa9-bad8-604468cb6af3': 'TIME TO PLAY',
-  '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'Towertactic',
-  'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'DiceCUP',
-};
-
+// ฟังก์ชันสำหรับดึงข้อมูลชื่อผู้ขาย
 const getSellerImage = (sellerId) => {
   const images = {
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
@@ -19,18 +12,43 @@ const getSellerImage = (sellerId) => {
     '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.jpg',
     'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
   };
-  return images[sellerId] || '/assets/default_image.png';
+  return images[sellerId] || '/assets/default_image.png'; // ใช้ภาพดีฟอลต์หากไม่มี
 };
 
+// ฟังก์ชันสำหรับดึงข้อมูลชื่อผู้ขาย
 const getSellerName = (sellerId) => {
-  return sellerNames[sellerId] || 'Unknown';
+  const sellerNames = {
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
+    'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
+    '940256ba-a9de-4aa9-bad8-604468cb6af3': 'TIME TO PLAY',
+    '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'Towertactic',
+    'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'DiceCUP',
+  };
+  return sellerNames[sellerId] || 'Unknown'; // ใช้ชื่อผู้ขายเป็น 'Unknown' หากไม่พบ
 };
 
 const NewProducts = () => {
   const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);  // สถานะของตะกร้า
   const productRefs = useRef([]);
-
   const placeholderImage = '../assets/images/Splendor.jpg';
+
+  // ฟังก์ชันสำหรับเพิ่มสินค้าลงตะกร้า
+  const addToCart = (productId) => {
+    setCart((prevCart) => {
+        const existingProduct = prevCart.find(item => item.id === productId);
+        if (existingProduct) {
+            return prevCart; // ถ้ามีสินค้าอยู่แล้วไม่ต้องเพิ่ม
+        }
+        const productToAdd = products.find(product => product.id === productId);
+        const updatedCart = [...prevCart, productToAdd];
+        
+        localStorage.setItem('cart', JSON.stringify(updatedCart)); // บันทึกตะกร้าลง localStorage
+        return updatedCart;
+    });
+    console.log(`เพิ่มสินค้า ID: ${productId} ลงตะกร้า`);
+};
+
 
   useEffect(() => {
     axios
@@ -42,29 +60,27 @@ const NewProducts = () => {
         setProducts(filteredProducts);
       })
       .catch((error) => {
-        console.error('Error fetching the products:', error);
+        console.error('เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า:', error);
       });
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('fade-in'); // เพิ่มคลาส fade-in เมื่อสินค้าปรากฏในมุมมอง
-            observer.unobserve(entry.target); // หยุดสังเกตการณ์หลังจากแสดงผลแล้ว
+            entry.target.classList.add('fade-in');
+            observer.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.1 }
     );
 
-    // สังเกตการณ์สินค้าทุกตัว
     productRefs.current.forEach((productRef) => {
       if (productRef) {
         observer.observe(productRef);
       }
     });
 
-    // ลบ observer เมื่อคอมโพเนนต์ถูกถอดออก
     return () => observer.disconnect();
   }, [products]);
 
@@ -161,6 +177,13 @@ const NewProducts = () => {
                           </Link>
                         </div>
                       </div>
+                      <Button 
+                        onClick={() => addToCart(product.id)}
+                        variant="outline-primary"
+                        className="mt-2"
+                      >
+                        เพิ่มลงตะกร้า
+                      </Button>
                     </Card.Body>
                   </Card>
                 </Col>
