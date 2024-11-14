@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Image, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom'; // เพิ่ม useNavigate
@@ -60,7 +56,7 @@ const Deliverys = () => {
     let currentIndex = storedStatus ? storedStatus.currentIndex || 0 : 0;
   
     if (storedStatus) {
-      setStatusUpdates(storedStatus.statusMessages); // ฟื้นฟูสถานะจาก localStorage
+      setStatusUpdates(storedStatus.statusMessages);
     }
   
     if (currentIndex >= statusMessages.length) {
@@ -71,19 +67,27 @@ const Deliverys = () => {
       const now = new Date().toLocaleString('th-TH');
       const newStatus = { message: statusMessages[currentIndex], time: now };
   
-      // ตรวจสอบว่าเป็นสถานะใหม่หรือไม่
       setStatusUpdates(prevUpdates => {
-        // ตรวจสอบสถานะล่าสุดว่าซ้ำกับสถานะใหม่หรือไม่
         if (prevUpdates.length > 0 && prevUpdates[0].message === newStatus.message) {
-          return prevUpdates; // ถ้าซ้ำก็ไม่อัปเดต
+          return prevUpdates;
         }
   
-        // ถ้าไม่ซ้ำก็อัปเดตสถานะ
-        const updatedStatus = [...prevUpdates, newStatus]; // เก็บสถานะใหม่ที่ท้ายสุด
+        const updatedStatus = [...prevUpdates, newStatus];
         localStorage.setItem('orderStatus', JSON.stringify({
           statusMessages: updatedStatus,
           currentIndex: currentIndex + 1
         }));
+  
+        // เช็คสถานะสุดท้ายและย้ายไปหน้า ToHistorie
+        if (newStatus.message === "พัสดุถูกจัดส่งสำเร็จแล้ว") {
+          const storedOrders = JSON.parse(localStorage.getItem('ordersHistory')) || [];
+          storedOrders.push(orderDetails);
+          localStorage.setItem('ordersHistory', JSON.stringify(storedOrders));
+  
+          // ลบข้อมูลออกจาก orderDetails หรือทำการรีเซ็ตหากจำเป็น
+          localStorage.removeItem('orderDetails');
+        }
+  
         return updatedStatus;
       });
   
@@ -92,12 +96,11 @@ const Deliverys = () => {
       if (currentIndex >= statusMessages.length) {
         clearInterval(interval);
       }
-    }, 10000); // อัปเดตทุกๆ 30 วินาที
+    }, 5000);
   
     return () => clearInterval(interval);
   }, []);
-  
-  
+   
 
   if (!orderDetails || !shippingAddress) {
     return <div>Loading...</div>;
@@ -135,8 +138,6 @@ const Deliverys = () => {
           </Button>
         </Col>
       </Row>
-
-      
 
       <Row className="mb-4">
         <Col>
