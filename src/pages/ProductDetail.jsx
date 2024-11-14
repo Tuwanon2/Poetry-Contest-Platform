@@ -30,6 +30,7 @@ const getSellerName = (sellerId) => {
   return sellerNames[sellerId] || 'Unknown';
 };
 
+
 const QuantitySelector = ({ quantity, setQuantity }) => {
   const handleChange = (e) => {
     const value = e.target.value;
@@ -253,7 +254,7 @@ const ProductDetail = () => {
         </Row>
       </Container>
       <div className="elgy-tooltip-container">
-  <a href="https://www.example.com" target="_blank" rel="noopener noreferrer">
+  <a target="_blank" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
         viewBox="0 0 16 16"

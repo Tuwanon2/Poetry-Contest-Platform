@@ -11,7 +11,7 @@ const Delivery = () => {
       <TopMenu />
       <Deliverys />
       <div className="elgy-tooltip-container">
-  <a href="https://www.example.com" target="_blank" rel="noopener noreferrer">
+  <a target="_blank" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
         viewBox="0 0 16 16"

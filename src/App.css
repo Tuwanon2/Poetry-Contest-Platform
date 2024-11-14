@@ -1599,3 +1599,13 @@ h1 {
 .gradient-btn:hover svg {
   transform: rotate(45deg);
 }
+
+.custom-search-btn {
+  background-color: #FF5733; /* พื้นหลังใหม่ */
+  color: #FFFFFF;            /* สีข้อความ */
+  border: none;              /* ลบเส้นขอบออก */
+}
+
+.custom-search-btn:hover {
+  background-color: #C70039; /* สีพื้นหลังเมื่อ hover */
+}

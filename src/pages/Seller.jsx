@@ -29,7 +29,7 @@ const getSellerImage = (sellerId) => {
 const sellerFacebookLinks = {
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'https://www.facebook.com/@siamboardgames/',
   'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'https://www.facebook.com/lanlalencafe',
-  '940256ba-a9de-4aa9-bad8-604468cb6af3': 'https://www.facebook.com/timetoplayaustralia',
+  '940256ba-a9de-4aa9-bad8-604468cb6af3': 'https://www.facebook.com/velalonglen',
   '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'https://www.facebook.com/towertacticgames',
   'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'https://www.facebook.com/dicecupboardgamecafe/',
 };
@@ -49,7 +49,7 @@ const Seller = () => {
       <Products sellerId={sellerId} /> 
       <AllMarket sellerId={sellerId} /> {/* Pass sellerId to AllMarket */}
       <div className="elgy-tooltip-container">
-  <a href="https://www.example.com" target="_blank" rel="noopener noreferrer">
+  <a target="_blank" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
         viewBox="0 0 16 16"

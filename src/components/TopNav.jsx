@@ -71,7 +71,7 @@ const TopNav = () => {
           <img src="/assets/namo-logo.png" alt="Logo" width="100" height="80" />
         </Link>
 
-        <form onSubmit={handleSearchSubmit} className="d-flex flex-grow-1 mx-4">
+        <form onSubmit={handleSearchSubmit} className="d-flex flex-grow-1 mx-4" >
           <input
             className="form-control me-2 w-100"
             type="search"
@@ -79,13 +79,14 @@ const TopNav = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             aria-label="Search"
+            
           />
-          <button className="btn btn-outline-success" type="submit">
+          <button className="btn btn-outline-success" type="submit" >
             <FaSearch />
           </button>
         </form>
 
-        <div className="d-flex">
+        <div className="d-flex" >
           <Link className={`btn btn-light cart-icon ${cartAnimate ? 'animate' : ''}`} to="/MyCart">
             <FaShoppingCart />
             <span className={`badge bg-danger ${cartAnimate ? 'animate' : ''}`}>{cartCount}</span>

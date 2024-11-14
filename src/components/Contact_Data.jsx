@@ -3,7 +3,6 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import '../App.css';
 
 const Contact_Data = () => {
-    // Initialize state for each input field
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -11,7 +10,6 @@ const Contact_Data = () => {
         issue: ''
     });
 
-    // Handle form field change
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevState) => ({
@@ -20,12 +18,9 @@ const Contact_Data = () => {
         }));
     };
 
-    // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
         alert('ทาง Namo จะรีบแก้ไขปัญหานะคะ');
-
-        // Reset the form after submission
         setFormData({
             name: '',
             email: '',
@@ -33,32 +28,37 @@ const Contact_Data = () => {
             issue: ''
         });
     };
+  
 
     return (
         <Container fluid className="p-4" style={{ backgroundColor: '#f8f9fa' }}>
-            <Row className="border border-dark">
+            <Row className="border border-dark" style={{border: 'none'}}>
                 {/* Left Section: Student Info */}
                 <Col md={6} className="p-4 border-end border-dark" style={{ backgroundColor: '#ffffff', borderRadius: '10px' }}>
-    <h5 className="text-center mb-4" style={{ fontSize: '1.25rem', fontWeight: '600', color: '#007bff' }}>รายชื่อนักศึกษา</h5>
-    <ul className="list-unstyled">
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
-            <strong>ชื่อ:</strong> นาย ธุวานนท์ ใจกล้า - <strong>รหัส:</strong> 650710159
-        </li>
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
-            <strong>ชื่อ:</strong> นางสาว จิราพร ศรีใสสุข - <strong>รหัส:</strong> 650710676
-        </li>
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
-            <strong>ชื่อ:</strong> นางสาว.ปภาดา ไชยพงษ์ - <strong>รหัส:</strong> 650710699
-        </li>
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
-            <strong>ชื่อ:</strong> นางสาวอาทิตยา แสงกระจ่าง - <strong>รหัส:</strong> 650710733
-        </li>
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
-            <strong>ชื่อ:</strong> นาย ชนกันต์ กิตติวิริยะ - <strong>รหัส:</strong> 650710862
-        </li>
-    </ul>
-</Col>
+                    <h3 className="text-center mb-4" style={{ fontSize: '2.2rem', fontWeight: '600', color: '#B740D8' }}>ติดต่อเรา</h3>
+                    <h3 className="text-center mb-4" style={{ fontSize: '1.5rem', fontWeight: '600', color: '#CC6CE7' }}>012-345-6789</h3>
 
+                    <h5 className="text-center mb-4" style={{ fontSize: '1.5rem', fontWeight: '600', color: '#99BBFA' }}>-------------------------------------------------------------------</h5>
+                    <h5 className="text-center mb-4" style={{ fontSize: '1.5rem', fontWeight: '600', color: '#4943D4' }}>รายชื่อนักศึกษา</h5>
+
+                    <ul className="list-unstyled">
+                        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
+                            <strong>ชื่อ:</strong> นาย ธุวานนท์ ใจกล้า - <strong>รหัส:</strong> 650710159
+                        </li>
+                        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
+                            <strong>ชื่อ:</strong> นางสาว จิราพร ศรีใสสุข - <strong>รหัส:</strong> 650710676
+                        </li>
+                        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
+                            <strong>ชื่อ:</strong> นางสาว.ปภาดา ไชยพงษ์ - <strong>รหัส:</strong> 650710699
+                        </li>
+                        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
+                            <strong>ชื่อ:</strong> นางสาวอาทิตยา แสงกระจ่าง - <strong>รหัส:</strong> 650710733
+                        </li>
+                        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
+                            <strong>ชื่อ:</strong> นาย ชนกันต์ กิตติวิริยะ - <strong>รหัส:</strong> 650710862
+                        </li>
+                    </ul>
+                </Col>
 
                 {/* Right Section: Request Form */}
                 <Col md={6} className="p-4" style={{ backgroundColor: '#ffffff' }}>
@@ -66,7 +66,7 @@ const Contact_Data = () => {
                     <div className="text-center mb-3">
                         <img src="/assets/images/bug_fix.gif" alt="request gif" style={{ width: '128px', maxHeight: '128px', objectFit: 'cover' }} />
                     </div>
-                    <h5 className="text-center"> <strong>คำร้อง</strong>  </h5>
+                    <h5 className="text-center"><strong>คำร้อง</strong></h5>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3" controlId="formName">
                             <Form.Label>ชื่อ</Form.Label>
@@ -117,16 +117,16 @@ const Contact_Data = () => {
                             />
                         </Form.Group>
                         
-  <div class="gradient-btn-1"  variant="danger" type="submit">
-    <div class="gradient-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-        <path fill="none" d="M0 0h24v24H0z"></path>
-        <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
-      </svg>
-      <span>ส่ง</span>
-    </div>
-  </div>
-  
+                        {/* Submit button */}
+                        <Button type="submit" className="gradient-btn-1" variant='none'>
+                            <div className="gradient-btn" >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="none" d="M0 0h24v24H0z"></path>
+                                    <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+                                </svg>
+                                <span>ส่ง</span>
+                            </div>
+                        </Button>
                     </Form>
                 </Col>
             </Row>
