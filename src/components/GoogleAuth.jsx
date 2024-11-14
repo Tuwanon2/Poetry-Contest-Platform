@@ -19,18 +19,20 @@ const GoogleAuth = ({ setUser, handleClose }) => {
         id_token: credentialResponse.credential,
       });
 
+      console.log('Backend response:', backendResponse.data);
+
       if (backendResponse.status === 200) {
         console.log('Backend response:', backendResponse.data);
 
-        // เก็บข้อมูลผู้ใช้ใน sessionStorage (หรือเปลี่ยนเป็น localStorage ตามความต้องการ)
+        // เก็บข้อมูลผู้ใช้ใน sessionStorage
         const userData = {
-          name: backendResponse.data.user.name,
-          email: backendResponse.data.user.email,
-          picture: decodedToken.picture, // ดึงรูปภาพจาก decodedToken
+          name: backendResponse.data.user.name || decodedToken.name || "Unnamed User",
+          email: backendResponse.data.user.email || decodedToken.email || "No email",
+          picture: decodedToken.picture || "default_picture_url", // กำหนด default รูปถ้ารูปไม่มาจาก token
         };
+        
         setUser(userData);
         sessionStorage.setItem('user', JSON.stringify(userData)); // เก็บข้อมูลผู้ใช้ใน sessionStorage
-
         sessionStorage.setItem('accessToken', backendResponse.data.access_token); // เก็บ accessToken
 
         // ปิด modal หลังจากล็อกอินสำเร็จ
@@ -63,7 +65,11 @@ const GoogleAuth = ({ setUser, handleClose }) => {
     };
 
     fetchClientId(); // เรียกใช้งานฟังก์ชันดึง clientId
-  }, []);
+
+    // ดึงข้อมูลผู้ใช้จาก sessionStorage เมื่อ component โหลดครั้งแรก
+    const storedUser = JSON.parse(sessionStorage.getItem('user'));
+    if (storedUser) setUser(storedUser);
+  }, [setUser]);
 
   return (
     <div>
