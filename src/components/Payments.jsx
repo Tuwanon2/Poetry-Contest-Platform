@@ -384,10 +384,7 @@ const Payment = () => {
         className="btn-content" 
         href="#"
         style={{ padding: '4px 10px', display: 'flex', alignItems: 'center' }}
-        onClick={(e) => { 
-            e.preventDefault();
-            isAddressValid() && handleConfirmPayment();
-        }}
+       
     >
         <span className="btn-title" style={{ fontSize: "80%", marginRight: '10px' }}>ยืนยันการชำระเงิน</span>
         <span className="icon-arrow">
