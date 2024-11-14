@@ -77,10 +77,10 @@ const MyCart = () => {
                                 borderRadius: '50px'
                             }}
                         >
-                            <Col xs={6}>Products</Col>
-                            <Col xs={2} className="text-center">Price</Col>
-                            <Col xs={2} className="text-center">Quantity</Col>
-                            <Col xs={2} className="text-right">Total</Col>
+                            <Col xs={6}>สินค้า</Col>
+                            <Col xs={2} className="text-center">ราคา</Col>
+                            <Col xs={2} className="text-center">จำนวน</Col>
+                            <Col xs={2} className="text-right">รวมเป็นเงิน</Col>
                         </Row>
 
                         {products.map((product) => {
@@ -151,18 +151,18 @@ const MyCart = () => {
                     {/* Cart Summary */}
                     <Col md={3}>
                         <div className="cart-summary" style={{ padding: '20px', backgroundColor: '#f1f1f1', borderRadius: '15px', marginTop: '0px' }}>
-                            <h5 style={{ fontWeight: 'bold', backgroundColor: '#e0e0e0', padding: '10px', borderRadius: '15px 15px 0 0' }}>Cart Totals</h5>
+                            <h5 style={{ fontWeight: 'bold', backgroundColor: '#e0e0e0', padding: '10px', borderRadius: '15px 15px 0 0' }}>รวมเป็นเงินทั้งหมด</h5>
                             <div style={{ padding: '20px' }}>
-                                <p style={{ fontWeight: 'bold' }}>Subtotal <span style={{ float: 'right' }}>฿{subtotal.toFixed(2)}</span></p>
-                                <p>Discount ({discountPercentage}%): <span style={{ float: 'right' }}>-฿{discount.toFixed(2)}</span></p>
-                                {products.length > 0 && <p>Shipping <span style={{ float: 'right' }}>฿{shipping}</span></p>}
-                                <h4>Total <span style={{ float: 'right' }}>฿{total.toFixed(2)}</span></h4>
+                                <p style={{ fontWeight: 'bold' }}>ยอดรวม <span style={{ float: 'right' }}>฿{subtotal.toFixed(2)}</span></p>
+                                <p>ส่วนลด ({discountPercentage}%): <span style={{ float: 'right' }}>-฿{discount.toFixed(2)}</span></p>
+                                {products.length > 0 && <p>ค่าส่ง <span style={{ float: 'right' }}>฿{shipping}</span></p>}
+                                <h4>ราคารวม <span style={{ float: 'right' }}>฿{total.toFixed(2)}</span></h4>
                                 
                                 <Button
                                     className="styled-checkout-button"
                                     onClick={handleCheckout}
                                 >
-                                    Checkout
+                                    สั่งซื้อสินค้า
                                     <svg
                                         className="styled-checkout-icon"
                                         fill="none"
@@ -191,7 +191,7 @@ const MyCart = () => {
             ) : (
                 <button className="cta">
                 <Link to="/Shop" style={{ textDecoration: 'none' }}>
-                  <span className="hover-underline-animation"> Shop now </span>
+                  <span className="hover-underline-animation">สั่งซื้อที่นี่</span>
                   <svg
                     id="arrow-horizontal"
                     xmlns="http://www.w3.org/2000/svg"

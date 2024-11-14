@@ -22,7 +22,11 @@ const SearchResults = () => {
         .get(`/api/v1/products?search=${query}&limit=20`)
         .then((response) => {
           if (response.data.items) {
-            setProducts(response.data.items); // ตั้งค่า products ด้วยข้อมูลจาก API
+            // กรองผลลัพธ์ให้แสดงเฉพาะสินค้าที่ชื่อ (name) ตรงกับคำค้นหา
+            const filteredProducts = response.data.items.filter((product) =>
+              product.name.toLowerCase().includes(query.toLowerCase())
+            );
+            setProducts(filteredProducts); // ตั้งค่า products ด้วยสินค้าที่กรองแล้ว
             setError(null); // ล้าง error หากมีข้อมูล
           } else if (response.data.error) {
             setError(response.data.error); // เก็บข้อความข้อผิดพลาด
@@ -86,14 +90,16 @@ const SearchResults = () => {
                   <Card className="mb-4 p-3" style={{ border: '1px solid #e5e5e5' }}>
                     <Row>
                       <Col md={3}>
-                        <Card.Img
-                          src={primaryImage}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = placeholderImage;
-                          }}
-                          style={{ maxHeight: '150px', objectFit: 'contain' }}
-                        />
+                        <Link to={`/product/${product.id}`}>
+                          <Card.Img
+                            src={primaryImage}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = placeholderImage;
+                            }}
+                            style={{ maxHeight: '150px', objectFit: 'contain', cursor: 'pointer' }}
+                          />
+                        </Link>
                       </Col>
                       <Col md={6}>
                         <Card.Body>
@@ -103,23 +109,33 @@ const SearchResults = () => {
                           <div style={{ fontSize: '1.2rem', color: '#28a745' }}>
                             <strong>{product.price ? `฿${product.price}` : 'ราคาไม่ระบุ'}</strong>
                           </div>
-
                         </Card.Body>
                       </Col>
                       <Col md={3} className="d-flex align-items-center justify-content-center">
                         <div>
-                          <Button class='button-57' variant="primary" className="me-2" onClick={() => addToCart(product)} 
-                          style={{border: '3px solid #CC0066',
-                            borderRadius: '5%',
-                            backgroundColor: '#CC0066',
-                          }}>
+                          <Button
+                            variant="primary"
+                            className="me-2"
+                            onClick={() => addToCart(product)}
+                            style={{
+                              border: '3px solid #CC0066',
+                              borderRadius: '5%',
+                              backgroundColor: '#CC0066',
+                              transition: 'all 0.3s ease', // เพิ่มการเปลี่ยนแปลงให้ลื่นไหล
+                            }}
+                            onMouseOver={(e) => (e.target.style.backgroundColor = '#9B0056')}
+                            onMouseOut={(e) => (e.target.style.backgroundColor = '#CC0066')}
+                          >
                             เพิ่มลงในตะกร้า
                           </Button>
                           <Link to={`/product/${product.id}`}>
-                            <Button class='button-57' variant="outline-secondary"
-                            style={{border: '3px solid #CC0066',
-                              
-                            }}>
+                            <Button
+                              variant="outline-secondary"
+                              style={{
+                                border: '3px solid #CC0066',
+                                transition: 'all 0.3s ease',
+                              }}
+                            >
                               ดูรายละเอียด
                             </Button>
                           </Link>
