@@ -36,24 +36,34 @@ const Contact_Data = () => {
 
     return (
         <Container fluid className="p-4" style={{ backgroundColor: '#f8f9fa' }}>
+
+            
+
             <Row className="border border-dark">
                 {/* Left Section: Student Info */}
                 <Col md={6} className="p-4 border-end border-dark" style={{ backgroundColor: '#ffffff', borderRadius: '10px' }}>
-    <h5 className="text-center mb-4" style={{ fontSize: '1.25rem', fontWeight: '600', color: '#007bff' }}>รายชื่อนักศึกษา</h5>
+
+                <h3 className="text-center mb-4" style={{ fontSize: '2.2rem', fontWeight: '600', color: '#B740D8' }}>ติดต่อเรา</h3>
+                <h3 className="text-center mb-4" style={{ fontSize: '1.5rem', fontWeight: '600', color: '#CC6CE7' }}>012-345-6789</h3>
+
+    <h5 className="text-center mb-4" style={{ fontSize: '1.5rem', fontWeight: '600', color: '#99BBFA' }}>-------------------------------------------------------------------</h5>
+    <h5 className="text-center mb-4" style={{ fontSize: '1.5rem', fontWeight: '600', color: '#4943D4' }}>รายชื่อนักศึกษา</h5>
+   
+ 
     <ul className="list-unstyled">
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
             <strong>ชื่อ:</strong> นาย ธุวานนท์ ใจกล้า - <strong>รหัส:</strong> 650710159
         </li>
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
             <strong>ชื่อ:</strong> นางสาว จิราพร ศรีใสสุข - <strong>รหัส:</strong> 650710676
         </li>
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
             <strong>ชื่อ:</strong> นางสาว.ปภาดา ไชยพงษ์ - <strong>รหัส:</strong> 650710699
         </li>
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
             <strong>ชื่อ:</strong> นางสาวอาทิตยา แสงกระจ่าง - <strong>รหัส:</strong> 650710733
         </li>
-        <li className="mb-3" style={{ fontSize: '1rem', fontWeight: '500', lineHeight: '1.5' }}>
+        <li className="mb-3" style={{ fontSize: '1.2rem', fontWeight: '500', lineHeight: '1.5' }}>
             <strong>ชื่อ:</strong> นาย ชนกันต์ กิตติวิริยะ - <strong>รหัส:</strong> 650710862
         </li>
     </ul>
