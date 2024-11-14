@@ -65,7 +65,7 @@ const TopNav = () => {
   };
 
   return (
-    <nav className="navbar navbar-light bg-light">
+    <nav className="navbar navbar-light bg-light" style={{zIndex: '3000'}}>
       <div className="container-fluid d-flex justify-content-between align-items-center">
         <Link className="navbar-brand" to="/">
           <img src="/assets/namo-logo.png" alt="Logo" width="100" height="80" />
@@ -103,7 +103,11 @@ const TopNav = () => {
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/profile">My Profile</Dropdown.Item>
+                {/* Display user's name first, disabled and smaller */}
+                <Dropdown.Item disabled style={{ fontSize: '0.8rem' }}>
+                  {user.name}
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/MyProfile">My Profile</Dropdown.Item>
                 <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>

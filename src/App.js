@@ -26,6 +26,7 @@ function App() {
         <Route path="/MyCart" element={<MyCart />} />
         <Route path="/Payment" element={<Payment />} />
         <Route path="/MyProfile" element={<MyProfile />} />
+        <Route path="/Profile" element={<profile />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/Shop" element={<Shop />} />
         <Route path="/product/:productId" element={<ProductDetail />} />
@@ -43,4 +44,3 @@ function App() {
 }
 
 export default App;
-

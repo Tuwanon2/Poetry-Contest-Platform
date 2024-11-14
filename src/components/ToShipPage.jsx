@@ -67,6 +67,27 @@ const ToShipPage = () => {
     navigate('/Upstatus');  // Navigate to status update page
   };
 
+  const handleOrderSubmit = (newOrderItems) => {
+    // ดึงข้อมูลเก่าจาก localStorage
+    const savedOrder = JSON.parse(localStorage.getItem('orderDetails')) || { items: [], total: 0 };
+  
+    // รวมสินค้าจากการสั่งซื้อใหม่กับสินค้าจากการสั่งซื้อเก่า
+    const updatedItems = [...savedOrder.items, ...newOrderItems]; 
+  
+    // คำนวณราคาใหม่
+    const updatedTotal = calculateTotalPrice(updatedItems);
+  
+    // เซฟข้อมูลใหม่ลงใน localStorage
+    const updatedOrder = { items: updatedItems, total: updatedTotal };
+    localStorage.setItem('orderDetails', JSON.stringify(updatedOrder));
+  
+    // อัพเดตสถานะใน state
+    setOrder(updatedOrder);
+  };
+  
+
+
+
   return (
     <Container className="my-5">
       <Row className="justify-content-center">
