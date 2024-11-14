@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Image, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom'; // เพิ่ม useNavigate
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
 
 const Update = () => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [shippingAddress, setShippingAddress] = useState(null);
-  const navigate = useNavigate(); // กำหนด navigate
+  const navigate = useNavigate();
 
   const sellerNames = {
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
@@ -45,13 +45,7 @@ const Update = () => {
     return <div>Loading...</div>;
   }
 
-
   const orderTime = new Date(orderDetails.orderTime); // กำหนดวันที่และเวลา
-  <Row className="mb-3">
-    <Col sm={8}>วันเวลาที่สั่งสินค้า</Col>
-    <Col sm={4} className="text-end">{orderTime.toLocaleString('th-TH')}</Col>
-  </Row>
-
 
   const { items, subtotal, discountPercentage, totalShipping, grandTotal, paymentMethod } = orderDetails;
 
@@ -68,14 +62,12 @@ const Update = () => {
     return new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(amount);
   };
 
-  // ฟังก์ชันสำหรับการนำทางไปหน้า Upstatus
   const handleStatusUpdate = () => {
-    navigate('/upstatus'); // นำทางไปยังหน้า Upstatus
+    navigate('/upstatus');
   };
 
-  // ฟังก์ชันสำหรับการนำทางไปหน้า ShippingDetails
   const handleShippingDetails = () => {
-    navigate('/ShippingDetails'); // นำทางไปยังหน้า ShippingDetails
+    navigate('/ShippingDetails');
   };
 
   return (
@@ -97,25 +89,20 @@ const Update = () => {
       </Row>
 
       {/* Button "ข้อมูลการจัดส่ง" with order time */}
-<Row className="mb-4">
-  <Col>
-    <Button 
-      variant="primary" 
-      className="w-100 text-start" 
-      onClick={() => navigate('/Delivery')} // เพิ่มการนำทางไปยังหน้า Delivery
-      style={{ display: 'block', width: '100%', fontSize: '1.3rem', padding: '12px', color: '#CC0066' ,backgroundColor:'white', border: '2px solid #CC0066' }} 
-    >
-      
-      <h3>ข้อมูลการจัดส่ง</h3>
-
-      <h6>ตรวจสอบสถานะการสั่งซื้อที่นี่</h6>
-      
-      
-    </Button>
-  </Col>
-</Row>
-
-
+      <Row className="mb-4">
+        <Col>
+          <Button 
+            variant="primary" 
+            className="w-100 text-start" 
+            onClick={() => navigate('/Delivery')}
+            style={{ display: 'block', width: '100%', fontSize: '1.3rem', padding: '12px', color: '#CC0066', backgroundColor: 'white', border: '2px solid #CC0066' }} 
+          >
+            <h3>ข้อมูลการจัดส่ง</h3>
+            <h6>วันเวลาที่สั่งสินค้า: {orderTime.toLocaleString('th-TH')}</h6>
+            <h6>ตรวจสอบสถานะการสั่งซื้อที่นี่</h6>
+          </Button>
+        </Col>
+      </Row>
 
       {/* Address details */}
       <Row className="mb-4">
@@ -204,28 +191,28 @@ const Update = () => {
                 <Col sm={4} className="text-end">{formatCurrency((subtotal * discountPercentage) / 100)}</Col>
               </Row>
               <Row className="mb-3">
-                <Col sm={8}>ค่าจัดส่ง</Col>
+                <Col sm={8}>ค่าส่งสินค้า</Col>
                 <Col sm={4} className="text-end">{formatCurrency(totalShipping)}</Col>
               </Row>
               <hr />
-              <Row className="mb-3">
-                <Col sm={8}><strong>ยอดชำระทั้งหมด</strong></Col>
+              <Row>
+                <Col sm={8}><strong>ยอดรวมสุทธิ</strong></Col>
                 <Col sm={4} className="text-end"><strong>{formatCurrency(grandTotal)}</strong></Col>
               </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-              <Row className="mb-3">
-                <Col sm={8}>วิธีการชำระเงิน</Col>
-                <Col sm={4} className="text-end">{paymentMethod || 'ไม่ระบุ'}</Col>
-              </Row>
-
-              {/* Display the total products and estimated delivery */}
-              <Row className="mb-3">
-                <Col sm={8}><strong>สินค้ารวม {items.length} รายการ:</strong></Col>
-                <Col sm={4} className="text-end"><strong>{formatCurrency(grandTotal)}</strong></Col>
-              </Row>
-
-             
-              
+      {/* Payment method */}
+      <Row className="mb-4">
+        <Col>
+          <Card>
+            <Card.Header>
+              <h3>วิธีการชำระเงิน</h3>
+            </Card.Header>
+            <Card.Body>
+              <p>{paymentMethod}</p>
             </Card.Body>
           </Card>
         </Col>

@@ -35,8 +35,9 @@ const MyCart = () => {
     const removeProduct = (productId) => {
         const updatedProducts = products.filter(product => product.id !== productId);
         setProducts(updatedProducts);
-        updateLocalStorage(updatedProducts);
+        updateLocalStorage(updatedProducts); // อัปเดต localStorage
     };
+    
 
     const changeQuantity = (productId, action) => {
         const updatedProducts = products.map(product => {
