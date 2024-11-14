@@ -386,7 +386,7 @@ const Payment = () => {
         style={{ padding: '4px 10px', display: 'flex', alignItems: 'center' }}
        
     >
-        <span className="btn-title" style={{ fontSize: "80%", marginRight: '10px' }}>ยืนยันการชำระเงิน</span>
+        <span className="btn-title" style={{ fontSize: "80%", marginRight: '10px',color:'white' }}>ยืนยันการชำระเงิน</span>
         <span className="icon-arrow">
             <svg width="30px" height="30px" viewBox="0 0 66 43">
                 <g id="arrow" fill="none" fillRule="evenodd">
