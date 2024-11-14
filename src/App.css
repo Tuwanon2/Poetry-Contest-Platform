@@ -243,6 +243,7 @@ h1 {
 
 /* CSS */
 .button-40 {
+  
   background-color: #111827;
   border: 1px solid transparent;
   border-radius: .75rem;
@@ -1395,3 +1396,193 @@ h1 {
   color: #03a9f4;
 }
 
+/* From Uiverse.io by Li-Deheng */ 
+/* Button Container */
+.btn-conteiner {
+  display: flex;
+  justify-content: center;
+  --color-text: #ffffff;
+  --color-background: #ff135a;
+  --color-outline: #ff145b80;
+  --color-shadow: #00000080;
+}
+
+/* Button Content */
+.btn-content {
+  display: flex;
+  align-items: center;
+  padding: 10px 40px; /* ขยาย padding เพื่อให้ปุ่มมีขนาดใหญ่และชัดเจน */
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition: all 0.4s ease;
+  border-radius: 30px; /* ปรับขอบมนให้สัมพันธ์กับขนาดปุ่ม */
+  box-shadow: 0 0 0.4em var(--color-shadow);
+}
+
+.btn-content:hover,
+.btn-content:focus {
+  transition: all 0.3s ease;
+  box-shadow: 0 0 1em var(--color-outline); /* เพิ่ม shadow ให้สอดคล้องกับขนาดปุ่ม */
+  outline: none; /* เอา outline ออก */
+}
+
+.btn-content .icon-arrow {
+  transition: 0.3s;
+  margin-right: 0px;
+  transform: scale(0.6);
+}
+
+.btn-content:hover .icon-arrow {
+  margin-right: 15px; /* ลด margin เพื่อให้สอดคล้องกับขนาดปุ่ม */
+}
+
+/* SVG Arrow Styles */
+.icon-arrow {
+  width: 20px;
+  margin-left: 10px;
+  position: relative;
+  
+}
+
+/* SVG Animations */
+#arrow-icon-one,
+#arrow-icon-two {
+  transition: transform 0.4s;
+}
+
+#arrow-icon-one {
+  transform: translateX(-50%);
+}
+
+#arrow-icon-two {
+  transform: translateX(-30%);
+}
+
+.btn-content:hover #arrow-icon-one {
+  transform: translateX(0%);
+}
+
+.btn-content:hover #arrow-icon-two {
+  transform: translateX(0%);
+}
+
+@keyframes color_anim {
+  0%, 100% { fill: white; }
+  50% { fill: var(--color-background); }
+}
+
+/* Removing the unnecessary outline animation */
+@keyframes btn-content {
+  0% { box-shadow: 0 0 0.2em var(--color-outline); }
+  100% { box-shadow: 0 0 0.4em var(--color-outline); }
+}
+
+
+/* From Uiverse.io by vinodjangid07 */ 
+.Btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100px;
+  height: 40px;
+  border: none;
+  padding: 0px 20px;
+  background-color: rgb(168, 38, 255);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 10px;
+  box-shadow: 5px 5px 0px rgb(140, 32, 212);
+  transition-duration: .3s;
+}
+
+.svg {
+  width: 13px;
+  position: absolute;
+  right: 0;
+  margin-right: 20px;
+  fill: white;
+  transition-duration: .3s;
+}
+
+.Btn:hover {
+  color: transparent;
+}
+
+.Btn:hover svg {
+  right: 43%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  transition-duration: .3s;
+}
+
+.Btn:active {
+  transform: translate(3px , 3px);
+  transition-duration: .3s;
+  box-shadow: 2px 2px 0px rgb(140, 32, 212);
+}
+
+/* From Uiverse.io by eirikvold */
+.gradient-btn {
+  font-family: inherit;
+  font-size: 18px;
+  background: linear-gradient(to bottom, #4dc7d9 0%, #66a6ff 100%);
+  color: white;
+  padding: 0.8em 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 25px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s;
+}
+
+.gradient-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.gradient-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.gradient-btn span {
+  display: block;
+  margin-left: 0.4em;
+  transition: all 0.3s;
+}
+
+.gradient-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: white;
+  transition: all 0.3s;
+}
+
+.gradient-btn .svg-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin-right: 0.5em;
+  transition: all 0.3s;
+}
+
+.gradient-btn:hover .svg-wrapper {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.gradient-btn:hover svg {
+  transform: rotate(45deg);
+}

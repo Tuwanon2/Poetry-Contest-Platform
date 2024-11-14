@@ -65,12 +65,7 @@ const TopNav = () => {
   };
 
   return (
-<<<<<<< HEAD
-    <nav className="navbar navbar-light bg-light" style={{
-      zIndex: '3000'}}>
-=======
     <nav className="navbar navbar-light bg-light" style={{zIndex: '3000'}}>
->>>>>>> f0e3f984a47324ceb54c8fa8425c7cff6380ccc9
       <div className="container-fluid d-flex justify-content-between align-items-center">
         <Link className="navbar-brand" to="/">
           <img src="/assets/namo-logo.png" alt="Logo" width="100" height="80" />
