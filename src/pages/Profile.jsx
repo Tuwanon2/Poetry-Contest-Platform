@@ -60,7 +60,7 @@ const Profile = () => {
         </Col>
       </Row>
       <div className="elgy-tooltip-container">
-  <a  target="_blank" rel="noopener noreferrer">
+  <a  href="/" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
         viewBox="0 0 16 16"
@@ -111,7 +111,7 @@ const Profile = () => {
     </span>
   </a>
 
-  <a href="/Contact" target="_blank" rel="noopener noreferrer">
+  <a href="/Contact" rel="noopener noreferrer">
     <span className="elgy-tooltip3">
       <svg
         viewBox="0 0 16 16"

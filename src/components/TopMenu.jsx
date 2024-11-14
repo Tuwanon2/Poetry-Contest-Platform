@@ -24,7 +24,7 @@ const TopMenu = () => {
   const location = useLocation();
 
   return (
-    <nav className="navbar navbar-expand-lg" style={{ backgroundColor: '#CC0066' }}>
+    <nav className="navbar navbar-expand-lg" style={{ backgroundColor: '#CC0066',position:'sticky',top:'13.5%' }}>
       <div className="container-fluid">
         <Link
           className={`navbar-brand ${location.pathname === '/' ? 'active' : ''}`}

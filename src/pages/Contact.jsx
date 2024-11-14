@@ -3,7 +3,8 @@ import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
 import Contact_Data from '../components/Contact_Data';
- 
+import { Link } from 'react-router-dom';
+
 const Contact = () => {
   return (
     <div style={{ fontFamily: "'Prompt', sans-serif", backgroundColor: '#f7f1e3' }}>
@@ -11,7 +12,7 @@ const Contact = () => {
       <TopMenu />
       <Contact_Data/>
       <div className="elgy-tooltip-container">
-  <a target="_blank" rel="noopener noreferrer">
+  <a href="/" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
         viewBox="0 0 16 16"
@@ -61,8 +62,8 @@ const Contact = () => {
       </svg>
     </span>
   </a>
-
-  <a href="/Contact" target="_blank" rel="noopener noreferrer">
+ 
+  <a  href="/Contract" rel="noopener noreferrer">
     <span className="elgy-tooltip3">
       <svg
         viewBox="0 0 16 16"

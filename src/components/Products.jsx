@@ -57,7 +57,7 @@ const Products = () => {
     };
     return images[sellerId] || '/assets/default_image.png';
   };
-  
+
 
   useEffect(() => {
     axios
@@ -123,12 +123,17 @@ return (
               boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
             }}
           />
-        </div>
         
+        
+        
+        
+
+      </div>
       </Container>
       <h2 className="text-center mb-4"></h2>
       <h1 className="text-center mb-4">สินค้าของร้าน</h1>
       <div className="container" style={{ position: 'relative' }}>
+        
         
   {/* Sidebar for Categories */}
   <div className="sidebar" style={{

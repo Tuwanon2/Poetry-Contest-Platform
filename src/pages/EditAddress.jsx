@@ -9,7 +9,7 @@ const EditAddress = () => {
       <TopNav /> {/* ส่วนค้นหาจะอยู่ใน TopNav */}
       <TopMenu />
       <div className="elgy-tooltip-container">
-  <a target="_blank" rel="noopener noreferrer">
+  <a href="/" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
         viewBox="0 0 16 16"
@@ -60,7 +60,7 @@ const EditAddress = () => {
     </span>
   </a>
 
-  <a href="/Contact" target="_blank" rel="noopener noreferrer">
+  <a href="/Contact" rel="noopener noreferrer">
     <span className="elgy-tooltip3">
       <svg
         viewBox="0 0 16 16"

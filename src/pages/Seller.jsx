@@ -4,7 +4,9 @@ import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
 import Products from '../components/Products';
 import AllMarket from '../components/AllMarket';
+import FooterInfo from '../components/FooterInfo';
 import '../App.css';
+
 
 
 
@@ -34,6 +36,7 @@ const sellerFacebookLinks = {
   'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'https://www.facebook.com/dicecupboardgamecafe/',
 };
 
+
 const getSellerName = (sellerId) => {
   return sellerNames[sellerId] || 'Unknown';
 };
@@ -45,11 +48,13 @@ const Seller = () => {
     <div>
       <TopNav />
       <TopMenu />
+
       {/* Pass sellerId to Products if filtering by seller is needed */}
       <Products sellerId={sellerId} /> 
       <AllMarket sellerId={sellerId} /> {/* Pass sellerId to AllMarket */}
+      
       <div className="elgy-tooltip-container">
-  <a target="_blank" rel="noopener noreferrer">
+  <a href="/" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
         viewBox="0 0 16 16"
@@ -99,7 +104,7 @@ const Seller = () => {
     </span>
   </a>
 
-  <a href="/Contact" target="_blank" rel="noopener noreferrer">
+  <a href="/Contact" rel="noopener noreferrer">
     <span className="elgy-tooltip3">
       <svg
         viewBox="0 0 16 16"
@@ -132,7 +137,7 @@ const Seller = () => {
     </span>
   </a>
 </div>
-      
+      <FooterInfo sellerId={sellerId}/>
     </div>
   );
 };

@@ -6,7 +6,6 @@ import NewProducts from '../components/NewProducts'; // ส่วนแสดง
 import Footer from '../components/Footer'; // ส่วนแสดง Footer
 import PopularProducts from'../components/PopularProducts';
 import PromotionProducts from'../components/PromotionProducts';
-
 import '../App.css'
 
 const Home = () => {
@@ -19,7 +18,7 @@ const Home = () => {
       <PopularProducts/>
       <PromotionProducts/>
       <div className="elgy-tooltip-container">
-  <a target="_blank" rel="noopener noreferrer">
+  <a  href="/" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
         viewBox="0 0 16 16"
@@ -70,7 +69,7 @@ const Home = () => {
     </span>
   </a>
 
-  <a href="/Contact" target="_blank" rel="noopener noreferrer">
+  <a href="/Contact" rel="noopener noreferrer">
     <span className="elgy-tooltip3">
       <svg
         viewBox="0 0 16 16"
