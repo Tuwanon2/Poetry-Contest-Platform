@@ -90,7 +90,7 @@ import '../App.css'
         </Col>
         <Col>
             <h3>ตำแหน่งร้าน</h3>
-            <LoadScript googleMapsApiKey="">
+            <LoadScript googleMapsApiKey="AIzaSyDwH4Ot_KTAaukfOJSZTJuAd8FIMIjNIcU">
               <GoogleMap mapContainerStyle={mapStyles} zoom={15} center={defaultCenter}>
                 <Marker position={defaultCenter} />
               </GoogleMap>
