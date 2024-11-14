@@ -107,8 +107,8 @@ const TopNav = () => {
                 <Dropdown.Item disabled style={{ fontSize: '0.8rem' }}>
                   {user.name}
                 </Dropdown.Item>
-                <Dropdown.Item as={Link} to="/MyProfile">My Profile</Dropdown.Item>
-                <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                <Dropdown.Item as={Link} to="/MyProfile">โปรไฟล์ของฉัน</Dropdown.Item>
+                <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (

@@ -1014,5 +1014,18 @@ h1 {
 .styled-button:hover::before {
   box-shadow: inset 0 0 0 10em rgb(24, 119, 242);
 }
+.horizontal-scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 10px;
+}
+
+.horizontal-scroll .row {
+  flex-wrap: nowrap;
+}
+
+.product-card {
+  min-width: 200px;
+}
 
 
