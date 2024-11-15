@@ -67,32 +67,11 @@ const ToShipPage = () => {
     navigate('/Upstatus');  // Navigate to status update page
   };
 
-  const handleOrderSubmit = (newOrderItems) => {
-    // ดึงข้อมูลเก่าจาก localStorage
-    const savedOrder = JSON.parse(localStorage.getItem('orderDetails')) || { items: [], total: 0 };
-  
-    // รวมสินค้าจากการสั่งซื้อใหม่กับสินค้าจากการสั่งซื้อเก่า
-    const updatedItems = [...savedOrder.items, ...newOrderItems]; 
-  
-    // คำนวณราคาใหม่
-    const updatedTotal = calculateTotalPrice(updatedItems);
-  
-    // เซฟข้อมูลใหม่ลงใน localStorage
-    const updatedOrder = { items: updatedItems, total: updatedTotal };
-    localStorage.setItem('orderDetails', JSON.stringify(updatedOrder));
-  
-    // อัพเดตสถานะใน state
-    setOrder(updatedOrder);
-  };
-  
-
-
-
   return (
     <Container className="my-5">
       <Row className="justify-content-center">
         <Col xs="auto">
-          <button className="btn btn-link" onClick={() => navigate('/Ship1')}>
+          <button  className=" custom-fade-button" onClick={() => navigate('/Ship1')}>
             ที่ต้องจัดส่ง
           </button>
         </Col>
@@ -101,12 +80,12 @@ const ToShipPage = () => {
           
         </Col>
         <Col xs="auto">
-          <button className="btn btn-link" onClick={() => navigate('/Ship2')}>
+          <button className=" custom-fade-button" onClick={() => navigate('/Ship2')}>
             ประวัติการสั่งซื้อ
           </button>
         </Col>
       </Row>
-      <Row className="mb-4">
+      <Row className="mb-4" style={{marginTop:'10px'}}>
         <Col>
           <Card>
             <Card.Header>

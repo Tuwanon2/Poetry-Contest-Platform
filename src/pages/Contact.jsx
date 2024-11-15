@@ -3,7 +3,6 @@ import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
 import Footer from '../components/Footer';
 import Contact_Data from '../components/Contact_Data';
-import { Link } from 'react-router-dom';
 
 const Contact = () => {
   return (

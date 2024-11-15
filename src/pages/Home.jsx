@@ -1,25 +1,40 @@
-import React from 'react';
-import TopNav from '../components/TopNav'; // ส่วนแสดง Navigation Bar
-import TopMenu from '../components/TopMenu'; // ส่วนแสดงเมนูด้านบน
-import BannerCarousel from '../components/BannerCarousel'; // ส่วนแสดง Banner
-import NewProducts from '../components/NewProducts'; // ส่วนแสดงสินค้ามาใหม่
-import Footer from '../components/Footer'; // ส่วนแสดง Footer
-import PopularProducts from'../components/PopularProducts';
-import PromotionProducts from'../components/PromotionProducts';
-import '../App.css'
+import React, { useState, useEffect } from 'react';
+import TopNav from '../components/TopNav';
+import TopMenu from '../components/TopMenu';
+import BannerCarousel from '../components/BannerCarousel';
+import NewProducts from '../components/NewProducts';
+import Footer from '../components/Footer';
+import PopularProducts from '../components/PopularProducts';
+import PromotionProducts from '../components/PromotionProducts';
+import LoadingPage from '../components/LoadingPage';
 
 const Home = () => {
+  const [showLoading, setShowLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if user has already visited
+    const firstVisit = localStorage.getItem('firstVisit');
+    if (!firstVisit) {
+      setShowLoading(true);
+      localStorage.setItem('firstVisit', 'true'); // Set flag to mark the first visit
+      // Hide loading after a short delay
+      setTimeout(() => setShowLoading(false), 5000); // Adjust time as needed
+    }
+  }, []);
+
   return (
     <div>
-      <TopNav /> {/* ส่วนค้นหาจะอยู่ใน TopNav */}
-      <TopMenu />
-      <BannerCarousel />
-      <PromotionProducts/>
-      
-      <NewProducts /> {/* แสดงสินค้ามาใหม่ */}
-      <PopularProducts/>
-      
-      <div className="elgy-tooltip-container">
+      {showLoading && <LoadingPage />}
+      {!showLoading && (
+        <>
+          <TopNav />
+          <TopMenu />
+          <BannerCarousel />
+          <PromotionProducts />
+          <NewProducts />
+          <PopularProducts />
+          
+<div className="elgy-tooltip-container">
   <a  href="/" rel="noopener noreferrer">
     <span className="elgy-text">
       <svg
@@ -104,11 +119,9 @@ const Home = () => {
     </span>
   </a>
 </div>
-
-
-
-      <Footer />
-
+          <Footer />
+        </>
+      )}
     </div>
   );
 };

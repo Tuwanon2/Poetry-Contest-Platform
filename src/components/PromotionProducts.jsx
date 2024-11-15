@@ -29,25 +29,26 @@ const getSellerName = (sellerId) => {
 
 const PromotionProducts = () => {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);  // สถานะของตะกร้า
+  const [quantity, setQuantity] = useState(1); // ประกาศ quantity
   const productRefs = useRef([]);
   const placeholderImage = '../assets/images/Splendor.jpg';
 
   // ฟังก์ชันสำหรับเพิ่มสินค้าลงตะกร้า
-  const addToCart = (productId) => {
-    setCart((prevCart) => {
-        const existingProduct = prevCart.find(item => item.id === productId);
-        if (existingProduct) {
-            return prevCart; // ถ้ามีสินค้าอยู่แล้วไม่ต้องเพิ่ม
-        }
-        const productToAdd = products.find(product => product.id === productId);
-        const updatedCart = [...prevCart, productToAdd];
-        
-        localStorage.setItem('cart', JSON.stringify(updatedCart)); // บันทึกตะกร้าลง localStorage
-        return updatedCart;
-    });
-    console.log(`เพิ่มสินค้า ID: ${productId} ลงตะกร้า`);
-};
+  const addToCart = (product) => {
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingProduct = storedCart.find((item) => item.id === product.id);
+
+    if (existingProduct) {
+      existingProduct.quantity += quantity; // เพิ่มจำนวนสินค้า
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    } else {
+      storedCart.push({ ...product, quantity }); // เพิ่มสินค้าใหม่พร้อมจำนวน
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    }
+
+    window.dispatchEvent(new Event('cart-updated'));
+    console.log(`Added ${quantity} of ${product.name} to the cart.`);
+  };
 
 
   useEffect(() => {
@@ -95,7 +96,7 @@ const PromotionProducts = () => {
 
               return (
                 <Col md={3} key={product.id}>
-                  <Card className="product-card mb-4 shadow-sm border-light rounded product">
+                  <Card className="product-card mb-4 shadow-sm border-light rounded product fade-in">
                     <div 
                       style={{ 
                         height: '250px', 
@@ -174,11 +175,24 @@ const PromotionProducts = () => {
                             >
                               {getSellerName(product.seller_id)}
                             </small>
+                            <span style={{
+    fontSize: '0.9rem', 
+    fontWeight: 'bold', 
+    color: 'white', 
+    cursor: 'pointer',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    textAlign: 'center',
+  }}>
+    ร้านค้า>>
+  </span>
                           </Link>
                         </div>
                       </div>
                       <Button 
-                        onClick={() => addToCart(product.id)}
+                        onClick={() => addToCart(product)}
                         variant="outline-primary"
                         className="mt-2"
                       >

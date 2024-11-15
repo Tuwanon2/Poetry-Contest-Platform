@@ -84,28 +84,6 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
   );
 };
 
-const buttonStyle = {
-  width: '40px',
-  height: '40px',
-  fontSize: '24px',
-  fontWeight: 'bold',
-  border: '1px solid #ddd',
-  backgroundColor: '#CC0066',
-  cursor: 'pointer',
-  borderRadius: '50%',
-};
-
-const inputStyle = {
-  width: '60px',
-  height: '40px',
-  textAlign: 'center',
-  border: '1px solid #CC0066',
-  fontSize: '20px',
-  outline: 'none',
-  fontSize: '1.2rem',
-  borderRadius: '50%',
-};
-
 const ProductDetail = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
@@ -142,7 +120,7 @@ const ProductDetail = () => {
   }, [productId]);
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <a href="/assets/images/namo_loading.gif"></a>;
   }
 
   const addToCart = () => {

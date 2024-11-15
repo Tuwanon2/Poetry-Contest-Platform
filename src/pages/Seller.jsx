@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import TopNav from '../components/TopNav';
 import TopMenu from '../components/TopMenu';
 import Products from '../components/Products';
-import AllMarket from '../components/AllMarket';
 import FooterInfo from '../components/FooterInfo';
 import '../App.css';
 
@@ -37,21 +36,18 @@ const sellerFacebookLinks = {
 };
 
 
-const getSellerName = (sellerId) => {
-  return sellerNames[sellerId] || 'Unknown';
-};
 const Seller = () => {
   const { sellerId } = useParams(); // Get sellerId from URL
   const sellerFacebook = sellerFacebookLinks[sellerId] || '#';
 
   return (
-    <div>
+    <div >
       <TopNav />
       <TopMenu />
 
       {/* Pass sellerId to Products if filtering by seller is needed */}
       <Products sellerId={sellerId} /> 
-      <AllMarket sellerId={sellerId} /> {/* Pass sellerId to AllMarket */}
+      
       
       <div className="elgy-tooltip-container">
   <a href="/" rel="noopener noreferrer">
@@ -137,7 +133,8 @@ const Seller = () => {
     </span>
   </a>
 </div>
-      <FooterInfo sellerId={sellerId}/>
+      
+      <FooterInfo sellerId={sellerId} />
     </div>
   );
 };

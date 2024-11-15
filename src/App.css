@@ -3,15 +3,22 @@
   font-family: 'Roboto', 'Noto Sans Thai', sans-serif;
   margin: 0;
   padding: 0;
+  
 }
 
+.space{
+ position: fixed;
+ display: flex;
+}
 
 .App {
   text-align: center;
+  
 }
 /* ในไฟล์ CSS */
 .pre-line-text {
   white-space: pre-line; /* แสดงผล \n เป็นการขึ้นบรรทัดใหม่ */
+  
 }
 
 .App-logo {
@@ -292,6 +299,7 @@ body {
   background-attachment: fixed;
   background-repeat: no-repeat;
   background-color: #000000;
+  
 }
 
 
@@ -1609,3 +1617,55 @@ h1 {
 .custom-search-btn:hover {
   background-color: #C70039; /* สีพื้นหลังเมื่อ hover */
 }
+
+#foot {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: black;
+  display: contents;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+/* From Uiverse.io by vikiWayne */ 
+.custom-fade-button {
+  padding: 1em 2em;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #2c9caf;
+  transition: all 1000ms;
+  font-size: 15px;
+  position: relative;
+  overflow: hidden;
+  outline: 2px solid #2c9caf;
+}
+
+.custom-fade-button:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+  outline: 2px solid #70bdca;
+  box-shadow: 4px 5px 17px -4px #268391;
+}
+
+.custom-fade-button::before {
+  content: "";
+  position: absolute;
+  left: -50px;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: #2c9caf;
+  transform: skewX(45deg);
+  z-index: -1;
+  transition: width 1000ms;
+}
+
+.custom-fade-button:hover::before {
+  width: 250%;
+}
+

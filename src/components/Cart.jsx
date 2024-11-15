@@ -36,6 +36,10 @@ const MyCart = () => {
         const updatedProducts = products.filter(product => product.id !== productId);
         setProducts(updatedProducts);
         updateLocalStorage(updatedProducts); // อัปเดต localStorage
+        
+        // ส่ง custom event เมื่อการอัพเดตตะกร้าเสร็จสิ้น
+        const event = new CustomEvent('cart-updated');
+        window.dispatchEvent(event);
     };
     
 

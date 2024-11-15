@@ -3,6 +3,9 @@ import axios from 'axios';
 import { Card, Container, Row, Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+
+
+
 // ฟังก์ชันสำหรับดึงข้อมูลชื่อผู้ขาย
 const getSellerImage = (sellerId) => {
   const images = {
@@ -28,26 +31,29 @@ const getSellerName = (sellerId) => {
 };
 
 const NewProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);  // สถานะของตะกร้า
+  const [product, setProducts] = useState([]);
   const productRefs = useRef([]);
   const placeholderImage = '../assets/images/Splendor.jpg';
+  const [quantity, setQuantity] = useState(1); // กำหนดเริ่มต้นเป็น 1
 
+
+  
   // ฟังก์ชันสำหรับเพิ่มสินค้าลงตะกร้า
-  const addToCart = (productId) => {
-    setCart((prevCart) => {
-        const existingProduct = prevCart.find(item => item.id === productId);
-        if (existingProduct) {
-            return prevCart; // ถ้ามีสินค้าอยู่แล้วไม่ต้องเพิ่ม
-        }
-        const productToAdd = products.find(product => product.id === productId);
-        const updatedCart = [...prevCart, productToAdd];
-        
-        localStorage.setItem('cart', JSON.stringify(updatedCart)); // บันทึกตะกร้าลง localStorage
-        return updatedCart;
-    });
-    console.log(`เพิ่มสินค้า ID: ${productId} ลงตะกร้า`);
-};
+  const addToCart = (product) => {
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingProduct = storedCart.find((item) => item.id === product.id);  // ใช้ product ที่ส่งมา
+  
+    if (existingProduct) {
+      existingProduct.quantity += quantity;
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    } else {
+      storedCart.push({ ...product, quantity });
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    }
+  
+    window.dispatchEvent(new Event('cart-updated'));
+  };
+  
 
 
   useEffect(() => {
@@ -82,20 +88,20 @@ const NewProducts = () => {
     });
 
     return () => observer.disconnect();
-  }, [products]);
+  }, [product]);
 
   return (
     <Container className="my-5">
       <h1 className="text-center mb-4">สินค้ามาใหม่</h1>
       <div className="horizontal-scroll">
         <Row className="flex-nowrap">
-          {products.length > 0 ? (
-            products.map((product, index) => {
+          {product.length > 0 ? (
+            product.map((product, index) => {
               const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
 
               return (
                 <Col md={3} key={product.id}>
-                  <Card className="product-card mb-4 shadow-sm border-light rounded product">
+                  <Card className="product-card mb-4 shadow-sm border-light rounded product fade-in">
                     <div 
                       style={{ 
                         height: '250px', 
@@ -127,14 +133,14 @@ const NewProducts = () => {
                         />
                       </Link>
                     </div>
-                    <Card.Body className="d-flex flex-column">
+                    <Card.Body className="d-flex flex-column fade-in">
                       <Card.Title 
                         className="text-truncate" 
                         style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#CC0066' }}
                       >
                         {product.name}
                       </Card.Title>
-                      <div className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex justify-content-between align-items-center ">
                         <Card.Text 
                           style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#28a745' }}
                         >
@@ -174,11 +180,25 @@ const NewProducts = () => {
                             >
                               {getSellerName(product.seller_id)}
                             </small>
+                            <span style={{
+    fontSize: '0.9rem', 
+    fontWeight: 'bold', 
+    color: 'white', 
+    cursor: 'pointer',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    textAlign: 'center',
+  }}>
+    ร้านค้า>>
+  </span>
                           </Link>
+                          
                         </div>
                       </div>
                       <Button 
-                        onClick={() => addToCart(product.id)}
+                        onClick={() => addToCart(product)}
                         variant="outline-primary"
                         className="mt-2"
                       >

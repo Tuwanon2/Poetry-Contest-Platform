@@ -21,20 +21,20 @@ const ToHistorie = () => {
   };
 
   return (
-    <Container className="my-5">
+    <Container className="my-5 ">
       <Row className="mb-4 justify-content-center">
         <Col xs="auto">
-          <Button variant="link" onClick={() => navigate('/Ship1')}>
+          <button class="custom-fade-button"  onClick={() => navigate('/Ship1')}>
             ที่ต้องจัดส่ง
-          </Button>
+          </button>
         </Col>
         <Col xs="auto">
           <span style={{ borderLeft: '1px solid black', height: '100%' }} />
         </Col>
         <Col xs="auto">
-          <Button variant="link" onClick={() => navigate('/Ship2')}>
+          <button class="custom-fade-button"  onClick={() => navigate('/Ship2')}>
             ประวัติการสั่งซื้อ
-          </Button>
+          </button>
         </Col>
       </Row>
 

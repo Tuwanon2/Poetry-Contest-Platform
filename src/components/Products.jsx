@@ -71,7 +71,21 @@ const Products = () => {
         console.error('Error fetching the products:', error);
       });
   }, [sellerId]);
-
+  const addToCart = (product) => {
+    const quantity =1;
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingProduct = storedCart.find((item) => item.id === product.id);  // ใช้ product ที่ส่งมา
+  
+    if (existingProduct) {
+      existingProduct.quantity += quantity;
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    } else {
+      storedCart.push({ ...product, quantity });
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    }
+  
+    window.dispatchEvent(new Event('cart-updated'));
+  };
   const handleCategoryClick = (category) => {
     setSelectedCategory(category === selectedCategory ? '' : category);
   };
@@ -91,6 +105,7 @@ const Products = () => {
       );
     })
     .sort((a, b) => (sortOrder === 'price-asc' ? a.price - b.price : b.price - a.price));
+    
 return (
 
     <Container fluid>
@@ -124,35 +139,30 @@ return (
               boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
             }}
           />
-        
-        
-        
-        
-
       </div>
       </Container>
       <h2 className="text-center mb-4"></h2>
       <h1 className="text-center mb-4">สินค้าของร้าน</h1>
-      <div className="container" style={{ position: 'relative' }}>
-        
-        
-  {/* Sidebar for Categories */}
-  <div className="sidebar" style={{
-    position: 'absolute',  // ทำให้มันอยู่ในตำแหน่งที่กำหนดใน container
+      <div className="container space" style={{ position: 'relative' }}>
+  
+
+{/* Sidebar for Categories */}
+<div className="sidebar " style={{
+    display: 'flex',
+    position: 'static',  // ทำให้มันอยู่ในตำแหน่งที่กำหนดใน container
     top: '0px',           // ระยะห่างจากด้านบนของ container
-    left: '-5%',             // ระยะห่างจากด้านซ้ายของ container
-    width: '250px',        // ความกว้าง
+    left: '0',             // ระยะห่างจากด้านซ้ายของ container
+    width: '300px',        // ความกว้าง
     backgroundColor: '#f8f9fa',
     padding: '10px',
-    zIndex: '10',          // เพื่อให้แถบหมวดหมู่ไม่ถูกทับ
+              
   }}>
-
-    <h2 className="text-center mt-5">หมวดหมู่</h2>
-    <Row className="text-center my-4">
+    <Row className="text-center my-4"  >
+    <h2 className="text-center mt-5" >หมวดหมู่</h2>
       {categories.map((category, index) => (
         <Col key={index} xs={12} className="mb-3">
           <Button
-            className={`category-button w-100 d-flex align-items-center justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'} button-35`}
+            className={`category-button justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'} button-35`}
             onClick={() => handleCategoryClick(category)}
             style={{
               backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
@@ -186,9 +196,11 @@ return (
 
   {/* Main Content */}
   <div className="content" style={{
-    marginLeft: '220px',   // พื้นที่ขวางจากแถบหมวดหมู่
+    marginLeft: '50px',   // พื้นที่ขวางจากแถบหมวดหมู่
     padding: '20px',
     backgroundColor: '#fff',
+    
+
   }}>
     {/* Search, Price Range, and Sort Options */}
     <Form className="my-4">
@@ -256,6 +268,15 @@ return (
                     <Card.Text style={{ fontSize: '1.1rem', color: '#28a745' }}>
                       ฿{product.price}
                     </Card.Text>
+                    <Button 
+                        onClick={() => addToCart(product)}
+                        variant="outline-primary"
+                        className="mt-2"
+                        style={{width:'100%'}}
+                      >
+                        เพิ่มลงตะกร้า
+                      </Button>
+                      
                   </Card.Body>
                 </Card>
               </Col>
@@ -268,7 +289,11 @@ return (
         )}
       </Row>
     </Container>
-  </div>
+  </div>      
+        
+  
+
+
 </div>
     </Container>
   );

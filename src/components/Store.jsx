@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Card, Container, Row, Col, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import '../App.css'; 
+import { Button } from 'react-bootstrap';
 
 const placeholderImage = '/assets/images/Splendor.jpg';
 
@@ -35,7 +36,21 @@ const Store = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [sortOrder, setSortOrder] = useState('price-asc'); // For sorting by price
   const productRefs = useRef([]);
-
+  const addToCart = (product) => {
+    const quantity = 1;
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingProduct = storedCart.find((item) => item.id === product.id);  // ใช้ product ที่ส่งมา
+  
+    if (existingProduct) {
+      existingProduct.quantity += quantity;
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    } else {
+      storedCart.push({ ...product, quantity });
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+    }
+  
+    window.dispatchEvent(new Event('cart-updated'));
+  };
   useEffect(() => {
     // Fetch products (replace with your actual API endpoint)
     axios
@@ -176,6 +191,7 @@ const Store = () => {
                           e.target.src = placeholderImage;
                         }}
                       />
+                      
                     </Link>
                   </div>
                   <Card.Body className="d-flex flex-column">
@@ -229,6 +245,7 @@ const Store = () => {
     {getSellerName(product.seller_id)}
   </small>
   
+  
   {/* Additional text that will appear on hover */}
   <span className="hover-text" style={{
     position: 'absolute',
@@ -256,13 +273,19 @@ const Store = () => {
     transform: 'translate(-50%, -50%)',
     textAlign: 'center',
   }}>
-    ร้านค้า
+    ร้านค้า>>
   </span>
+
 </Link>
 
 
                       </div>
                     </div>
+                    <Button onClick={() => addToCart(product)}
+                        variant="outline-primary"
+                        className="mt-2"
+                      >
+                        เพิ่มลงตะกร้า</Button>
                   </Card.Body>
                 </Card>
               </Col>
