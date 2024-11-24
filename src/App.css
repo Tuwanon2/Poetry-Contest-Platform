@@ -81,12 +81,15 @@
 .category-button {
   font-size: 1.2em;
   padding: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100px;
-  transition: background-color 0.2s ease-in-out;
   border-radius: 10px; /* ขอบมนของปุ่ม */
+  height: 100px; /* ความสูงคงที่ */
+  width: 100%; /* ความกว้างเต็ม */
+  border-radius: 10px;
+  border: 2px solid #CC0066;
+  display: flex; /* ใช้ Flexbox */
+  align-items: center; /* จัดเนื้อหาให้อยู่กลางแนวตั้ง */
+  justify-content: center; /* จัดเนื้อหาให้อยู่กลางแนวนอน */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* เพิ่มเอฟเฟกต์นุ่มนวล */
 }
 
 .category-button.selected {

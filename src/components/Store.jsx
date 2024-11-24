@@ -1,24 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Card, Container, Row, Col, Form } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import '../App.css'; 
-import { Button } from 'react-bootstrap';
+import '../App.css'
 
-const placeholderImage = '/assets/images/Splendor.jpg';
+const Store = () => {
+  const { sellerId } = useParams();
+  const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState('');
+  const [sortOrder, setSortOrder] = useState('price-asc');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
-const getSellerImage = (sellerId) => {
-  const images = {
-    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
-    'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
-    '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
-    '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.jpg',
-    'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
-  };
-  return images[sellerId] || '/assets/default_image.png';
-};
+  const placeholderImage = '../assets/images/Splendor.jpg';
+  
 
-const getSellerName = (sellerId) => {
+  const categories = [
+    { name: 'บอร์ดเกมทั้งหมด', icon: '/assets/images/AllBoardGame.png', category_id: '' },
+    { name: 'บอร์ดเกมเดี่ยว', icon: '/assets/images/solo_BoardGame.png', category_id: 1 },
+    { name: 'บอร์ดเกมเล่นหลายคน', icon: '/assets/images/Multi_BoardGame.png', category_id: 2 },
+    { name: 'บอร์ดเกมปาร์ตี้', icon: '/assets/images/party_BoardGame.png', category_id: 3 },
+    { name: 'บอร์ดเกมกลยุทธ์', icon: '/assets/images/strategy_BoardGame.png', category_id: 4 },
+    { name: 'บอร์ดเกมเด็กและครอบครัว', icon: '/assets/images/Family_BoardGame.png', category_id: 5 },
+    { name: 'บอร์ดเกมแนวสงคราม', icon: '/assets/images/War_BoardGame.png', category_id: 6 },
+    { name: 'บอร์ดเกม co-op', icon: '/assets/images/Co-op_BoardGame.png', category_id: 7 },
+    { name: 'บอร์ดเกม gateway', icon: '/assets/images/Gateway_BoardGame.png', category_id: 8 },
+    { name: 'บอร์ดเกมบริหารทรัพยากร', icon: '/assets/images/Management_BoardGame.png', category_id: 9 }
+  ];
+
   const sellerNames = {
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
     'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
@@ -26,275 +36,320 @@ const getSellerName = (sellerId) => {
     '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'Towertactic',
     'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'DiceCUP',
   };
-  return sellerNames[sellerId] || 'Unknown Seller';
-};
-
-const Store = () => {
-  const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState('');
-  const [sortOrder, setSortOrder] = useState('price-asc'); // For sorting by price
-  const productRefs = useRef([]);
-  const addToCart = (product) => {
-    const quantity = 1;
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existingProduct = storedCart.find((item) => item.id === product.id);  // ใช้ product ที่ส่งมา
   
-    if (existingProduct) {
-      existingProduct.quantity += quantity;
-      localStorage.setItem('cart', JSON.stringify(storedCart));
-    } else {
-      storedCart.push({ ...product, quantity });
-      localStorage.setItem('cart', JSON.stringify(storedCart));
-    }
-  
-    window.dispatchEvent(new Event('cart-updated'));
+  const getSellerImage = (sellerId) => {
+    const images = {
+      'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
+      'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
+      '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
+      '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.jpg',
+      'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
+    };
+    return images[sellerId] || '/assets/default_image.png';
   };
+  
+  const getSellerName = (sellerId) => {
+    return sellerNames[sellerId] || 'Unknown';
+  };
+
+
   useEffect(() => {
-    // Fetch products (replace with your actual API endpoint)
     axios
       .get('/api/v1/products?sort=created_at&order=desc')
       .then((response) => {
-        setProducts(response.data.items);
+        console.log('API Response:', response.data);
+        setProducts(response.data.items || []);
       })
       .catch((error) => {
         console.error('Error fetching the products:', error);
       });
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('fade-in'); // เพิ่มคลาส fade-in เมื่อสินค้าปรากฏในมุมมอง
-              observer.unobserve(entry.target); // หยุดสังเกตการณ์หลังจากแสดงผลแล้ว
-            }
-          });
-        },
-        { threshold: 0.1 }
-      );
+  }, [sellerId]); // ฟังก์ชันสำหรับเพิ่มสินค้าลงตะกร้า
+  const [quantity, setQuantity] = useState(1);
+
+  const addToCart = (product) => {
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingProduct = storedCart.find((item) => item.id === product.id);
   
-      // สังเกตการณ์สินค้าทุกตัว
-      productRefs.current.forEach((productRef) => {
-        if (productRef) {
-          observer.observe(productRef);
-        }
-      });
+    if (existingProduct) {
+      existingProduct.quantity += quantity;
+    } else {
+      storedCart.push({ ...product, quantity });
+    }
   
-      // ลบ observer เมื่อคอมโพเนนต์ถูกถอดออก
-      return () => observer.disconnect();
-    }, [products]);
-
-  const handleSortChange = (e) => {
-    setSortOrder(e.target.value);
+    localStorage.setItem('cart', JSON.stringify(storedCart));
+    window.dispatchEvent(new Event('cart-updated'));
+    console.log(`Added ${quantity} of ${product.name} to the cart.`);
   };
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleMinPriceChange = (e) => {
-    setMinPrice(Number(e.target.value));
-  };
-
-  const handleMaxPriceChange = (e) => {
-    setMaxPrice(Number(e.target.value) || '');
+  
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category === selectedCategory ? '' : category);
   };
 
   const filteredProducts = products
-    .filter((product) => {
-      const matchesSearchTerm = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesMinPrice = product.price >= minPrice;
-      const matchesMaxPrice = maxPrice ? product.price <= maxPrice : true;
-      return matchesSearchTerm && matchesMinPrice && matchesMaxPrice;
-    })
-    .sort((a, b) => {
-      if (sortOrder === 'price-asc') return a.price - b.price;
-      if (sortOrder === 'price-desc') return b.price - a.price;
-      return 0;
-    });
+  .filter((product) => {
+    const skuEndsWithCategoryId =
+      selectedCategory && selectedCategory.category_id
+        ? product.sku.endsWith(selectedCategory.category_id.toString())
+        : true;
 
-  return (
-    <Container className="my-5">
-      <h2 className="text-center mb-4">รวมบอร์ดเกม</h2>
+    return (
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      product.price >= minPrice &&
+      (maxPrice ? product.price <= maxPrice : true) &&
+      skuEndsWithCategoryId
+    );
+  })
+  .sort((a, b) => (sortOrder === 'price-asc' ? a.price - b.price : b.price - a.price));
 
-      {/* Search and Filter Form */}
-      <Form className="mb-4 d-flex justify-content-center">
-        <Form.Group className="mx-2">
-          <Form.Label>ค้นหาสินค้า</Form.Label>
-          <Form.Control
-            type="text"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-        </Form.Group>
-        <Form.Group className="mx-2">
-          <Form.Label>ราคาเริ่มต้น</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="0"
-            value={minPrice}
-            onChange={handleMinPriceChange}
-          />
-        </Form.Group>
-        <Form.Group className="mx-2">
-          <Form.Label>ถึง</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="สูงสุด"
-            value={maxPrice}
-            onChange={handleMaxPriceChange}
-          />
-        </Form.Group>
-        <Form.Group className="mx-2">
-          <Form.Label>จัดเรียงตาม</Form.Label>
-          <Form.Control as="select" value={sortOrder} onChange={handleSortChange}>
-            <option value="price-asc">ราคาน้อย-มาก</option>
-            <option value="price-desc">ราคามาก-น้อย</option>
-          </Form.Control>
-        </Form.Group>
-      </Form>
+    
+return (
 
-      <Row>
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product, index) => {
-            const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
+    <Container fluid style={{width: '100%', marginRight: '0%',right:  '0px',}}>
+      
+      
+      <h2 className="text-center mb-4"></h2>
+      <div className="container space" style={{ position: 'relative', marginLeft: '0%',  // Reduced the left margin
+  padding: '20px',
+  backgroundColor: '#fff', }}>
+  
 
-            return (
-              <Col md={3} key={product.id}> {/* 4 columns layout */}
-                <Card className="product-card mb-4 shadow-sm border-light rounded product" ref={(el) => (productRefs.current[index] = el)} >
-                  <div 
-                    style={{ 
-                      height: '250px', 
-                      width: '100%', 
-                      overflow: 'hidden', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      borderTopLeftRadius: '10px', 
-                      borderTopRightRadius: '10px' 
-                    }}
+{/* Sidebar for Categories */}
+<div className="sidebar " style={{
+    display: 'block',
+    position: 'sticky',  // ทำให้มันอยู่ในตำแหน่งที่กำหนดใน container
+    top: '0px',           // ระยะห่างจากด้านบนของ container
+    left: '0px', 
+    right:  '0px',          // ระยะห่างจากด้านซ้ายของ container
+    width: '250px',        // ความกว้าง
+    backgroundColor: '#f8f9fa',
+    padding: '10px',
+              
+  }}>
+    <Row className="text-center my-4"  >
+    <h2 className="text-center mt-5" >หมวดหมู่</h2>
+      {categories.map((category, index) => (
+        <Col key={index} xs={12} className="mb-3 display-fixed">
+          <Button
+            className={`category-button justify-content-center text-white position-relative ${selectedCategory === category ? 'selected' : 'default'} button-35`}
+            onClick={() => handleCategoryClick(category)}
+            style={{
+              backgroundColor: selectedCategory === category ? '#8BD2EC' : 'transparent',
+              height: '60px', // ขนาดคงที่
+              width: '120%', // ขนาดคงที่เต็มความกว้าง
+              borderRadius: '10px',
+              border: '2px solid #CC0066',
+              display: 'flex', // ใช้ Flexbox เพื่อจัดการเนื้อหาในปุ่ม
+              alignItems: 'center', // จัดแนวกลางในแนวตั้ง
+              justifyContent: 'center', // จัดแนวกลางในแนวนอน
+              overflow: 'hidden', // ป้องกันเนื้อหาล้นออก
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                right:  '0px',
+                transform: 'translate(-50%, -50%)',
+                background: `url(${category.icon}) center/cover no-repeat`,
+                border: 'none',
+              }}
+            />
+            <span className="visually-hidden">{category.name}</span>
+          </Button>
+        </Col>
+      ))}
+    </Row>
+  </div>
+
+
+  {/* Main Content */}
+<div className="content" style={{
+  marginLeft: '20px', // เพิ่มระยะห่างทางซ้าย
+  padding: '20px',
+  backgroundColor: '#fff',
+}}>
+  {/* Search, Price Range, and Sort Options */}
+  <Form className="my-4">
+    <Row>
+      <Col md={4} className="mb-3">
+        <Form.Control
+          type="text"
+          placeholder="ค้นหาสินค้า..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </Col>
+      <Col md={3} className="mb-3">
+        <Form.Control
+          type="number"
+          placeholder="ราคาขั้นต่ำ"
+          value={minPrice}
+          onChange={(e) => setMinPrice(Number(e.target.value))}
+        />
+      </Col>
+      <Col md={3} className="mb-3">
+        <Form.Control
+          type="number"
+          placeholder="ราคาสูงสุด"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(Number(e.target.value))}
+        />
+      </Col>
+      <Col md={2} className="mb-3">
+        <Form.Select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+        >
+          <option value="price-asc">ราคาน้อยไปมาก</option>
+          <option value="price-desc">ราคามากไปน้อย</option>
+        </Form.Select>
+      </Col>
+    </Row>
+  </Form>
+
+  {/* Product Listings */}
+  <Container className="my-5">
+    <Row className="justify-content-end"> {/* ใช้ justify-content-end เพื่อเลื่อนสินค้าทางขวา */}
+      {filteredProducts.length > 0 ? (
+        filteredProducts.map((product) => {
+          const primaryImage = product.images.find((img) => img.is_primary)?.image_url;
+
+          return (
+            <Col md={4} lg={3} key={product.id}>
+              <Card className="product-card mb-4 shadow-sm border-light fade-in" style={{
+                height: 'auto',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+              }}>
+                <div 
+                  style={{ 
+                    height: '250px', 
+                    width: '100%', 
+                    overflow: 'hidden', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    borderTopLeftRadius: '10px', 
+                    borderTopRightRadius: '10px' 
+                  }}
+                >
+                  <Link to={`/product/${product.id}`}>
+                    <Card.Img 
+                      variant="top" 
+                      src={primaryImage || placeholderImage} 
+                      alt={product.name} 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'contain' 
+                      }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = placeholderImage;
+                      }}
+                    />
+                  </Link>
+                </div>
+
+                <Card.Body className="d-flex flex-column">
+                  <Card.Title 
+                    className="text-truncate" 
+                    style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#CC0066' }}
                   >
-                    <Link to={`/product/${product.id}`}>
-                      <Card.Img 
-                        variant="top" 
-                        src={primaryImage || placeholderImage} 
-                        alt={product.name} 
-                        style={{ 
-                          width: '100%', 
-                          height: '100%', 
-                          maxWidth: '100%', 
-                          maxHeight: '250px',
-                          objectFit: 'contain' 
-                        }}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = placeholderImage;
-                        }}
-                      />
-                      
-                    </Link>
-                  </div>
-                  <Card.Body className="d-flex flex-column">
-                    <Card.Title 
-                      className="text-truncate" 
-                      style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#CC0066' }}
+                    {product.name}
+                  </Card.Title>
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <Card.Text 
+                      style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#28a745' }}
                     >
-                      {product.name}
-                    </Card.Title>
-                    <div className="d-flex justify-content-between align-items-center">
-                      <Card.Text 
-                        style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#28a745' }}
+                      ฿{product.price}
+                    </Card.Text>
+
+                    <div className="d-flex align-items-center clickable-logo-card">
+                      <Link 
+                        to={`/seller/${product.seller_id}`}
+                        className="button-57 d-flex align-items-center clickable-logo-card"
+                        style={{
+                          padding: '5px 15px',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          borderRadius: '5px',
+                          border: '2px solid #CC0066',
+                        }}
                       >
-                        ฿{product.price}
-                      </Card.Text>
-                      <div className="d-flex align-items-center clickable-logo-card">
-                        {/* Seller logo and link to profile */}
-                        
-                        <Link 
-  to={`/seller/${product.seller_id}`}
-  className="button-57 d-flex align-items-center clickable-logo-card "
-  style={{
-    padding: '5px 15px',
-    textDecoration: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    position: 'relative',
-    borderRadius: '12px',  // Rounded corners for the link
-    overflow: 'hidden',    // Ensures the image fits within the rounded container
-  }}
->
-  <img
-    src={getSellerImage(product.seller_id)}
-    alt={getSellerName(product.seller_id)}
-    style={{
-      width: '40px',
-      height: '40px',
-      borderRadius: '50%',  // Make the image circular
-      marginRight: '8px',
-      border: '2px solid #CC0066',
-    }}
-  />
-  <small 
-    style={{
-      fontSize: '0.9rem', 
-      fontWeight: 'bold', 
-      color: '#CC0066', 
-      cursor: 'pointer',
-    }}
-  >
-    {getSellerName(product.seller_id)}
-  </small>
-  
-  
-  {/* Additional text that will appear on hover */}
-  <span className="hover-text" style={{
-    position: 'absolute',
-    top: '100%',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    opacity: 0,
-    visibility: 'hidden',
-    color: '#CC0066',
-    fontSize: '0.8rem',
-    fontWeight: 'normal',
-    transition: 'opacity 0.3s ease, visibility 0.3s ease', 
-    whiteSpace: 'nowrap',
-  }}>
-    {getSellerName(product.seller_id)}'s Shop
-  </span>
-  <span style={{
-    fontSize: '0.9rem', 
-    fontWeight: 'bold', 
-    color: 'white', 
-    cursor: 'pointer',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    textAlign: 'center',
-  }}>
-    ร้านค้า>>
-  </span>
-
-</Link>
-
-
-                      </div>
+                        <img
+                          src={getSellerImage(product.seller_id)}
+                          alt={getSellerName(product.seller_id)}
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            marginRight: '8px',
+                            border: '2px solid #CC0066',
+                          }}
+                        />
+                        <small 
+                          style={{
+                            fontSize: '0.9rem', 
+                            fontWeight: 'bold', 
+                            color: '#CC0066', 
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {getSellerName(product.seller_id)}
+                        </small>
+                        <span style={{
+                          fontSize: '0.9rem', 
+                          fontWeight: 'bold', 
+                          color: 'white', 
+                          cursor: 'pointer',
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          textAlign: 'center',
+                        }}>
+                          ร้านค้า >>
+                        </span>
+                      </Link>
                     </div>
-                    <Button onClick={() => addToCart(product)}
-                        variant="outline-primary"
-                        className="mt-2"
-                      >
-                        เพิ่มลงตะกร้า</Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            );
-          })
-        ) : (
-          <h5 className="text-center text-muted mt-5">ไม่มีสินค้าที่ตรงกับการค้นหาของคุณ</h5>
-        )}
-      </Row>
+                  </div>
+
+                  <Button 
+                    onClick={() => addToCart(product)}
+                    variant="outline-primary"
+                    className="mt-2"
+                  >
+                    เพิ่มลงตะกร้า
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          );
+        })
+      ) : (
+        <Col md={12}>
+          <p className="text-center text-muted">ไม่พบสินค้าที่ตรงกับเงื่อนไข</p>
+        </Col>
+      )}
+    </Row>
+  </Container>
+</div>
+  
+        
+  
+
+
+</div>
     </Container>
   );
 };
