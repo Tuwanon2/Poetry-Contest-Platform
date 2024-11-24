@@ -292,8 +292,8 @@ const Payment = () => {
               </Row>
               <hr />
               <Row className="mb-3">
-                <Col sm={8}><strong>ยอดชำระทั้งหมด</strong></Col>
-                <Col sm={4} className="text-end"><strong>฿{grandTotal.toFixed(2)}</strong></Col>
+                <Col sm={8}><h4>ยอดชำระทั้งหมด</h4></Col>
+                <Col sm={4} className="text-end"><h4>฿{grandTotal.toFixed(2)}</h4></Col>
               </Row>
               <Card>
   <Card.Body>
