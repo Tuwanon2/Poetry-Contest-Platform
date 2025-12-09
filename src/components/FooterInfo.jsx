@@ -94,7 +94,7 @@ import '../App.css'
           bottom: 0, 
           left: 0, 
           width: '100%', 
-          backgroundColor: '#CC0066', 
+          backgroundColor: '#70136C', 
           color:'white',
           padding: '10px 0', 
           zIndex: 1000,  // Ensures it stays on top of other content

@@ -1,140 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
-import { Button, Modal, Dropdown } from 'react-bootstrap';
-import GoogleAuth from './GoogleAuth';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FaSearch } from 'react-icons/fa';
+import './TopNav.css';
 
 const TopNav = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [showLogin, setShowLogin] = useState(false);
-  const [user, setUser] = useState(null);
-  const [cartCount, setCartCount] = useState(0); // State for cart item count
-  const [cartAnimate, setCartAnimate] = useState(false); // Track animation trigger
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const storedUser = sessionStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
-    // Initially set the cart count
-    updateCartCount();
-
-    // Listen for custom 'cart-updated' event to update the cart count
-    const handleCartUpdated = () => {
-      updateCartCount(); // Update the count when the event is triggered
-      triggerCartAnimation(); // Trigger animation
-    };
-
-    window.addEventListener('cart-updated', handleCartUpdated);
-
-    // Cleanup listener on component unmount
-    return () => {
-      window.removeEventListener('cart-updated', handleCartUpdated);
-    };
-  }, []); // The empty array ensures this effect runs only once when the component mounts
-
-  const updateCartCount = () => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCartCount(storedCart.length); // Set cart count based on number of items
-  };
-
-  const triggerCartAnimation = () => {
-    setCartAnimate(true);
-    // Remove the animation class after animation is complete
-    setTimeout(() => {
-      setCartAnimate(false);
-    }, 600); // Duration of the animation (600ms)
-  };
+  const location = useLocation();
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchTerm) {
-      navigate(`/search?q=${searchTerm}`);
+    if (searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
 
-  const handleShow = () => setShowLogin(true);
-  const handleClose = () => setShowLogin(false);
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('user');
-    setUser(null);
-    navigate('/');
-  };
-
   return (
-    <nav className="navbar navbar-light bg-light" style={{zIndex: '3000' ,position: 'sticky'}}>
-      <div className="container-fluid d-flex justify-content-between align-items-center">
-        <Link className="navbar-brand" to="/">
-          <img src="/assets/namo-logo.png" alt="Logo" width="100" height="80" />
-        </Link>
+    <nav className="topnav">
+  <div className="topnav-container">
 
-        <form onSubmit={handleSearchSubmit} className="d-flex flex-grow-1 mx-4" >
+    {/* LEFT — Search Bar */}
+    <div className="nav-left">
+      <form onSubmit={handleSearchSubmit} className="search-form">
+        <div className="search-input-wrapper">
+          <FaSearch className="search-icon" />
           <input
-            className="form-control me-2 w-100"
-            type="search"
-            placeholder="ค้นหา"
+            type="text"
+            placeholder="ค้นหา..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            aria-label="Search"
-            
+            className="search-input"
           />
-          <button className="btn btn-outline-success" type="submit" >
-            <FaSearch />
-          </button>
-        </form>
-
-        <div className="d-flex" >
-          <Link className={`btn btn-light cart-icon ${cartAnimate ? 'animate' : ''}`} to="/MyCart">
-            <FaShoppingCart />
-            <span className={`badge bg-danger ${cartAnimate ? 'animate' : ''}`}>{cartCount}</span>
-          </Link>
-
-          {user ? (
-            <Dropdown>
-              <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center">
-                <img
-                  src={user.picture}
-                  alt="user-profile"
-                  style={{ borderRadius: '50%', width: '40px' }}
-                  referrerPolicy="no-referrer"
-                />
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                {/* Display user's name first, disabled and smaller */}
-                <Dropdown.Item disabled style={{ fontSize: '0.8rem' }}>
-                  {user.name}
-                </Dropdown.Item>
-                <Dropdown.Item as={Link} to="/MyProfile">โปรไฟล์ของฉัน</Dropdown.Item>
-                <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          ) : (
-            <Button variant="light" className="ms-2" onClick={handleShow}>
-              <FaUser /> เข้าสู่ระบบ
-            </Button>
-          )}
         </div>
-      </div>
+      </form>
+    </div>
 
-      <Modal show={showLogin} onHide={handleClose} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>เข้าสู่ระบบ</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <GoogleAuth
-            setUser={(user) => {
-              setUser(user);
-              sessionStorage.setItem('user', JSON.stringify(user));
-            }}
-            handleClose={handleClose}
-          />
-        </Modal.Body>
-      </Modal>
-    </nav>
+    {/* CENTER — Main Menu */}
+    <div className="nav-center">
+      <ul className="main-menu">
+        <li><Link to="/" className={location.pathname === '/' ? 'active' : ''}>หน้าหลัก</Link></li>
+
+        <li className="dropdown">
+          <span className={location.pathname.startsWith('/competition') ? 'active' : ''}>กิจกรรมการประกวด</span>
+          <div className="dropdown-content">
+            <Link to="/competition/student">สำหรับนักเรียน</Link>
+            <Link to="/competition/university">สำหรับนิสิตนักศึกษา</Link>
+            <Link to="/competition/general">สำหรับประชาชนทั่วไป</Link>
+          </div>
+        </li>
+
+        <li><Link to="/results" className={location.pathname === '/results' ? 'active' : ''}>ประกาศผล</Link></li>
+        <li><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>เกี่ยวกับเรา</Link></li>
+      </ul>
+    </div>
+
+    {/* RIGHT — Sign In */}
+    <div className="nav-right">
+      <Link to="/signin" className="signin-btn">เข้าสู่ระบบ</Link>
+    </div>
+
+  </div>
+</nav>
   );
 };
 

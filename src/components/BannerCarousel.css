@@ -1,0 +1,29 @@
+.banner-carousel-wrapper {
+  width: 100%;
+  padding: 0 48px;                 /* ช่องว่างซ้ายขวา */
+  margin: 0 auto 32px auto;
+  box-sizing: border-box;
+}
+
+.banner-img-container {
+  width: 100%;
+  height: 320px;                   /* ทำให้เตี้ยลงแบบที่ต้องการ */
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(112,19,108,0.10);
+}
+
+/* รูปภาพ */
+.banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;               /* ปรับภาพให้พอดีแบบไม่บิด */
+  object-position: center;
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* effect scale เวลา slide active */
+.carousel-item.active .banner-img {
+  transform: scale(1.03);
+}

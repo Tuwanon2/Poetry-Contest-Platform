@@ -1,156 +1,56 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const sellerNames = {
-  'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': 'SIAM BOARDGAME',
-  'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': 'Lanlalen',
-  '940256ba-a9de-4aa9-bad8-604468cb6af3': 'TIME TO PLAY',
-  '494d4f06-225c-463e-bd8a-6c9caabc1fc4': 'Towertactic',
-  'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': 'DiceCUP',
-};
-
-const getSellerImage = (sellerId) => {
-  const images = {
-    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11': '/assets/images/SIAM_BOARDGAME.jpg',
-    'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22': '/assets/images/Lanlalen.jpg',
-    '940256ba-a9de-4aa9-bad8-604468cb6af3': '/assets/images/TIME_TO_PLAY.jpg',
-    '494d4f06-225c-463e-bd8a-6c9caabc1fc4': '/assets/images/Towertactic.jpg',
-    'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35': '/assets/images/DiceCUP.jpg',
-  };
-  return images[sellerId] || '/assets/default_image.png';
-};
-
 const TopMenu = () => {
   const location = useLocation();
-
   return (
-    <nav className="navbar navbar-expand-lg" style={{ backgroundColor: '#CC0066',position:'sticky',top:'13.5%' }}>
-      <div className="container-fluid">
-        <Link
-          className={`navbar-brand ${location.pathname === '/' ? 'active' : ''}`}
-          to="/"
-          style={{
-            color: 'white',
-            fontWeight: location.pathname === '/' ? 'bold' : 'normal',
-            fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
-          }}
-        >
-          หน้าแรก
-        </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon" />
-        </button>
-
-        <div className="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-          <ul className="navbar-nav" style={{ width: '100%', display: 'flex', justifyContent: 'space-evenly' }}>
-            <li className="nav-item dropdown">
-              <Link
-                className={`nav-link dropdown-toggle ${location.pathname === '/Shop' ? 'active' : ''}`}
-                to="/Shop"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                style={{
-                  color: 'white',
-                  fontWeight: location.pathname === '/Shop' ? 'bold' : 'normal',
-                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
-                }}
-              >
-                ร้านค้า
-              </Link>
-              <ul className="dropdown-menu">
-                {Object.entries(sellerNames).map(([seller_id, seller_name]) => (
-                  <li key={seller_id} className="dropdown-item" style={{ fontFamily: 'Roboto, Noto Sans Thai, sans-serif' }}>
-                    <Link 
-                      to={`/seller/${seller_id}`} 
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        color: 'black', 
-                        textDecoration: 'none' // Remove underline
-                        
-                      }}
-                    >
-                      <img
-                        src={getSellerImage(seller_id)}
-                        alt={seller_name}
-                        style={{
-                          width: '30px',
-                          height: '30px',
-                          borderRadius: '50%',
-                          marginRight: '10px',
-                        }}
-                      />
-                      {seller_name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === '/MyCart' ? 'active' : ''}`}
-                to="/MyCart"
-                style={{
-                  color: 'white',
-                  fontWeight: location.pathname === '/MyCart' ? 'bold' : 'normal',
-                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
-                }}
-              >
-                ตะกร้าของฉัน
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === '/Payment' ? 'active' : ''}`}
-                to="/Payment"
-                style={{
-                  color: 'white',
-                  fontWeight: location.pathname === '/Payment' ? 'bold' : 'normal',
-                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
-                }}
-              >
-                ชำระเงิน
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === '/Ship1' ? 'active' : ''}`}
-                to="/Ship1"
-                style={{
-                  color: 'white',
-                  fontWeight: location.pathname === '/Ship1' ? 'bold' : 'normal',
-                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
-                }}
-              >
-                การจัดส่ง
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === '/Contact' ? 'active' : ''}`}
-                to="/Contact" // ลิงก์ไปที่หน้า Contact
-                style={{
-                  color: 'white',
-                  fontWeight: location.pathname === '/Contact' ? 'bold' : 'normal',
-                  fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
-                 
-                }}
-              >
-                ติดต่อเรา
-              </Link>
-              
-            </li>
-          </ul>
-        </div>
+    <nav style={{ background: '#fff', borderBottom: '1px solid #eee', position: 'sticky', top: 0, zIndex: 100 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 70 }}>
+        <ul style={{ display: 'flex', gap: 32, listStyle: 'none', margin: 0, padding: 0, flex: 1, justifyContent: 'center' }}>
+          <li>
+            <Link to="/" style={{ color: '#222', fontWeight: location.pathname === '/' ? 'bold' : 'normal', textDecoration: 'none', fontFamily: 'Roboto, Noto Sans Thai, sans-serif' }}>หน้าหลัก</Link>
+          </li>
+          <li style={{ position: 'relative', display: 'inline-block' }}>
+            <span
+              style={{
+                color: '#222',
+                fontWeight: location.pathname.startsWith('/competition') ? 'bold' : 'normal',
+                fontFamily: 'Roboto, Noto Sans Thai, sans-serif',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                padding: 0
+              }}
+              className="menu-dropdown-hover"
+            >
+              กิจกรรมการประกวด
+            </span>
+            <div
+              className="menu-dropdown-content"
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: '100%',
+                background: '#fff',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                borderRadius: 8,
+                minWidth: 180,
+                display: 'none',
+                zIndex: 10
+              }}
+            >
+              <Link to="/competition/student" style={{ display: 'block', color: '#009688', padding: '10px 16px', textDecoration: 'none', fontFamily: 'Roboto, Noto Sans Thai, sans-serif' }}>สำหรับนักเรียน</Link>
+              <Link to="/competition/university" style={{ display: 'block', color: '#009688', padding: '10px 16px', textDecoration: 'none', fontFamily: 'Roboto, Noto Sans Thai, sans-serif' }}>สำหรับนิสิตนักศึกษา</Link>
+              <Link to="/competition/general" style={{ display: 'block', color: '#009688', padding: '10px 16px', textDecoration: 'none', fontFamily: 'Roboto, Noto Sans Thai, sans-serif' }}>สำหรับประชาชนทั่วไป</Link>
+            </div>
+          </li>
+          <li>
+            <Link to="/results" style={{ color: '#222', fontWeight: location.pathname === '/results' ? 'bold' : 'normal', textDecoration: 'none', fontFamily: 'Roboto, Noto Sans Thai, sans-serif' }}>ประกาศผล</Link>
+          </li>
+          <li>
+            <Link to="/about" style={{ color: '#222', fontWeight: location.pathname === '/about' ? 'bold' : 'normal', textDecoration: 'none', fontFamily: 'Roboto, Noto Sans Thai, sans-serif' }}>เกี่ยวกับเรา</Link>
+          </li>
+        </ul>
       </div>
     </nav>
   );

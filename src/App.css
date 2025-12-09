@@ -1,3 +1,13 @@
+/* TopMenu dropdown hover effect */
+.menu-dropdown-hover:hover + .menu-dropdown-content,
+.menu-dropdown-content:hover {
+  display: block !important;
+}
+/* Make dropdown caret (arrow) white in TopNav */
+.dropdown-toggle-white::after {
+  color: #fff !important;
+  filter: brightness(1000%);
+}
 /* ตั้งค่า fontFamily สำหรับทุกข้อความในเว็บไซต์ */
 * {
   font-family: 'Roboto', 'Noto Sans Thai', sans-serif;

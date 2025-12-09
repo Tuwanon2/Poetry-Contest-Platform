@@ -2,55 +2,35 @@ import React from 'react';
 import { Carousel } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const BannerCarousel = () => {
-  return (
-    <Carousel>
-      <Carousel.Item>
-        <Link to="/product/Edeeabd1-da23-4ce2-b4aa-5ed00994e2b1"> {/* ลิงก์ไปยังหน้า ProductDetail ของ Slide 1 */}
-          <img
-            className="d-block w-100"
-            src="/assets/images/Slide_1.png"
-            alt="First slide"
-            style={{ maxWidth: '100%', height: '90%', margin: '0 auto' }} // ปรับขนาดภาพ
-          />
-        </Link>
-      </Carousel.Item>
 
-      <Carousel.Item>
-        <Link to="/product/a9544191-026e-4839-b625-8aed6a28ab2a"> {/* ลิงก์ไปยังหน้า ProductDetail ของ Slide 2 */}
-          <img
-            className="d-block w-100"
-            src="/assets/images/Slide_2.gif"
-            alt="Second slide"
-            style={{ maxWidth: '100%', height: 'auto', margin: '0 auto' }} // ปรับขนาดภาพ
-          />
-        </Link>
-      </Carousel.Item>
+// ใช้ชื่อไฟล์ใหม่สำหรับรูปที่ผู้ใช้แนบมา
+const images = [
+  '/assets/images/banner1.jpg', // รูปแรก (กรุณาตั้งชื่อไฟล์นี้ใน assets/images)
+  '/assets/images/banner2.jpg', // รูปที่สอง (กรุณาตั้งชื่อไฟล์นี้ใน assets/images)
+];
 
-
-      <Carousel.Item>
-        <Link to="/product/B05ca5ca-7f55-4626-b1bb-3f17881f39ea"> {/* ลิงก์ไปยังหน้า ProductDetail ของ Slide 3 */}
+const BannerCarousel = () => (
+  <div className="banner-carousel-wrapper">
+    <Carousel fade interval={4000} controls={true} indicators={true} pause={false}>
+      {images.map((img, idx) => (
+        <Carousel.Item key={idx}>
           <img
-            className="d-block w-100"
-            src="/assets/images/Slide_3.png"
-            alt="Third slide"
-            style={{ maxWidth: '100%', height: 'auto', margin: '0 auto' }} // ปรับขนาดภาพ
+            className="d-block w-100 banner-img"
+            src={img}
+            alt={`slide-${idx+1}`}
+              style={{
+                width: '100%',
+                height: '320px',
+                objectFit: 'cover',
+                objectPosition: 'top',
+                borderRadius: 16,
+                boxShadow: '0 4px 24px rgba(112,19,108,0.12)'
+              }}
           />
-        </Link>
-      </Carousel.Item>
-
-    <Carousel.Item>
-        <Link to="/product/3ea67d69-fe39-4e9c-9fea-63babe288a43"> {/* ลิงก์ไปยังหน้า ProductDetail ของ Slide 4 */}
-          <img
-            className="d-block w-100"
-            src="/assets/images/Slide_4.gif"
-            alt="Forth slide"
-            style={{ maxWidth: '100%', height: 'auto', margin: '0 auto' }} // ปรับขนาดภาพ
-          />
-        </Link>
-      </Carousel.Item>
+        </Carousel.Item>
+      ))}
     </Carousel>
-  );
-};
+  </div>
+);
 
 export default BannerCarousel;

@@ -1,0 +1,144 @@
+.topnav {
+  z-index: 3000;
+  border-bottom: 1px solid #eee;
+  background: #70136C;
+  color: #fff;
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.topnav-container {
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  width: 100%;
+  gap: 48px; /* ระยะระหว่าง left/center/right */
+}
+
+/* LEFT — Search Bar */
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+/* CENTER — Main Menu */
+.nav-center {
+  display: flex;
+  align-items: center;
+  gap: 80px; /* ระยะห่างระหว่างเมนู */
+}
+
+/* RIGHT — Sign In */
+.nav-right {
+  margin-left: auto; /* ⭐ ดันไปขวาสุด */
+  display: flex;
+  align-items: center;
+}
+
+.signin-btn {
+  padding: 8px 22px;
+  background: #ffffff;
+  color: #70136C;
+  border-radius: 999px;   /* pill */
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transition: 0.25s ease;
+}
+
+.signin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+}
+
+/* Search Bar */
+.search-form {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.9);
+  border-radius: 20px;
+  padding: 2px 10px;
+  width: 400px;
+  max-width: 100%;
+  height: 32px;
+}
+
+.search-icon {
+  color: #555;
+  margin-right: 6px;
+  font-size: 0.9rem;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 4px 0;
+  font-size: 0.9rem;
+  color: #333;
+  width: 100%;
+}
+
+.search-input::placeholder {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+/* Main Menu */
+.main-menu {
+  display: flex;
+  gap: 80px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.main-menu li a,
+.main-menu li span {
+  color: #fff;
+  text-decoration: none;
+  font-family: inherit;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.main-menu li a.active,
+.main-menu li span.active {
+  font-weight: bold;
+}
+
+/* Dropdown */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border-radius: 8px;
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  z-index: 10;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 10px 16px;
+  color: #70136C;
+  text-decoration: none;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
