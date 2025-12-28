@@ -89,6 +89,16 @@ const UploadBox = ({ file, onSelect }) => (
 // MAIN PAGE: CreateCompetition
 // =========================
 export default function CreateCompetition() {
+  // ...existing code...
+  // ประเภทกลอน (เลือกได้หลายข้อ)
+  const poemTypeOptions = [
+    { label: 'กลอน 8', value: 'กลอน 8' },
+    { label: 'กลอนเปล่า', value: 'กลอนเปล่า' },
+    { label: 'กาพย์ยานี 11', value: 'กาพย์ยานี 11' },
+    { label: 'กาพย์ฉบัง 16', value: 'กาพย์ฉบัง 16' },
+    { label: 'โคลงสี่สุภาพ', value: 'โคลงสี่สุภาพ' },
+  ];
+  const [levelPoemTypes, setLevelPoemTypes] = useState({});
       // Modal for adding judge (invite or select existing)
       const [showAddJudge, setShowAddJudge] = useState(false);
       const [addJudgeTab, setAddJudgeTab] = useState('email');
@@ -346,6 +356,7 @@ export default function CreateCompetition() {
                 const topicEnabled = levelTopics[level]?.topicEnabled || false;
                 const topicName = levelTopics[level]?.topicName || "";
                 const detail = levelDetails[level] || "";
+                const selectedPoemTypes = levelPoemTypes[level] || [];
                 return (
                   <div
                     key={level}
@@ -365,9 +376,32 @@ export default function CreateCompetition() {
                     >
                       {`ระดับ${level}`}
                     </h3>
+
+                    {/* ประเภทกลอน (เลือกได้หลายข้อ) */}
+                    <div style={{ marginBottom: 16 }}>
+                      <label style={{ fontWeight: 500, marginBottom: 6, display: 'block' }}>ประเภทกลอน (เลือกได้หลายข้อ)</label>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                        {poemTypeOptions.map((pt) => (
+                          <label key={pt.value} style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 400, fontSize: 15, background: '#f7f7fb', borderRadius: 8, padding: '4px 12px', border: selectedPoemTypes.includes(pt.value) ? '2px solid #70136C' : '1px solid #ccc', cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={selectedPoemTypes.includes(pt.value)}
+                              onChange={e => {
+                                let newArr = selectedPoemTypes.includes(pt.value)
+                                  ? selectedPoemTypes.filter(v => v !== pt.value)
+                                  : [...selectedPoemTypes, pt.value];
+                                setLevelPoemTypes({ ...levelPoemTypes, [level]: newArr });
+                              }}
+                              style={{ accentColor: '#70136C', marginRight: 4 }}
+                            />
+                            {pt.label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Topic selection: two buttons */}
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
-                      
                       <button
                         type="button"
                         style={{

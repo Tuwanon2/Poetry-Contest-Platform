@@ -91,7 +91,7 @@ const ContestDetail = () => {
               <button
                 style={{
                   padding: '8px 18px',
-                  background: '#00b8a9',
+                  background: '#70136C',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 6,

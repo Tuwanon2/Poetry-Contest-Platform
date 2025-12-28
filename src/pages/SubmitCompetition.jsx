@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import TopNav2 from "../components/TopNav2";
 
@@ -96,7 +95,8 @@ export default function SubmitCompetition() {
     phone: "",
     level: "",
     title: "",
-    poemLines: Array(12).fill(""), // 12 lines for 2 columns x 6 rows
+      poemType: "กลอน 8", // เพิ่มประเภทกลอน
+      poemLines: Array(8).fill(""), // เริ่มต้น 8 วรรค
     file: null,
   });
   const [step, setStep] = useState(0); // 0: personal, 1: poem, 2: confirm
@@ -107,6 +107,40 @@ export default function SubmitCompetition() {
     { label: "มหาวิทยาลัย", icon: <span role="img" aria-label="มหาวิทยาลัย"></span> },
     { label: "ประชาชนทั่วไป", icon: <span role="img" aria-label="ประชาชนทั่วไป"></span> },
   ];
+    // เพิ่มประเภทกลอน
+    const poemTypes = [
+      { label: "กลอน 8", value: "กลอน 8" },
+      { label: "กลอนเปล่า", value: "กลอนเปล่า" },
+      { label: "กลอนอิสระ", value: "กลอนอิสระ" },
+      { label: "กาพย์ยานี 11", value: "กาพย์ยานี 11" },
+      { label: "กาพย์ฉบัง 16", value: "กาพย์ฉบัง 16" },
+      { label: "โคลงสี่สุภาพ", value: "โคลงสี่สุภาพ" },
+    ];
+
+
+    // จำนวนวรรคที่เพิ่มต่อ 1 ครั้ง (4 วรรค)
+    const LINES_PER_ADD = 4;
+
+
+    // เมื่อเปลี่ยนประเภทกลอน ให้ reset ช่องกรอก (เริ่ม 8 วรรค)
+    const handlePoemTypeChange = (type) => {
+      setForm(f => ({
+        ...f,
+        poemType: type,
+        poemLines: Array(8).fill("")
+      }));
+    };
+
+    // เพิ่มอีก 1 ชุด (4 วรรค)
+    const handleAddStanza = () => {
+      setForm(f => ({
+        ...f,
+        poemLines: [
+          ...f.poemLines,
+          ...Array(LINES_PER_ADD).fill("")
+        ]
+      }));
+    };
 
 
   const handleChange = (e) => {
@@ -116,9 +150,11 @@ export default function SubmitCompetition() {
 
   // For poem lines
   const handlePoemLineChange = (idx, value) => {
-    const newLines = [...form.poemLines];
-    newLines[idx] = value;
-    setForm({ ...form, poemLines: newLines });
+    setForm(f => {
+      const lines = [...f.poemLines];
+      lines[idx] = value;
+      return { ...f, poemLines: lines };
+    });
   };
 
   const handleFile = (e) => {
@@ -148,6 +184,53 @@ export default function SubmitCompetition() {
 
   // Stepper steps
   const steps = ["รายละเอียดผู้ประกวด", "รายละเอียดกลอน", "ยืนยัน"];
+    // ...existing code...
+
+    // ในส่วน render ช่องกรอกกลอน (step === 1)
+    // ให้เพิ่มปุ่มเลือกประเภทกลอนด้านบน
+    // และ render ช่องกรอกตามประเภท
+
+    // ตัวอย่าง render (ใส่ในส่วนที่แสดงช่องกรอกกลอน)
+    // ...
+    // <div style={{ marginBottom: 24 }}>
+    //   <label style={{ fontWeight: 600, fontSize: '1.08rem', marginBottom: 8, display: 'block' }}>เลือกประเภทกลอน</label>
+    //   <div style={{ display: 'flex', gap: 12 }}>
+    //     {poemTypes.map(pt => (
+    //       <button
+    //         key={pt.value}
+    //         type="button"
+    //         style={{
+    //           padding: '8px 18px',
+    //           borderRadius: 8,
+    //           border: form.poemType === pt.value ? '2px solid #70136C' : '1px solid #e0e0e0',
+    //           background: form.poemType === pt.value ? '#f3e6f7' : '#fff',
+    //           color: form.poemType === pt.value ? '#70136C' : '#333',
+    //           fontWeight: 500,
+    //           cursor: 'pointer',
+    //           transition: '0.18s',
+    //         }}
+    //         onClick={() => handlePoemTypeChange(pt.value)}
+    //       >
+    //         {pt.label}
+    //       </button>
+    //     ))}
+    //   </div>
+    // </div>
+
+    // <div style={{ marginTop: 18 }}>
+    //   {form.poemLines.map((line, idx) => (
+    //     <div key={idx} style={{ marginBottom: 12 }}>
+    //       <label style={{ marginRight: 8 }}>บรรทัดที่ {idx + 1}</label>
+    //       <input
+    //         type="text"
+    //         value={line}
+    //         onChange={e => handlePoemLineChange(idx, e.target.value)}
+    //         style={inputStyle}
+    //       />
+    //     </div>
+    //   ))}
+    // </div>
+    // ...
 
   return (
     <>
@@ -470,7 +553,7 @@ export default function SubmitCompetition() {
                       background: '#fcf7fd',
                       marginTop: 8,
                       marginBottom: 0,
-                      minHeight: 320,
+                      minHeight: 120,
                       maxWidth: 900,
                     }}
                   >
@@ -478,40 +561,86 @@ export default function SubmitCompetition() {
                       style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
-                        gap: '14px 16px', // ลดช่องว่างระหว่างคอลัมน์
+                        gap: '14px 16px',
                         justifyItems: 'stretch',
                         alignItems: 'center',
-                        minHeight: 240,
+                        minHeight: 40,
                       }}
                     >
                         {form.poemLines.map((line, idx) => (
                           <div key={idx} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8 }}>
                             <span style={{ color: '#b48bb4', fontWeight: 600, minWidth: 22, textAlign: 'right', fontSize: 15 }}>{idx + 1}.</span>
-                           <input
-  type="text"
-  value={line}
-  onChange={e => handlePoemLineChange(idx, e.target.value)}
-  style={{
-    flex: 1,
-    width: '100%',
-    minWidth: '260px',          // << เพิ่ม
-    border: 'none',
-    borderBottom: '1.5px solid #bdbdbd',
-    outline: 'none',
-    fontSize: '1.05rem',        // << ขยายตัวอักษรเล็กน้อย
-    background: 'transparent',
-    textAlign: 'center',
-    padding: '8px 6px',         // << เพิ่ม padding
-    marginBottom: 0,
-    letterSpacing: 0.01,
-  }}
-  placeholder={`กลอนวรรคที่ ${idx + 1} ...`}
-/>
+                            <input
+                              type="text"
+                              value={line}
+                              onChange={e => handlePoemLineChange(idx, e.target.value)}
+                              style={{
+                                flex: 1,
+                                width: '100%',
+                                minWidth: '260px',
+                                border: 'none',
+                                borderBottom: '1.5px solid #bdbdbd',
+                                outline: 'none',
+                                fontSize: '1.05rem',
+                                background: 'transparent',
+                                textAlign: 'center',
+                                padding: '8px 6px',
+                                marginBottom: 0,
+                                letterSpacing: 0.01,
+                              }}
+                              placeholder={`กลอนวรรคที่ ${idx + 1} ...`}
+                            />
                           </div>
                         ))}
                     </div>
+                    <div style={{ textAlign: 'center', marginTop: 20 }}>
+                      <button
+                        type="button"
+                        onClick={handleAddStanza}
+                        style={{
+                          padding: '8px 22px',
+                          borderRadius: 999,
+                          border: '2px dashed #70136C',
+                          background: '#fff',
+                          color: '#70136C',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          fontSize: '1.05rem',
+                        }}
+                      >
+                         เพิ่มอีก 1 บท
+                      </button>
+                    </div>
                   </div>
                 </div>
+                {/* ===================== ปุ่มเลือกประเภทกลอน ===================== */}
+                <div style={{ marginBottom: 24, width: '100%' }}>
+      <label style={{ fontWeight: 600, fontSize: '1.08rem', marginBottom: 8, display: 'block', color: '#70136C' }}>เลือกประเภทกลอน</label>
+      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+        {poemTypes.map(pt => (
+          <button
+            key={pt.value}
+            type="button"
+            style={{
+              padding: '8px 18px',
+              borderRadius: 8,
+              border: form.poemType === pt.value ? '2px solid #70136C' : '1px solid #e0e0e0',
+              background: form.poemType === pt.value ? '#f3e6f7' : '#fff',
+              color: form.poemType === pt.value ? '#70136C' : '#333',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: '0.18s',
+              minWidth: 120,
+              fontSize: '1.05rem',
+              boxShadow: form.poemType === pt.value ? '0 2px 8px rgba(112,19,108,0.10)' : 'none',
+            }}
+            onClick={() => handlePoemTypeChange(pt.value)}
+          >
+            {pt.label}
+          </button>
+        ))}
+      </div>
+    </div>
               </>
             )}
 

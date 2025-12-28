@@ -210,7 +210,7 @@ const ActivitiesList = ({ filterCategory }) => {
                         }}
                       />
                       <Card.Body style={{ width: '100%', maxWidth: 320 }}>
-                        <Card.Title style={{ fontSize: '1rem', fontWeight: 'bold', color: '#009688' }}>
+                        <Card.Title style={{ fontSize: '1rem', fontWeight: 'bold', color: '#70136C' }}>
                           {activity.title}
                         </Card.Title>
                         <Card.Text style={{ fontSize: '0.95rem', color: '#555' }}>
@@ -237,7 +237,7 @@ const ActivitiesList = ({ filterCategory }) => {
                       }}
                     />
                     <Card.Body style={{ width: '100%', maxWidth: 320 }}>
-                      <Card.Title style={{ fontSize: '1rem', fontWeight: 'bold', color: '#009688' }}>
+                      <Card.Title style={{ fontSize: '1rem', fontWeight: 'bold', color: '#70136C' }}>
                         {activity.title}
                       </Card.Title>
                       <Card.Text style={{ fontSize: '0.95rem', color: '#555' }}>

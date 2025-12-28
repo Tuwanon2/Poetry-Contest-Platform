@@ -1,8 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function HomeAdminButton() {
+export default function HomeAdminButton({ sidebar }) {
   const navigate = useNavigate();
+  if (sidebar) {
+    return (
+      <button
+        className="sidebar-btn teal"
+        style={{ marginBottom: 0 }}
+        onClick={() => navigate('/admin')}
+      >
+        เข้าสู่หน้าผู้ดูแลระบบ
+      </button>
+    );
+  }
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: '48px 0 0 0' }}>
       <button
