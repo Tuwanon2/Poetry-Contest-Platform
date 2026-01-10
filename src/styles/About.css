@@ -1,0 +1,98 @@
+.about-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.about-main {
+  flex: 1;
+  transition: margin-left 0.3s ease;
+}
+
+.about-container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 24px;
+}
+
+/* Header */
+.about-header {
+  background: linear-gradient(135deg, #70136c, #4b0c47);
+  color: #fff;
+  padding: 60px 30px;
+  border-radius: 24px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.about-header p {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Section */
+.section-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.section-box h2 {
+  color: #70136c;
+  margin-top: 0;
+}
+
+.section-content {
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+/* Mission */
+.mission-list {
+  padding-left: 20px;
+}
+
+/* Team */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.team-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.team-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #70136c;
+  margin: 0 auto 15px;
+}
+
+.team-card p {
+  font-size: 13px;
+  color: #777;
+}
+
+/* Contact */
+.contact-box {
+  margin-top: 60px;
+  padding: 30px;
+  background: #fff;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.contact-box h3 {
+  color: #70136c;
+}

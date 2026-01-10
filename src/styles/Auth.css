@@ -1,0 +1,160 @@
+/* ===============================
+   Auth Layout
+================================ */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f5f6fa;
+  padding: 16px;
+}
+
+/* ===============================
+   Card
+================================ */
+.auth-card {
+  background: #ffffff;
+  padding: 32px;
+  width: 100%;
+  max-width: 360px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #70136c;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* ===============================
+   Form Group
+================================ */
+.auth-group {
+  margin-bottom: 16px;
+}
+
+.auth-group label {
+  font-size: 0.9rem;
+  color: #333;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.auth-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-group input:focus {
+  border-color: #70136c;
+  box-shadow: 0 0 0 3px rgba(112, 19, 108, 0.15);
+}
+
+/* ===============================
+   Error Message
+================================ */
+.auth-error {
+  background: #fdecea;
+  color: #b71c1c;
+  border: 1px solid #f5c2c7;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+/* ===============================
+   Options (Remember / Forgot)
+================================ */
+.auth-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0 16px;
+  font-size: 0.85rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-me input {
+  accent-color: #70136c;
+}
+
+.forgot-link {
+  color: #70136c;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* ===============================
+   Button
+================================ */
+.auth-card button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #70136c;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.auth-card button:hover:not(:disabled) {
+  background: #5a0f56;
+}
+
+.auth-card button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   Footer
+================================ */
+.auth-footer {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.auth-footer a {
+  color: #70136c;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ===============================
+   Responsive
+================================ */
+@media (max-width: 400px) {
+  .auth-card {
+    padding: 24px;
+  }
+}

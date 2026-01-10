@@ -92,11 +92,13 @@ export default function CreateCompetition() {
   // ...existing code...
   // ประเภทกลอน (เลือกได้หลายข้อ)
   const poemTypeOptions = [
-    { label: 'กลอน 8', value: 'กลอน 8' },
-    { label: 'กลอนเปล่า', value: 'กลอนเปล่า' },
-    { label: 'กาพย์ยานี 11', value: 'กาพย์ยานี 11' },
-    { label: 'กาพย์ฉบัง 16', value: 'กาพย์ฉบัง 16' },
-    { label: 'โคลงสี่สุภาพ', value: 'โคลงสี่สุภาพ' },
+    { label: "กลอนแปด", value: "กลอนแปด" },
+    { label: "กาพย์ยานี 11", value: "กาพย์ยานี 11" },
+    { label: "กาพย์ฉบัง 16", value: "กาพย์ฉบัง 16" },
+    { label: "โคลงสี่สุภาพ", value: "โคลงสี่สุภาพ" },
+    { label: "สักวา", value: "สักวา" },
+    { label: "ดอกสร้อย", value: "ดอกสร้อย" },
+    { label: "อินทรวิเชียรฉันท์", value: "อินทรวิเชียรฉันท์" },
   ];
   const [levelPoemTypes, setLevelPoemTypes] = useState({});
       // Modal for adding judge (invite or select existing)

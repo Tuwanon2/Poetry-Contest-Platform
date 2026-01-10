@@ -56,7 +56,7 @@ const TopNav = () => {
 
     {/* RIGHT — Sign In */}
     <div className="nav-right">
-      <Link to="/signin" className="signin-btn">เข้าสู่ระบบ</Link>
+      <Link to="/login" className="signin-btn">เข้าสู่ระบบ</Link>
     </div>
 
   </div>

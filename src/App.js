@@ -4,7 +4,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import JudgeScoring from './pages/JudgeScoring';
 import JudgeWorkDetail from './pages/JudgeWorkDetail';
-
+import Login from './pages/Login';
+import Register from './pages/Register';
 import Home from './pages/Home';
 import AdminDashboard from './pages/AdminDashboard';
 import ContestList from './pages/ContestList';
@@ -15,8 +16,8 @@ import StudentCompetitions from './pages/StudentCompetitions';
 import UniversityCompetitions from './pages/UniversityCompetitions';
 import GeneralCompetitions from './pages/GeneralCompetitions';
 import ContestDetail from './pages/ContestDetail';
-
-
+import CompetitionResults from './pages/CompetitionResults';
+import About from './pages/About';
 function App() {
   return (
     <Router>
@@ -35,6 +36,10 @@ function App() {
           <Route path="/competitions-overview" element={<CompetitionsOverview />} />
           <Route path="/judge-scoring" element={<JudgeScoring />} />
           <Route path="/judge-work-detail" element={<JudgeWorkDetail />} />
+          <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+         <Route path="/results" element={<CompetitionResults />} />
+         <Route path="/about" element={<About />} />
       </Routes>
     </Router>
   );

@@ -128,17 +128,23 @@
 
 @media (max-width: 900px) {
   .sidebar-home.clean {
-    position: static;
+    position: fixed;              
+    top: 0;
+    left: 0;
     width: 100vw;
-    height: auto;
+    height: 100vh;
     border-right: none;
-    border-bottom: 1.5px solid #ece6f3;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    box-shadow: none;
-    padding: 0;
+    box-shadow: 2px 0 16px rgba(112,19,108,0.08);
+    flex-direction: column;
+    background: #f7f6fa;
+    transform: translateX(-100%);
   }
+  .sidebar-home.closed {
+  transform: translateX(-100%);
+}
+.sidebar-home.open {
+  transform: translateX(0);
+}
   .sidebar-logo {
     height: 60px;
     margin-bottom: 0;

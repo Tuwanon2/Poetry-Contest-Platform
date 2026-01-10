@@ -2,6 +2,7 @@ import React from 'react';
 import TopNav from '../components/TopNav';
 import { Card, Row, Col, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import '../styles/UniversityCompetitions.css'; 
 
 const universityActivities = [
   {
@@ -23,29 +24,30 @@ const universityActivities = [
 const UniversityCompetitions = () => (
   <>
     <TopNav />
-    <Container className="my-5">
-      <h2 style={{ fontWeight: 'bold', color: '#009688', fontSize: '1.3rem', marginBottom: 24 }}>กิจกรรมสำหรับนิสิตนักศึกษา</h2>
+    <Container className="uc-container">
+      <h2 className="uc-title">กิจกรรมสำหรับนิสิตนักศึกษา</h2>
+
       <Row xs={1} md={3} className="g-4">
-          {universityActivities.map(activity => (
-            <Col key={activity.id}>
-              <Card className="h-100 shadow-sm d-flex flex-column align-items-center" style={{ maxWidth: 350, margin: '0 auto' }}>
-                {/* Render image based on activity type */}
-                {activity.title.includes('ประกวดร้องเพลงชั้นมัธยมศึกษาฯ') ? (
-                  <img src="/assets/images/hug.jpg" alt={activity.title} style={{ width: '100%', maxWidth: 320, height: 220, objectFit: 'cover', background: '#fff', borderTopLeftRadius: 8, borderTopRightRadius: 8 }} />
-                ) : activity.title.includes('ขับร้องร้องเพลง 3 ระดับ') ? (
-                  <img src="/assets/images/kawee.jpg" alt={activity.title} style={{ width: '100%', maxWidth: 320, height: 220, objectFit: 'cover', background: '#fff', borderTopLeftRadius: 8, borderTopRightRadius: 8 }} />
-                ) : (
-                  <div style={{ width: '100%', maxWidth: 320, height: 220, background: '#fff', borderTopLeftRadius: 8, borderTopRightRadius: 8 }} />
-                )}
-                <Card.Body style={{ width: '100%', maxWidth: 320 }}>
-                  <Card.Title style={{ fontSize: '1rem', fontWeight: 'bold', color: '#009688' }}>{activity.title}</Card.Title>
-                  <Card.Text style={{ fontSize: '0.95rem', color: '#555' }}>{activity.description}</Card.Text>
-                  <div style={{ fontSize: '0.9rem', color: '#888' }}>{activity.category}</div>
-                  <div style={{ fontSize: '0.9rem', color: '#888' }}>{activity.date}</div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
+        {universityActivities.map(activity => (
+          <Col key={activity.id}>
+            <Card className="uc-card">
+              {activity.title.includes('ประกวดร้องเพลงชั้นมัธยมศึกษาฯ') ? (
+                <img src="/assets/images/hug.jpg" alt={activity.title} className="uc-image" />
+              ) : activity.title.includes('ขับร้องร้องเพลง 3 ระดับ') ? (
+                <img src="/assets/images/kawee.jpg" alt={activity.title} className="uc-image" />
+              ) : (
+                <div className="uc-image placeholder" />
+              )}
+
+              <Card.Body className="uc-card-body">
+                <Card.Title className="uc-card-title">{activity.title}</Card.Title>
+                <Card.Text className="uc-description">{activity.description}</Card.Text>
+                <div className="uc-meta">{activity.category}</div>
+                <div className="uc-meta">{activity.date}</div>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
       </Row>
     </Container>
   </>

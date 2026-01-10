@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TopNav2 from "../components/TopNav2";
-
+const isMobile = window.innerWidth < 768;
+const isTablet = window.innerWidth < 992;
 // Custom RadioCard for level selection (single choice)
 function LevelRadioCard({ label, icon, checked, onClick }) {
   return (
@@ -109,13 +110,14 @@ export default function SubmitCompetition() {
   ];
     // เพิ่มประเภทกลอน
     const poemTypes = [
-      { label: "กลอน 8", value: "กลอน 8" },
-      { label: "กลอนเปล่า", value: "กลอนเปล่า" },
-      { label: "กลอนอิสระ", value: "กลอนอิสระ" },
-      { label: "กาพย์ยานี 11", value: "กาพย์ยานี 11" },
-      { label: "กาพย์ฉบัง 16", value: "กาพย์ฉบัง 16" },
-      { label: "โคลงสี่สุภาพ", value: "โคลงสี่สุภาพ" },
-    ];
+    { label: "กลอนแปด", value: "กลอนแปด" },
+    { label: "กาพย์ยานี 11", value: "กาพย์ยานี 11" },
+    { label: "กาพย์ฉบัง 16", value: "กาพย์ฉบัง 16" },
+    { label: "โคลงสี่สุภาพ", value: "โคลงสี่สุภาพ" },
+    { label: "สักวา", value: "สักวา" },
+    { label: "ดอกสร้อย", value: "ดอกสร้อย" },
+    { label: "อินทรวิเชียรฉันท์", value: "อินทรวิเชียรฉันท์" },
+  ];
 
 
     // จำนวนวรรคที่เพิ่มต่อ 1 ครั้ง (4 วรรค)
@@ -241,8 +243,19 @@ export default function SubmitCompetition() {
           ✏️ กรอกรายละเอียดกลอนของคุณอย่างประณีต เพื่อส่งเข้าประกวดในหัวข้อ…
         </span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', maxWidth: 1400, margin: '28px 0 40px 0', padding: '0 20px' }}>
-        {/* Left side: poster and contest name, stick to left */}
+<div
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    width: '100%',
+    maxWidth: 1200,
+    margin: '28px auto 40px',
+    padding: '0 16px',
+    boxSizing: 'border-box',
+  }}
+>        {/* Left side: poster and contest name, stick to left */}
         <div style={{ minWidth: 260, maxWidth: 320, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 12, marginRight: 32 }}>
           <img src="/assets/images/hug.jpg" alt="โปสเตอร์การแข่งขัน" style={{ width: '100%', maxWidth: 260, borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.10)', marginBottom: 18 }} />
           <div style={{ fontSize: '1rem', fontWeight: 500, color: '#222', textAlign: 'left', marginTop: 0, marginLeft: 8, lineHeight: 1.5 }}>
@@ -403,7 +416,7 @@ export default function SubmitCompetition() {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(4, 1fr)",
+                      gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
                       gap: 16,
                       marginTop: 8,
                     }}
@@ -560,8 +573,7 @@ export default function SubmitCompetition() {
                     <div
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '14px 16px',
+gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',                        gap: '14px 16px',
                         justifyItems: 'stretch',
                         alignItems: 'center',
                         minHeight: 40,
@@ -616,8 +628,14 @@ export default function SubmitCompetition() {
                 {/* ===================== ปุ่มเลือกประเภทกลอน ===================== */}
                 <div style={{ marginBottom: 24, width: '100%' }}>
       <label style={{ fontWeight: 600, fontSize: '1.08rem', marginBottom: 8, display: 'block', color: '#70136C' }}>เลือกประเภทกลอน</label>
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-        {poemTypes.map(pt => (
+<div
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'center',
+  }}
+>        {poemTypes.map(pt => (
           <button
             key={pt.value}
             type="button"
