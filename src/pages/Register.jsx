@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/Auth.css';
 
 const Register = () => {
@@ -21,7 +22,7 @@ const Register = () => {
     setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
@@ -35,10 +36,30 @@ const Register = () => {
     }
 
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      const payload = {
+        Username: form.email,
+        Password: form.password,
+        FullName: `${form.firstName} ${form.lastName}`,
+        Email: form.email,
+        Role: 'student'
+      };
+
+      // Call backend directly to avoid dev-proxy issues
+      const res = await axios.post('http://localhost:8080/api/v1/auth/register', payload);
+
+      if (res.status === 201 || res.status === 200) {
+        setLoading(false);
+        navigate('/login');
+      } else {
+        setLoading(false);
+        setError('ไม่สามารถลงทะเบียนได้ ลองใหม่อีกครั้ง');
+      }
+    } catch (err) {
       setLoading(false);
-      navigate('/login');
-    }, 1000);
+      setError(err.response?.data?.error || err.message || 'เกิดข้อผิดพลาด');
+    }
   };
 
   return (

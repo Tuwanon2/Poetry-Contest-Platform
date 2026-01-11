@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/Auth.css';
 
 const Login = () => {
@@ -34,17 +35,24 @@ const Login = () => {
 
     try {
       setLoading(true);
-
-      // 🔒 ตัวอย่าง (เชื่อม backend ภายหลัง)
-      // await api.post('/login', form);
-
-      setTimeout(() => {
-        setLoading(false);
-        navigate('/');
-      }, 1000);
+      const payload = { Username: form.email, Password: form.password };
+      const res = await axios.post('http://localhost:8080/api/v1/auth/login', payload);
+      // ตัวอย่าง: บันทึก user / token ตาม response แล้วไปหน้าแรก
+      const user = res.data?.user;
+      const username = user?.Username || user?.username || form.email;
+      const storage = form.remember ? window.localStorage : window.sessionStorage;
+      try {
+        storage.setItem('username', username);
+        if (user) storage.setItem('user', JSON.stringify(user));
+        if (res.data?.token) storage.setItem('token', res.data.token);
+      } catch (err) {
+        console.warn('storage write failed', err);
+      }
+      navigate('/');
     } catch (err) {
+      setError(err.response?.data?.error || 'ไม่สามารถเข้าสู่ระบบได้');
+    } finally {
       setLoading(false);
-      setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
     }
   };
 
