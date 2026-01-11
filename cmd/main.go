@@ -8,6 +8,7 @@ import (
 	"productproject/internal/config"
 	"productproject/internal/handlers"
 	"productproject/internal/klon"
+	"productproject/internal/routes"
 	"time"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -28,15 +29,20 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	// TODO: connect to klon db (implement NewKlonDatabase)
-	var klonDB klon.KlonDatabase = nil // <- replace with real db
+	// Connect klon DB
+	connStr := cfg.GetConnectionString()
+	klonDB, err := klon.NewPostgresKlonDB(connStr)
+	if err != nil {
+		log.Fatalf("failed to connect klon db: %v", err)
+	}
 	kh := handlers.NewKlonHandlers(klonDB)
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	configCors := cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:4000"},
+		// Allow both localhost and 127.0.0.1 origins for common dev setups
+		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:4000", "http://127.0.0.1:4000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -50,13 +56,11 @@ func main() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
+	// Public register route (should be accessible without auth middleware)
+	r.POST("/api/v1/auth/register", kh.Register)
+
 	v1 := r.Group("/api/v1")
-	{
-		// ตัวอย่าง route สำหรับ users
-		v1.GET("/users/:id", kh.GetUser)
-		v1.POST("/users", kh.CreateUser)
-		// TODO: เพิ่ม route สำหรับ competitions, applicants, works, judges, scores
-	}
+	routes.Register(v1, kh)
 
 	if err := r.Run(":" + cfg.AppPort); err != nil {
 		log.Printf("Failed to run server: %v", err)

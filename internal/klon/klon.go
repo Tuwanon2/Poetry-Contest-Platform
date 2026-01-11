@@ -26,6 +26,7 @@ type Competition struct {
 	EndDate     string    `json:"end_date"`
 	Status      string    `json:"status"`
 	CreatedAt   time.Time `json:"created_at"`
+	OrganizerID int       `json:"organizer_id,omitempty"`
 }
 
 // Applicant represents a user's application to a competition
@@ -69,10 +70,41 @@ type KlonDatabase interface {
 	// User
 	GetUserByID(ctx context.Context, id int) (User, error)
 	CreateUser(ctx context.Context, user User) (User, error)
+	ListUsers(ctx context.Context) ([]User, error)
+	// Auth
+	Register(ctx context.Context, user User, password string) (User, error)
+	Login(ctx context.Context, username, password string) (User, error)
+	Logout(ctx context.Context, userID int) error
+	// Contests
+	ListContests(ctx context.Context) ([]Competition, error)
+	GetContestByID(ctx context.Context, id int) (Competition, error)
+	SearchContests(ctx context.Context, q string) ([]Competition, error)
+	// Results
+	GetResults(ctx context.Context, contestID int) ([]map[string]interface{}, error)
+	// Submissions / works
+	CreateSubmission(ctx context.Context, userID int, contestID int, title, content string) (Work, error)
+	GetSubmission(ctx context.Context, workID int) (Work, error)
+	UpdateSubmission(ctx context.Context, workID int, title, content string) (Work, error)
+	DeleteSubmission(ctx context.Context, workID int) error
+	GetSubmissionStatus(ctx context.Context, workID int) (map[string]interface{}, error)
+	// Profile
+	GetProfile(ctx context.Context, userID int) (User, error)
+	UpdateProfile(ctx context.Context, userID int, updates map[string]interface{}) (User, error)
 	// Competition
 	GetCompetitionByID(ctx context.Context, id int) (Competition, error)
 	ListCompetitions(ctx context.Context) ([]Competition, error)
 	CreateCompetition(ctx context.Context, comp Competition) (Competition, error)
+	UpdateCompetition(ctx context.Context, id int, comp Competition) (Competition, error)
+	DeleteCompetition(ctx context.Context, id int) error
+	MyContests(ctx context.Context, userID int) ([]Competition, error)
+	OpenContest(ctx context.Context, id int) error
+	CloseContest(ctx context.Context, id int) error
+	AddCoOrganizer(ctx context.Context, competitionID int, userID int) (int, error)
+	RemoveCoOrganizer(ctx context.Context, coOrganizerID int) error
+	RemoveJudge(ctx context.Context, judgeID int) error
+	ListSubmissionsForContest(ctx context.Context, competitionID int) ([]Work, error)
+	ContestProgress(ctx context.Context, competitionID int) (map[string]int, error)
+	PostResults(ctx context.Context, competitionID int) error
 	// Applicant
 	ApplyCompetition(ctx context.Context, applicant Applicant) (Applicant, error)
 	ListApplicants(ctx context.Context, competitionID int) ([]Applicant, error)
@@ -85,4 +117,31 @@ type KlonDatabase interface {
 	// Score
 	AddScore(ctx context.Context, score Score) (Score, error)
 	ListScores(ctx context.Context, workID int) ([]Score, error)
+
+	// Invitations & comments (judge workflows)
+	ListInvitations(ctx context.Context, userID int) ([]Invitation, error)
+	AcceptInvitation(ctx context.Context, invitationID int) error
+	ListJudgeContests(ctx context.Context, userID int) ([]Competition, error)
+	ListJudgeContestSubmissions(ctx context.Context, userID int, competitionID int) ([]Work, error)
+	AddComment(ctx context.Context, comment Comment) (Comment, error)
+	GetJudgeSummary(ctx context.Context, userID int, competitionID int) (map[string]interface{}, error)
+}
+
+// Invitation represents an invitation sent to a user to be a judge
+type Invitation struct {
+    ID            int       `json:"id"`
+    CompetitionID int       `json:"competition_id"`
+    FromUserID    int       `json:"from_user_id"`
+    ToUserID      int       `json:"to_user_id"`
+    Status        string    `json:"status"`
+    CreatedAt     time.Time `json:"created_at"`
+}
+
+// Comment represents a comment left by a judge on a work
+type Comment struct {
+    ID        int       `json:"id"`
+    WorkID    int       `json:"work_id"`
+    JudgeID   int       `json:"judge_id"`
+    Content   string    `json:"content"`
+    CreatedAt time.Time `json:"created_at"`
 }
