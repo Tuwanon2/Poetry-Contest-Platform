@@ -69,6 +69,12 @@ CREATE TABLE IF NOT EXISTS scores (
 );
 
 COMMIT;
+-- เพิ่มตัวอย่างผู้ใช้ 2 แถวในฐานข้อมูล klon
+INSERT INTO users (username, password_hash, full_name, email, role)
+VALUES
+    ('alice', 'placeholder_hash', 'Alice Example', 'alice@example.com', 'applicant'),
+    ('bob',   'placeholder_hash', 'Bob Example',   'bob@example.com',   'judge');
+
     SELECT 'CREATE DATABASE poem_competition'
     WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'poem_competition');
 
