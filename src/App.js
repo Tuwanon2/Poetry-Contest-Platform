@@ -4,10 +4,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import JudgeScoring from './pages/JudgeScoring';
 import JudgeWorkDetail from './pages/JudgeWorkDetail';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 import Home from './pages/Home';
-import AdminDashboard from './pages/AdminDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import ContestList from './pages/ContestList';
 import ApplicantsList from './pages/ApplicantsList';
 import CreateCompetition from './pages/CreateCompetition';
@@ -17,7 +17,7 @@ import UniversityCompetitions from './pages/UniversityCompetitions';
 import GeneralCompetitions from './pages/GeneralCompetitions';
 import ContestDetail from './pages/ContestDetail';
 import CompetitionResults from './pages/CompetitionResults';
-import About from './pages/About';
+import About from './pages/public/About';
 function App() {
   return (
     <Router>

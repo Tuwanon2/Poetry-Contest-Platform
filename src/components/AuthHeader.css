@@ -1,0 +1,106 @@
+.auth-header {
+  background-color: #6a1b6a; /* สีม่วงเข้มตามภาพ */
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-left, .header-right {
+  flex: 1; /* แบ่งพื้นที่ซ้ายขวาให้เท่ากันเพื่อให้ตรงกลางอยู่กึ่งกลางจริงๆ */
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  justify-content: flex-end;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ปุ่มย้อนกลับ */
+.back-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.back-btn:hover {
+  opacity: 0.7;
+}
+
+/* โลโก้วงกลมขาว */
+.logo-circle {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.logo-circle img {
+  width: 80%;
+  height: auto;
+}
+
+.brand-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* ตัวเลือกภาษา */
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+}
+
+.lang-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0;
+}
+
+.lang-btn.active {
+  color: white;
+}
+
+.divider {
+  color: rgba(255, 255, 255, 0.4);
+}
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  /* เพิ่มส่วนนี้เพื่อให้ Link ดูเหมือนข้อความปกติ */
+  text-decoration: none; /* เอาเส้นขีดเส้นใต้ออก */
+  color: white;          /* บังคับตัวอักษรเป็นสีขาว */
+  cursor: pointer;       /* เปลี่ยนเมาส์เป็นรูปมือ */
+  transition: opacity 0.2s;
+}
+
+/* เพิ่ม Effect เวลาเอาเมาส์ไปชี้ให้รู้ว่ากดได้ */
+.header-center:hover {
+  opacity: 0.8;
+}

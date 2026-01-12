@@ -1,0 +1,672 @@
+/* SubmitCompetition.css */
+
+/* --- Layout Main --- */
+.layout-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 28px auto 40px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* --- Top Header Text --- */
+.top-text-container {
+  width: 100%;
+  text-align: center;
+  margin-top: 24px;
+  margin-bottom: -8px;
+}
+.top-text {
+  font-size: 1.13rem;
+  color: #70136C;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+
+/* --- Sidebar (Poster & Rules) --- */
+.sidebar {
+  min-width: 260px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 12px;
+  margin-right: 32px;
+}
+
+.poster-img {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  margin-bottom: 18px;
+}
+
+.contest-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #222;
+  text-align: left;
+  margin-top: 0;
+  margin-left: 8px;
+  line-height: 1.5;
+}
+
+.rules-box {
+  margin-top: 18px;
+  margin-left: 8px;
+  background: #f8f2f7;
+  border-radius: 10px;
+  padding: 16px 14px;
+  color: #70136C;
+  font-size: 1.01rem;
+  box-shadow: 0 1px 6px rgba(112,19,108,0.06);
+}
+
+.rules-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.rules-list {
+  padding-left: 18px;
+  margin: 0;
+  color: #70136C;
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.rules-note {
+  color: #a07ca0;
+  font-size: 0.97rem;
+  margin-top: 8px;
+}
+
+/* --- Main Form Card --- */
+.form-card {
+  background: #fff;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px 0 rgba(60,60,60,0.10);
+  padding: 32px 36px 48px 36px;
+  width: 900px;
+  flex: 1;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-header {
+  margin-bottom: 10px;
+  margin-top: -18px;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #222;
+}
+
+/* --- Stepper --- */
+.stepper-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 36px;
+  margin-top: 0;
+  user-select: none;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 110px;
+}
+
+.step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 4px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.step-circle.active {
+  background: #70136C;
+  color: #fff;
+}
+
+.step-label {
+  font-size: 14px;
+  color: #222;
+  font-weight: 500;
+}
+.step-label.active {
+  color: #70136C;
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: #e0e0e0;
+  margin: 0 8px;
+  min-width: 32px;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+.step-line.filled {
+  background: #70136C;
+}
+.step-line.half {
+  background: linear-gradient(90deg, #e0e0e0 60%, #70136C 100%);
+}
+
+/* --- Form Inputs --- */
+.form-group {
+  margin-bottom: 22px;
+}
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+.form-col {
+  flex: 1;
+}
+
+.input-label {
+  display: block;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.input-field {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 1rem;
+  border-radius: 7px;
+  border: 1px solid #d2d2d2;
+  outline: none;
+  transition: border 0.2s;
+  background: #fafbfc;
+  box-sizing: border-box; /* สำคัญเพื่อให้ width 100% ไม่ล้น */
+}
+
+/* --- Level Radio Card --- */
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.level-card {
+  flex: 1;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 4px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  transition: 0.2s;
+  min-width: 0;
+  min-height: 44px;
+  height: 44px;
+  max-height: 44px;
+}
+
+.level-card.selected {
+  border: 2px solid #00b8a9;
+  background: #e6fffb;
+  box-shadow: 0 2px 8px rgba(0,184,169,0.08);
+}
+
+.radio-outer {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #bdbdbd;
+  background: #fff;
+  margin-right: 4px;
+  position: relative;
+  box-sizing: border-box;
+}
+.level-card.selected .radio-outer {
+  border: 2px solid #00b8a9;
+}
+
+.radio-inner {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00b8a9;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  font-size: 18px;
+  color: #b48bb4;
+  margin-right: 2px;
+  transition: background 0.2s, color 0.2s;
+}
+.level-card.selected .icon-circle {
+  background: #f3d6f2;
+  box-shadow: 0 2px 8px rgba(112,19,108,0.10);
+  color: #70136C;
+}
+
+.level-label {
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: #222;
+}
+.level-card.selected .level-label {
+  color: #00b8a9;
+}
+
+/* --- Upload Area --- */
+.upload-box {
+  border: 2px dashed #cccccc;
+  border-radius: 12px;
+  padding: 40px 20px 32px 20px;
+  text-align: center;
+  color: #555;
+  background: #fafafa;
+  margin-top: 8px;
+}
+.upload-title {
+  margin-bottom: 10px;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #555;
+  letter-spacing: 0.2px;
+}
+.upload-desc {
+  margin-bottom: 20px;
+  color: #888;
+  font-size: 1.08rem;
+}
+.btn-upload {
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: #70136C;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.98rem;
+  box-shadow: 0 2px 8px rgba(112,19,108,0.08);
+  transition: background 0.18s, box-shadow 0.18s;
+  min-width: 120px;
+  margin-top: 8px;
+}
+.btn-upload:hover {
+  background: #4b0c47;
+}
+.file-name-display {
+  margin-top: 20px;
+  font-size: 0.97rem;
+  color: #70136C;
+  word-break: break-all;
+}
+
+/* --- Step 2: Poem --- */
+.step2-header {
+  margin-bottom: 18px;
+  width: 100%;
+  text-align: center;
+}
+.step2-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #70136C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.step2-divider {
+  width: 60px;
+  height: 3px;
+  background: #f3d6f2;
+  border-radius: 2px;
+  margin: 12px auto 0 auto;
+}
+
+.label-with-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f3d6f2;
+  color: #70136C;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: help;
+  margin-top: 2px;
+  box-shadow: 0 1px 4px rgba(112,19,108,0.08);
+  border: 1.5px solid #e0c7e7;
+}
+
+.input-highlight {
+  border: 1.5px solid #e0c7e7;
+  background: #fcf7fd;
+}
+
+.poem-box {
+  border: 2px solid #e0c7e7;
+  border-radius: 6px;
+  padding: 24px;
+  background: #fcf7fd;
+  margin-top: 8px;
+  min-height: 120px;
+  max-width: 900px;
+}
+.poem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  justify-items: stretch;
+  align-items: center;
+  min-height: 40px;
+}
+.poem-line-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.poem-idx {
+  color: #b48bb4;
+  font-weight: 600;
+  min-width: 22px;
+  text-align: right;
+  font-size: 15px;
+}
+.poem-input {
+  flex: 1;
+  width: 100%;
+  min-width: 260px;
+  border: none;
+  border-bottom: 1.5px solid #bdbdbd;
+  outline: none;
+  font-size: 1.05rem;
+  background: transparent;
+  text-align: center;
+  padding: 8px 6px;
+  margin-bottom: 0;
+  letter-spacing: 0.01px;
+}
+
+/* --- Poem Action Buttons (Add/Remove) --- */
+.poem-action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-add-stanza {
+  padding: 8px 22px;
+  border-radius: 999px;
+  border: 2px dashed #70136C;
+  background: #fff;
+  color: #70136C;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: all 0.2s ease;
+}
+
+.btn-add-stanza:hover {
+  background: #f3e6f7;
+  border-style: solid;
+}
+
+/* ปุ่มลบบท (สีแดง) - แก้ไขให้เป็นเส้นประเหมือนปุ่มเพิ่ม */
+.btn-remove-stanza {
+  padding: 8px 22px;
+  border-radius: 999px;
+  border: 2px dashed #dc3545; /* เปลี่ยนเป็นเส้นประ */
+  background: #fff;
+  color: #dc3545;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: all 0.2s ease;
+}
+
+/* Hover แล้วเป็นเส้นทึบ พื้นหลังสีแดงอ่อน */
+.btn-remove-stanza:hover:not(:disabled) {
+  background: #fff5f5;
+  border-style: solid;
+}
+
+.btn-remove-stanza:disabled {
+  border-color: #e0e0e0;
+  color: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.6;
+  border-style: dashed; /* Disabled ก็ให้เป็นเส้นประจางๆ */
+}
+
+/* --- Poem Type Selector --- */
+.poem-type-wrapper {
+  margin-bottom: 24px;
+  width: 100%;
+}
+.poem-type-label {
+  font-weight: 600;
+  font-size: 1.08rem;
+  margin-bottom: 8px;
+  display: block;
+  color: #70136C;
+}
+.poem-type-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.btn-poem-type {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.18s;
+  min-width: 120px;
+  font-size: 1.05rem;
+}
+.btn-poem-type.selected {
+  border: 2px solid #70136C;
+  background: #f3e6f7;
+  color: #70136C;
+  box-shadow: 0 2px 8px rgba(112,19,108,0.10);
+}
+
+/* --- Step 3: Confirmation --- */
+.confirm-box {
+  margin-bottom: 22px;
+  font-size: 1.1rem;
+  color: #222;
+  width: 100%;
+}
+.confirm-row { margin-bottom: 12px; }
+.confirm-icon { font-size: 1.08em; margin-right: 6px; }
+
+.confirm-poem-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  justify-items: stretch;
+  align-items: center;
+}
+.display-line {
+  width: 100%;
+  min-width: 260px;
+  border-bottom: 1.5px solid #bdbdbd;
+  min-height: 32px;
+  font-size: 1.05rem;
+  text-align: center;
+  padding: 8px 6px;
+  color: #222;
+  letter-spacing: 0.01px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.display-line.empty {
+  color: #bbb;
+}
+
+/* --- Navigation Buttons --- */
+.nav-buttons {
+  text-align: center;
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.btn-back {
+  background: #e0e0e0;
+  padding: 8px 28px;
+  border-radius: 999px;
+  color: #333;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  letter-spacing: 0.5px;
+  transition: background 0.18s, box-shadow 0.18s;
+  min-width: 100px;
+}
+
+.btn-next, .btn-submit {
+  background: #70136C;
+  padding: 8px 28px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(112,19,108,0.08);
+  letter-spacing: 0.5px;
+  transition: background 0.18s, box-shadow 0.18s;
+  min-width: 100px;
+}
+.btn-next:hover, .btn-submit:hover {
+  background: #4b0c47;
+}
+
+/* --- MEDIA QUERIES (Responsive) --- */
+
+/* Tablet & Mobile ( < 992px ) */
+@media (max-width: 992px) {
+  .sidebar {
+    margin-right: 0;
+    margin-bottom: 32px;
+    max-width: 100%;
+    align-items: center;
+  }
+  .contest-title {
+    text-align: center;
+  }
+  .form-card {
+    width: 100%;
+  }
+}
+
+/* Mobile ( < 768px ) */
+@media (max-width: 768px) {
+  .level-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .poem-grid, .confirm-poem-display {
+    grid-template-columns: 1fr; /* 1 column for poem lines */
+  }
+  .poem-input, .display-line {
+    min-width: 100%; /* Full width */
+  }
+  .form-card {
+    padding: 24px 16px 32px 16px;
+  }
+  .form-header {
+    font-size: 1.8rem;
+  }
+  /* ส่วนแยกบทในหน้ากรอก */
+  .stanza-header {
+    grid-column: 1 / -1;
+    font-weight: bold;
+    color: #70136c;
+    margin-top: 15px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 5px;
+    font-size: 0.9rem;
+  }
+
+  /* ช่องว่างระหว่างบทในหน้ายืนยัน */
+  .stanza-gap {
+    height: 20px;
+  }
+
+  .poem-display-area {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    line-height: 2;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  }
+
+  .display-line {
+    font-size: 1.1rem;
+    color: #333;
+  }
+}

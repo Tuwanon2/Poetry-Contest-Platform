@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import SidebarHome from '../components/SidebarHome';
-import TopNav from '../components/TopNav';
-import '../styles/About.css';
+import SidebarHome from '../../components/SidebarHome';
+import TopNav from '../../components/TopNav';
+import '../../styles/About.css';
 
 const About = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);

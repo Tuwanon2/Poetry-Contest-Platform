@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/Auth.css';
+import AuthHeader from '../../components/AuthHeader';
+
+import '../../styles/Auth.css';
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -57,6 +60,8 @@ const Login = () => {
   };
 
   return (
+    <>
+    <AuthHeader />
     <main className="auth-container">
       <form
         className="auth-card"
@@ -122,6 +127,7 @@ const Login = () => {
         </p>
       </form>
     </main>
+    </>
   );
 };
 
