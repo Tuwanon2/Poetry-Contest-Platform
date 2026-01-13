@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
+import SidebarHome from './SidebarHome';
 import './TopNav.css';
 
 const TopNav = () => {
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,51 +18,58 @@ const TopNav = () => {
   };
 
   return (
-    <nav className="topnav">
-  <div className="topnav-container">
+    <>
+      <nav className="topnav">
+        <div className="topnav-container">
+          {/* LEFT SECTION */}
+          <div className="nav-left">
+            {/* เรียกใช้ SidebarHome (ปุ่ม Hamburger จะแสดงตรงนี้) */}
+            <div className="sidebar-trigger-wrapper">
+              <SidebarHome open={isSidebarOpen} setOpen={setSidebarOpen} />
+            </div>
 
-    {/* LEFT — Search Bar */}
-    <div className="nav-left">
-      <form onSubmit={handleSearchSubmit} className="search-form">
-        <div className="search-input-wrapper">
-          <FaSearch className="search-icon" />
-          <input
-            type="text"
-            placeholder="ค้นหา..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-        </div>
-      </form>
-    </div>
-
-    {/* CENTER — Main Menu */}
-    <div className="nav-center">
-      <ul className="main-menu">
-        <li><Link to="/" className={location.pathname === '/' ? 'active' : ''}>หน้าหลัก</Link></li>
-
-        <li className="dropdown">
-          <span className={location.pathname.startsWith('/competition') ? 'active' : ''}>กิจกรรมการประกวด</span>
-          <div className="dropdown-content">
-            <Link to="/competition/student">สำหรับนักเรียน</Link>
-            <Link to="/competition/university">สำหรับนิสิตนักศึกษา</Link>
-            <Link to="/competition/general">สำหรับประชาชนทั่วไป</Link>
+            <form onSubmit={handleSearchSubmit} className="search-form">
+              <div className="search-input-wrapper">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="ค้นหาการประกวด..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+            </form>
           </div>
-        </li>
 
-        <li><Link to="/results" className={location.pathname === '/results' ? 'active' : ''}>ประกาศผล</Link></li>
-        <li><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>เกี่ยวกับเรา</Link></li>
-      </ul>
-    </div>
+          {/* CENTER SECTION */}
+          <div className="nav-center">
+            <ul className="main-menu">
+              <li><Link to="/" className={location.pathname === '/' ? 'active' : ''}>หน้าหลัก</Link></li>
+              <li className="dropdown">
+                <span className={location.pathname.startsWith('/competition') ? 'active' : ''}>
+                  กิจกรรมการประกวด
+                </span>
+                <div className="dropdown-content">
+                  <Link to="/competition/student">สำหรับนักเรียน</Link>
+                  <Link to="/competition/university">สำหรับนิสิตนักศึกษา</Link>
+                  <Link to="/competition/general">สำหรับประชาชนทั่วไป</Link>
+                </div>
+              </li>
+              <li><Link to="/results" className={location.pathname === '/results' ? 'active' : ''}>ประกาศผล</Link></li>
+              <li><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>เกี่ยวกับเรา</Link></li>
+            </ul>
+          </div>
 
-    {/* RIGHT — Sign In */}
-    <div className="nav-right">
-      <Link to="/login" className="signin-btn">เข้าสู่ระบบ</Link>
-    </div>
-
-  </div>
-</nav>
+          {/* RIGHT SECTION */}
+          <div className="nav-right">
+            <Link to="/login" className="signin-btn">เข้าสู่ระบบ</Link>
+          </div>
+        </div>
+      </nav>
+      {/* ดัน Content ลงมาไม่ให้โดน Navbar ทับ (Optional) */}
+      <div style={{ height: '70px' }}></div> 
+    </>
   );
 };
 

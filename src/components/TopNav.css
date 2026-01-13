@@ -1,118 +1,127 @@
+/* TopNav.css */
+:root {
+  --primary-color: #70136C;
+  --text-on-primary: #ffffff; /* สีตัวอักษรบนพื้นม่วง */
+  --nav-height: 70px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2); /* เพิ่มเงาให้เข้มขึ้นนิดหน่อยเพราะพื้นหลังเข้ม */
+}
+
 .topnav {
-  z-index: 3000;
-  border-bottom: 1px solid #eee;
-  background: #70136C;
-  color: #fff;
-  height: 56px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--nav-height);
+  
+  /* ✅ เปลี่ยนพื้นหลังเป็นสีม่วง */
+  background-color: var(--primary-color); 
+  
+  box-shadow: var(--shadow-sm);
+  z-index: 1000;
   display: flex;
   align-items: center;
+  padding: 0 24px;
+  box-sizing: border-box;
 }
 
 .topnav-container {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0 32px;
   width: 100%;
-  gap: 48px; /* ระยะระหว่าง left/center/right */
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
-/* LEFT — Search Bar */
+/* --- Left Section --- */
 .nav-left {
   display: flex;
   align-items: center;
+  gap: 20px;
 }
 
-/* CENTER — Main Menu */
-.nav-center {
+/* ✅ ปรับปุ่ม Hamburger ให้เข้ากับพื้นม่วง */
+.sidebar-trigger-wrapper {
   display: flex;
   align-items: center;
-  gap: 80px; /* ระยะห่างระหว่างเมนู */
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.2s;
 }
 
-/* RIGHT — Sign In */
-.nav-right {
-  margin-left: auto; /* ⭐ ดันไปขวาสุด */
-  display: flex;
-  align-items: center;
+/* เปลี่ยนสีพื้นหลังเวลาเอาเมาส์ชี้เป็นสีขาวจางๆ */
+.sidebar-trigger-wrapper:hover {
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
-.signin-btn {
-  padding: 8px 22px;
-  background: #ffffff;
-  color: #70136C;
-  border-radius: 999px;   /* pill */
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  transition: 0.25s ease;
+/* ⚠️ สำคัญ: บังคับเปลี่ยนสีไอคอน Hamburger เป็นสีขาว */
+.sidebar-trigger-wrapper svg rect {
+  fill: #ffffff !important;
 }
 
-.signin-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-}
-
-/* Search Bar */
+/* ช่องค้นหา */
 .search-form {
-  display: flex;
-  align-items: center;
-  margin: 0;
+  position: relative;
 }
 
 .search-input-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,0.9);
-  border-radius: 20px;
-  padding: 2px 10px;
-  width: 400px;
-  max-width: 100%;
-  height: 32px;
 }
 
 .search-icon {
-  color: #555;
-  margin-right: 6px;
-  font-size: 0.9rem;
+  position: absolute;
+  left: 12px;
+  color: #888; /* สีไอคอนค้นหายังคงเป็นเทา เพราะอยู่ในกล่องขาว */
+  font-size: 14px;
 }
 
 .search-input {
-  border: none;
+  height: 40px;
+  padding-left: 38px;
+  padding-right: 16px;
+  border-radius: 20px;
+  border: none; /* เอาขอบออกเพื่อให้ดูคลีนบนพื้นม่วง */
+  background-color: #ffffff; /* พื้นหลังช่องค้นหาสีขาว */
+  width: 250px;
+  font-size: 14px;
+  transition: all 0.2s;
   outline: none;
-  background: transparent;
-  padding: 4px 0;
-  font-size: 0.9rem;
-  color: #333;
-  width: 100%;
 }
 
-.search-input::placeholder {
-  color: #999;
-  font-size: 0.9rem;
+.search-input:focus {
+  width: 300px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3); /* เปลี่ยนเงา focus เป็นสีขาวจางๆ */
 }
 
-/* Main Menu */
-.main-menu {
+/* --- Center Section --- */
+.nav-center .main-menu {
   display: flex;
-  gap: 80px;
   list-style: none;
+  gap: 30px;
   margin: 0;
   padding: 0;
-  align-items: center;
 }
 
-.main-menu li a,
-.main-menu li span {
-  color: #fff;
+/* ✅ เปลี่ยนสีตัวอักษรเมนูเป็นสีขาว */
+.main-menu a, .main-menu span {
   text-decoration: none;
-  font-family: inherit;
-  font-weight: normal;
+  color: rgba(255, 255, 255, 0.85); /* ขาวแบบนวลๆ */
+  font-weight: 500;
+  font-size: 16px;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
-.main-menu li a.active,
-.main-menu li span.active {
-  font-weight: bold;
+/* Hover แล้วให้เป็นสีขาวสว่างชัดเจน หรือสีทอง */
+.main-menu a:hover, .main-menu span:hover,
+.main-menu a.active, .main-menu span.active {
+  color: #ffffff; 
+  text-shadow: 0 0 10px rgba(255,255,255,0.4);
 }
 
 /* Dropdown */
@@ -121,24 +130,67 @@
 }
 
 .dropdown-content {
-  display: none;
   position: absolute;
   top: 100%;
-  left: 0;
-  background: #fff;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff; /* พื้นหลัง Dropdown ยังเป็นสีขาว เพื่อให้อ่านง่าย */
+  min-width: 200px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
   border-radius: 8px;
-  min-width: 180px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  z-index: 10;
+  padding: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  margin-top: 15px;
 }
 
-.dropdown-content a {
-  display: block;
-  padding: 10px 16px;
-  color: #70136C;
-  text-decoration: none;
+/* สามเหลี่ยมชี้ขึ้น (Optional - เพิ่มลูกเล่น) */
+.dropdown-content::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid #fff;
 }
 
 .dropdown:hover .dropdown-content {
+  opacity: 1;
+  visibility: visible;
+  margin-top: 10px;
+}
+
+/* ลิงก์ใน Dropdown เป็นสีดำเหมือนเดิม เพราะพื้นหลัง Dropdown สีขาว */
+.dropdown-content a {
   display: block;
+  padding: 10px 16px;
+  color: #333 !important; 
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.dropdown-content a:hover {
+  background-color: #fceeff;
+  color: var(--primary-color) !important;
+}
+
+/* --- Right Section --- */
+/* ✅ สลับสีปุ่มเข้าสู่ระบบ (พื้นขาว ตัวหนังสือม่วง) */
+.signin-btn {
+  padding: 8px 24px;
+  background-color: #ffffff;
+  color: var(--primary-color);
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.signin-btn:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-1px);
 }
