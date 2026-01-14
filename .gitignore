@@ -1,2 +1,14 @@
 # Environment variables
 .env
+
+# Uploaded files (should not be committed to git)
+uploads/
+
+# Build output
+main
+main.exe
+*.exe
+
+# Temporary files
+*.tmp
+*.log

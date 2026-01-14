@@ -2,6 +2,7 @@ package klon
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 )
 
@@ -21,12 +22,21 @@ type Competition struct {
 	ID          int       `json:"id"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
+	Purpose     string    `json:"purpose,omitempty"`
 	Type        string    `json:"type"`
 	StartDate   string    `json:"start_date"`
 	EndDate     string    `json:"end_date"`
 	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"created_at"`
-	OrganizerID int       `json:"organizer_id,omitempty"`
+	CreatedAt   time.Time       `json:"created_at"`
+	UpdatedAt   time.Time       `json:"updated_at"`
+	OrganizerID int             `json:"organizer_id,omitempty"`
+	PosterURL   string          `json:"poster_url,omitempty"`
+	Levels      json.RawMessage `json:"levels,omitempty"` // JSON per-level details
+	RegistrationStart string    `json:"registration_start,omitempty"`
+	RegistrationEnd   string    `json:"registration_end,omitempty"`
+	MaxScore    int             `json:"max_score,omitempty"`
+	Judges      []map[string]interface{} `json:"judges,omitempty"`
+	Assistants  []map[string]interface{} `json:"assistants,omitempty"`
 }
 
 // Applicant represents a user's application to a competition
@@ -51,7 +61,22 @@ type Judge struct {
 	ID            int       `json:"id"`
 	UserID        int       `json:"user_id"`
 	CompetitionID int       `json:"competition_id"`
+	LevelID       int       `json:"level_id"`
+	Status        string    `json:"status"` // pending, accepted, rejected
 	AssignedAt    time.Time `json:"assigned_at"`
+}
+
+// Assistant represents an assistant assigned to a competition
+type Assistant struct {
+	ID              int       `json:"id"`
+	UserID          int       `json:"user_id"`
+	CompetitionID   int       `json:"competition_id"`
+	Status          string    `json:"status"` // pending, accepted, rejected
+	CanView         bool      `json:"can_view"`
+	CanEdit         bool      `json:"can_edit"`
+	CanViewScores   bool      `json:"can_view_scores"`
+	CanAddAssistant bool      `json:"can_add_assistant"`
+	AssignedAt      time.Time `json:"assigned_at"`
 }
 
 // Score represents a score given by a judge to a work
@@ -71,6 +96,7 @@ type KlonDatabase interface {
 	GetUserByID(ctx context.Context, id int) (User, error)
 	CreateUser(ctx context.Context, user User) (User, error)
 	ListUsers(ctx context.Context) ([]User, error)
+	SearchUsersByEmail(ctx context.Context, email string) ([]User, error)
 	// Auth
 	Register(ctx context.Context, user User, password string) (User, error)
 	Login(ctx context.Context, username, password string) (User, error)
@@ -114,6 +140,9 @@ type KlonDatabase interface {
 	// Judge
 	AssignJudge(ctx context.Context, judge Judge) (Judge, error)
 	ListJudges(ctx context.Context, competitionID int) ([]Judge, error)
+	// Assistant management
+	AssignAssistant(ctx context.Context, assistant Assistant) (Assistant, error)
+	InviteAssistant(ctx context.Context, assistant Assistant) (Assistant, error)
 	// Score
 	AddScore(ctx context.Context, score Score) (Score, error)
 	ListScores(ctx context.Context, workID int) ([]Score, error)

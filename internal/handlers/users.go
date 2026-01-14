@@ -28,3 +28,17 @@ func (h *KlonHandlers) ListUsers(c *gin.Context) {
     if err != nil { c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}); return }
     c.JSON(http.StatusOK, users)
 }
+
+func (h *KlonHandlers) SearchUsersByEmail(c *gin.Context) {
+    email := c.Query("email")
+    if email == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "email query parameter required"})
+        return
+    }
+    users, err := h.db.SearchUsersByEmail(c.Request.Context(), email)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, users)
+}

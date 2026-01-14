@@ -126,3 +126,39 @@ func (h *KlonHandlers) PostResults(c *gin.Context) {
     if err := h.db.PostResults(c.Request.Context(), id); err != nil { c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}); return }
     c.Status(http.StatusOK)
 }
+
+func (h *KlonHandlers) InviteAssistant(c *gin.Context) {
+    competitionID, _ := strconv.Atoi(c.Param("id"))
+    var req struct {
+        UserID          int  `json:"user_id"`
+        CanView         bool `json:"can_view"`
+        CanEdit         bool `json:"can_edit"`
+        CanViewScores   bool `json:"can_view_scores"`
+        CanAddAssistant bool `json:"can_add_assistant"`
+    }
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    assistant := klon.Assistant{
+        UserID:          req.UserID,
+        CompetitionID:   competitionID,
+        CanView:         req.CanView,
+        CanEdit:         req.CanEdit,
+        CanViewScores:   req.CanViewScores,
+        CanAddAssistant: req.CanAddAssistant,
+        Status:          "pending",
+    }
+
+    created, err := h.db.InviteAssistant(c.Request.Context(), assistant)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    // TODO: Send email notification to the user
+    // For now, we just return success
+    c.JSON(http.StatusCreated, created)
+}
+
