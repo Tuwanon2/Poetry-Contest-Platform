@@ -1,10 +1,9 @@
-import { useNavigate, Link } from 'react-router-dom'; // 1. อย่าลืม import Link
-import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import './AuthHeader.css';
 
 export default function AuthHeader() {
   const navigate = useNavigate();
-  const [lang, setLang] = useState('TH');
+  // ลบ useState และ state ของภาษาออกแล้ว
 
   return (
     <header className="auth-header">
@@ -17,7 +16,7 @@ export default function AuthHeader() {
         </button>
       </div>
 
-      {/* 2. แก้ตรงนี้: ใช้ Link ครอบแทน div และใส่ to="/" */}
+      {/* ตรงกลาง: โลโก้ */}
       <Link to="/" className="header-center">
         <div className="logo-circle">
           <img src="/logo.png" alt="KLON Logo" />
@@ -25,24 +24,9 @@ export default function AuthHeader() {
         <span className="brand-name">Poetry Contest Platform</span>
       </Link>
 
-      {/* ฝั่งขวา: เปลี่ยนภาษา */}
-      <div className="header-right">
-        <div className="lang-switch">
-          <button 
-            className={`lang-btn ${lang === 'TH' ? 'active' : ''}`} 
-            onClick={() => setLang('TH')}
-          >
-            TH
-          </button>
-          <span className="divider">|</span>
-          <button 
-            className={`lang-btn ${lang === 'EN' ? 'active' : ''}`} 
-            onClick={() => setLang('EN')}
-          >
-            EN
-          </button>
-        </div>
-      </div>
+      {/* ฝั่งขวา: ลบส่วน TH/EN ออกไปแล้ว */}
+      {/* หากต้องการให้ Layout สมดุล อาจจะใส่ div เปล่าไว้ หรือจัดการด้วย CSS */}
+      <div className="header-right"></div> 
     </header>
   );
 }

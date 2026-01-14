@@ -27,8 +27,6 @@ function App() {
         <Route path="/contest-detail" element={<ContestDetail />} />
         <Route path="/submit-competition" element={<SubmitCompetition />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/contests" element={<ContestList />} />
-        <Route path="/admin/applicants" element={<ApplicantsList />} />
         <Route path="/all-competitions" element={<AllCompetitions />} />
         <Route path="/competition/student" element={<StudentCompetitions />} />
         <Route path="/competition/university" element={<UniversityCompetitions />} />

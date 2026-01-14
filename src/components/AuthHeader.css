@@ -1,51 +1,86 @@
+/* AuthHeader.css */
+
+/* 1. กำหนดตัวแปรสีให้เหมือนต้นฉบับ */
+:root {
+  --primary-color: #70136C;
+  --text-on-primary: #ffffff;
+  --nav-height: 70px; /* ปรับความสูงเป็น 70px ตามต้นฉบับ */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+}
+
 .auth-header {
-  background-color: #6a1b6a; /* สีม่วงเข้มตามภาพ */
-  height: 60px;
+  /* Fix ตำแหน่ง */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--nav-height);
+  z-index: 1000;
+  box-sizing: border-box;
+
+  /* ✅ สไตล์พื้นหลังสีม่วง */
+  background-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-on-primary);
+  
+  /* จัดวาง Layout */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 0 24px;
 }
 
+/* จัด Layout ซ้าย-ขวา ให้เท่ากันเพื่อให้โลโก้อยู่ตรงกลาง */
 .header-left, .header-right {
-  flex: 1; /* แบ่งพื้นที่ซ้ายขวาให้เท่ากันเพื่อให้ตรงกลางอยู่กึ่งกลางจริงๆ */
+  flex: 1;
   display: flex;
   align-items: center;
 }
 
-.header-right {
-  justify-content: flex-end;
+/* --- ส่วนปุ่มย้อนกลับ (ปรับให้เหมือนปุ่ม Hamburger ต้นฉบับ) --- */
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  
+  /* ขนาดและรูปร่าง */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  
+  /* สีไอคอน */
+  color: #ffffff; 
 }
 
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้ (พื้นขาวจางๆ) */
+.back-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- ส่วนตรงกลาง (โลโก้) --- */
 .header-center {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-/* ปุ่มย้อนกลับ */
-.back-btn {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9); /* สีขาว */
   transition: opacity 0.2s;
 }
 
-.back-btn:hover {
-  opacity: 0.7;
+.header-center:hover {
+  opacity: 1;
+  text-shadow: 0 0 10px rgba(255,255,255,0.4); /* เพิ่มความสว่างตอนชี้ */
 }
 
-/* โลโก้วงกลมขาว */
+/* โลโก้วงกลม */
 .logo-circle {
   width: 40px;
   height: 40px;
-  background: white;
+  background: white; /* พื้นหลังโลโก้ยังคงเป็นสีขาวเพื่อให้รูปชัด */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -62,45 +97,4 @@
   font-size: 1.1rem;
   font-weight: 500;
   letter-spacing: 0.5px;
-}
-
-/* ตัวเลือกภาษา */
-.lang-switch {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.85rem;
-}
-
-.lang-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.6);
-  cursor: pointer;
-  font-weight: bold;
-  padding: 0;
-}
-
-.lang-btn.active {
-  color: white;
-}
-
-.divider {
-  color: rgba(255, 255, 255, 0.4);
-}
-.header-center {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  
-  /* เพิ่มส่วนนี้เพื่อให้ Link ดูเหมือนข้อความปกติ */
-  text-decoration: none; /* เอาเส้นขีดเส้นใต้ออก */
-  color: white;          /* บังคับตัวอักษรเป็นสีขาว */
-  cursor: pointer;       /* เปลี่ยนเมาส์เป็นรูปมือ */
-  transition: opacity 0.2s;
-}
-
-/* เพิ่ม Effect เวลาเอาเมาส์ไปชี้ให้รู้ว่ากดได้ */
-.header-center:hover {
-  opacity: 0.8;
 }
