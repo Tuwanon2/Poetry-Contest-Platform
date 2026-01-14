@@ -8,8 +8,8 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-# Copy initialization scripts
-COPY init.sql /docker-entrypoint-initdb.d/
+# Copy only the poem_competition initialization script
+COPY 03-poem_competition.sql /docker-entrypoint-initdb.d/
 
 # Expose the PostgreSQL port
 EXPOSE 5432
