@@ -1,11 +1,27 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ContestList() {
+  const navigate = useNavigate();
+
+  const handleCreateContest = () => {
+    const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (!user) {
+      alert('กรุณาเข้าสู่ระบบก่อนสร้างการประกวด');
+      navigate('/login');
+      return;
+    }
+    navigate('/create-competition');
+  };
+
   return (
     <div style={{ padding: 32 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h2 style={{ fontSize: 24, fontWeight: 700, color: '#009688', margin: 0 }}>รายการประกวดทั้งหมด</h2>
-        <button style={{ background: '#00b8a9', color: '#fff', fontWeight: 600, border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,184,169,0.08)' }}>
+        <button 
+          onClick={handleCreateContest}
+          style={{ background: '#00b8a9', color: '#fff', fontWeight: 600, border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,184,169,0.08)' }}
+        >
           + สร้างการประกวดใหม่
         </button>
       </div>

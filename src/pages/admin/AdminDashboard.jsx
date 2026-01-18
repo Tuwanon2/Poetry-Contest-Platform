@@ -18,7 +18,10 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     if (window.confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
-       window.location.href = "/login"; 
+      // Clear all session and local storage
+      sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = "/login"; 
     }
   };
 

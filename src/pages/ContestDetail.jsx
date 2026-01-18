@@ -1,9 +1,171 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import TopNav from "../components/TopNav";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+
+const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 const ContestDetail = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [contest, setContest] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchContest = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_BASE_URL}/contests/${id}`);
+        console.log('🔍 Contest Detail API Response:', response.data);
+        console.log('📋 Available keys:', Object.keys(response.data));
+        console.log('📅 Start date field:', response.data.start_date, response.data.StartDate);
+        console.log('📅 End date field:', response.data.end_date, response.data.EndDate);
+        setContest(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('❌ Error fetching contest:', err);
+        setError('ไม่สามารถโหลดข้อมูลการประกวดได้');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchContest();
+    }
+  }, [id]);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('th-TH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const calculateTimeRemaining = (endDate) => {
+    if (!endDate) {
+      console.log('⚠️ No endDate provided');
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false };
+    }
+    
+    const now = new Date();
+    // แปลง endDate ให้เป็น Date object
+    let end = new Date(endDate);
+    
+    // ตรวจสอบว่า Date object ถูกต้องหรือไม่
+    if (isNaN(end.getTime())) {
+      console.error('❌ Invalid date:', endDate);
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false };
+    }
+    
+    console.log('⏰ Calculating time:', { now: now.toISOString(), end: end.toISOString() });
+    
+    const diff = end - now;
+    
+    if (diff <= 0) {
+      console.log('⏰ Contest expired');
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
+    }
+    
+    const result = {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+      seconds: Math.floor((diff % (1000 * 60)) / 1000),
+      isExpired: false,
+    };
+    
+    console.log('⏰ Time remaining:', result);
+    return result;
+  };
+
+  const getContestStatus = () => {
+    if (!contest) return 'loading';
+    const now = new Date();
+    const startDate = new Date(contest.start_date || contest.StartDate);
+    const endDate = new Date(contest.end_date || contest.EndDate);
+    
+    if (now < startDate) return 'upcoming';
+    if (now > endDate) return 'closed';
+    return 'open';
+  };
+
+  const [timeRemaining, setTimeRemaining] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false });
+
+  useEffect(() => {
+    if (contest && (contest.end_date || contest.EndDate)) {
+      const endDate = contest.end_date || contest.EndDate;
+      
+      console.log('📅 Contest data:', {
+        title: contest.title || contest.Title,
+        start_date: contest.start_date || contest.StartDate,
+        end_date: endDate,
+        full_contest: contest
+      });
+      
+      // คำนวณทันที
+      const initialTime = calculateTimeRemaining(endDate);
+      setTimeRemaining(initialTime);
+      
+      // ตั้ง interval เพื่ออัพเดตทุกวินาที
+      const interval = setInterval(() => {
+        const newTime = calculateTimeRemaining(endDate);
+        setTimeRemaining(newTime);
+        
+        // ถ้าหมดเวลาแล้ว ให้หยุด interval
+        if (newTime.isExpired) {
+          clearInterval(interval);
+        }
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    } else {
+      console.warn('⚠️ No contest or end_date available');
+    }
+  }, [contest]);
+
+  if (loading) {
+    return (
+      <>
+        <TopNav />
+        <div style={{ textAlign: 'center', padding: '100px' }}>
+          <p style={{ color: '#00796b', fontSize: '1.2rem' }}>กำลังโหลดข้อมูล...</p>
+        </div>
+      </>
+    );
+  }
+
+  if (error || !contest) {
+    return (
+      <>
+        <TopNav />
+        <div style={{ textAlign: 'center', padding: '100px' }}>
+          <p style={{ color: '#d32f2f', fontSize: '1.2rem' }}>{error || 'ไม่พบข้อมูลการประกวด'}</p>
+        </div>
+      </>
+    );
+  }
+
+  const levels = contest.levels || [];
+  const levelNames = levels.map(l => l.level_name || l.name || '').filter(Boolean).join(', ') || 'ทุกระดับ';
+  
+  // จัดการ poster URL
+  let posterUrl = null;
+  if (contest.poster_url || contest.PosterURL) {
+    const posterPath = contest.poster_url || contest.PosterURL;
+    if (posterPath.startsWith('http')) {
+      posterUrl = posterPath;
+    } else {
+      posterUrl = `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    }
+  }
+  
   return (
     <>
       <TopNav />
@@ -14,96 +176,154 @@ const ContestDetail = () => {
             <div style={{ padding: '18px 18px 0 18px' }}>
               <div style={{ color: "#00796b", fontWeight: 400, fontSize: 24, marginBottom: 10, textAlign: 'left', lineHeight: 1.2, display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ fontWeight: 400, fontSize: 24 }}>
-                  ประกวดเรื่องสั้นฉันทลักษณ์ ครั้งที่ 7
-                </span>
-                <span style={{ fontWeight: 400, fontSize: 24, marginLeft: 8 }}>
-                  “ป้องโลกด้วยกอด กอดโลกด้วยกลอน”
+                  {contest.title || contest.Title}
                 </span>
               </div>
-              {/* สมัครผลงานถึงวันที่ ... */}
               <div style={{ textAlign: 'left', fontSize: 15, color: '#222', margin: '14px 0 6px 0', fontWeight: 400 }}>
-                เปิดรับผลงานถึงวันที่ 15 ตุลาคม 2568
+                {timeRemaining.isExpired ? (
+                  <span style={{ color: '#d32f2f', fontWeight: 600 }}>
+                    หมดเวลารับสมัครแล้ว (ปิดรับเมื่อ {formatDate(contest.end_date || contest.EndDate)})
+                  </span>
+                ) : (
+                  <>
+                    เปิดรับผลงานถึงวันที่ {formatDate(contest.end_date || contest.EndDate)}
+                  </>
+                )}
               </div>
-              {/* Countdown bar */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e0e0e0', borderTop: '1px solid #e0e0e0', padding: '7px 0 5px 0', marginBottom: 6 }}>
-                {["12", "05", "23", "44"].map((num, idx) => (
-                  <div key={idx} style={{ flex: 1, textAlign: 'center' }}>
-                    <div style={{ color: '#d84315', fontWeight: 700, fontSize: 18, letterSpacing: 1 }}>{num}</div>
-                    <div style={{ color: '#444', fontSize: 11, marginTop: 1 }}>
-                      {['Days', 'Hours', 'Minutes', 'Seconds'][idx]}
+              {!timeRemaining.isExpired && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e0e0e0', borderTop: '1px solid #e0e0e0', padding: '7px 0 5px 0', marginBottom: 6 }}>
+                  {[String(timeRemaining.days).padStart(2, '0'), String(timeRemaining.hours).padStart(2, '0'), String(timeRemaining.minutes).padStart(2, '0'), String(timeRemaining.seconds).padStart(2, '0')].map((num, idx) => (
+                    <div key={idx} style={{ flex: 1, textAlign: 'center' }}>
+                      <div style={{ color: timeRemaining.days === 0 && timeRemaining.hours < 24 ? '#d32f2f' : '#d84315', fontWeight: 700, fontSize: 18, letterSpacing: 1 }}>{num}</div>
+                      <div style={{ color: '#444', fontSize: 11, marginTop: 1 }}>
+                        {['วัน', 'ชั่วโมง', 'นาที', 'วินาที'][idx]}
+                      </div>
                     </div>
+                  ))}
+                </div>
+              )}
+              {timeRemaining.isExpired && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '1px solid #e0e0e0', borderTop: '1px solid #e0e0e0', padding: '12px 0', marginBottom: 6, background: '#ffebee' }}>
+                  <div style={{ color: '#d32f2f', fontWeight: 600, fontSize: 15 }}>
+                    ⏰ การประกวดนี้ปิดรับสมัครแล้ว
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
-            <img src="/assets/images/hug.jpg" alt="โปสเตอร์ประกวดเรื่องสั้นฉันทลักษณ์" style={{ width: "100%", maxHeight: 320, objectFit: "contain", borderRadius: 0, margin: 0, background: '#e0f2f1', display: 'block' }} />
+            {posterUrl ? (
+              <img 
+                src={posterUrl} 
+                alt="โปสเตอร์การประกวด" 
+                style={{ width: "100%", maxHeight: 320, objectFit: "contain", borderRadius: 0, margin: 0, background: '#e0f2f1', display: 'block' }}
+                onError={(e) => { 
+                  console.log('❌ Poster failed to load:', e.target.src);
+                  e.target.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div style={{ width: "100%", height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', color: '#999', fontSize: 14 }}>
+                ไม่พบรูปโปสเตอร์
+              </div>
+            )}
             <div style={{ padding: '18px' }}>
-              <section style={{ marginBottom: 24 }}>
-                <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>แนวคิดการประกวด</h2>
-                <ul style={{ paddingLeft: 16, color: "#333", fontSize: 13 }}>
-                  <li>ถูกหลักฉันทลักษณ์ มีความเป็นวรรณศิลป์ และสะท้อนภาพสังคมไทยในปัจจุบัน</li>
-                  <li>ตระหนักถึงปัญหาทรัพยากรและสิ่งแวดล้อม วิกฤตขยะ การแย่งชิงทรัพยากร</li>
-                  <li>ผลงานควรเป็นกระบอกเสียงชี้ให้เห็นปัญหาและเสนอทางออกด้วยพลังวรรณศิลป์</li>
-                </ul>
-              </section>
-              <section style={{ marginBottom: 24 }}>
-                <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>กติกาการประกวด</h2>
-                <ul style={{ paddingLeft: 16, color: "#333", fontSize: 13 }}>
-                  <li>เป็นผลงานร้อยกรองประเภทเรื่องสั้น มีโครงเรื่อง ตัวละคร บทสนทนา</li>
-                  <li>แต่งด้วยฉันทลักษณ์ชนิดใดก็ได้ (โคลง ฉันท์ กาพย์ กลอน ร่าย ฯลฯ) ความยาว 80-100 บท</li>
-                  <li>ไม่รับกลอนเปล่าหรือฉันทลักษณ์ที่คิดขึ้นเอง</li>
-                  <li>พิมพ์ต้นฉบับฟอนต์ TH SarabunPSK ขนาด 16 บนกระดาษ A4 ไม่ระบุชื่อผู้แต่งในผลงาน</li>
-                  <li>ส่งไฟล์ pdf และ doc ผ่าน Google Form <a href="https://forms.gle/qiP4QNcJaq1i6rWb6" target="_blank" rel="noopener noreferrer">[คลิกที่นี่]</a></li>
-                  <li>ผลงานต้องไม่เคยเผยแพร่หรือได้รับรางวัลมาก่อน</li>
-                  <li>1 คนส่งได้ 1 ผลงานเท่านั้น</li>
-                </ul>
-              </section>
-              <section style={{ marginBottom: 24 }}>
-                <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>ระยะเวลาการจัดกิจกรรม</h2>
-                <ul style={{ paddingLeft: 16, color: "#333", fontSize: 13 }}>
-                  <li>เปิดรับผลงาน: 15 สิงหาคม – 15 ตุลาคม 2568</li>
-                  <li>ประกาศรายชื่อผลงานที่ส่งเข้าประกวด: 25 ตุลาคม 2568</li>
-                  <li>ประกาศ Longlist: 15 พฤศจิกายน 2568</li>
-                  <li>ประกาศ Shortlist: 30 พฤศจิกายน 2568</li>
-                  <li>ประกาศผลและพิธีมอบรางวัล: 10 ธันวาคม 2568 (วันนักกลอน)</li>
-                </ul>
-              </section>
-              <section style={{ marginBottom: 24 }}>
-                <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>รางวัล</h2>
-                <ul style={{ paddingLeft: 16, color: "#333", fontSize: 13 }}>
-                  <li>รางวัลชนะเลิศ โล่พระราชทานฯ + เกียรติบัตร + เงินรางวัล 10,000 บาท</li>
-                  <li>รองชนะเลิศอันดับ 1 โล่เกียรติยศ + เกียรติบัตร + เงินรางวัล 7,000 บาท</li>
-                  <li>รองชนะเลิศอันดับ 2 โล่เกียรติยศ + เกียรติบัตร + เงินรางวัล 5,000 บาท</li>
-                  <li>รางวัลชมเชย 2 รางวัล เกียรติบัตร + เงินรางวัล 3,000 บาท</li>
-                  <li>ผู้ส่งผลงานทุกคนได้รับ E-Certificate</li>
-                </ul>
-              </section>
-              <section style={{ marginBottom: 24 }}>
-                <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>ติดต่อสอบถาม</h2>
-                <ul style={{ paddingLeft: 16, color: "#333", fontSize: 13 }}>
-                  <li>เพจเฟซบุ๊ก: <a href="https://www.facebook.com/profile.php?id=100069233838120" target="_blank" rel="noopener noreferrer">สมาคมนักกลอนแห่งประเทศไทย</a></li>
-                  <li>โทรศัพท์: 08 2297 5968 (นายอมรศักดิ์ ศรีสุขกลาง)</li>
-                </ul>
-              </section>
+              {(contest.purpose || contest.Purpose) && (
+                <section style={{ marginBottom: 24 }}>
+                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>แนวคิด/วัตถุประสงค์</h2>
+                  <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
+                    {contest.purpose || contest.Purpose}
+                  </div>
+                </section>
+              )}
+              
+              {(contest.description || contest.Description) && (
+                <section style={{ marginBottom: 24 }}>
+                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>รายละเอียด</h2>
+                  <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
+                    {contest.description || contest.Description}
+                  </div>
+                </section>
+              )}
+
+              {levels.length > 0 && levels.some(l => l.rules) && (
+                <section style={{ marginBottom: 24 }}>
+                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>กติกาการประกวด</h2>
+                  {levels.map((level, idx) => (
+                    level.rules && (
+                      <div key={idx} style={{ marginBottom: 12 }}>
+                        {levels.length > 1 && (
+                          <h3 style={{ color: "#00796b", fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
+                            {level.level_name || level.name}
+                          </h3>
+                        )}
+                        <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
+                          {level.rules}
+                        </div>
+                      </div>
+                    )
+                  ))}
+                </section>
+              )}
+
+              {levels.length > 0 && levels.some(l => l.prizes) && (
+                <section style={{ marginBottom: 24 }}>
+                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>รางวัล</h2>
+                  {levels.map((level, idx) => {
+                    if (!level.prizes) return null;
+                    const prizes = typeof level.prizes === 'string' ? JSON.parse(level.prizes) : level.prizes;
+                    return (
+                      <div key={idx} style={{ marginBottom: 12 }}>
+                        {levels.length > 1 && (
+                          <h3 style={{ color: "#00796b", fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
+                            {level.level_name || level.name}
+                          </h3>
+                        )}
+                        <ul style={{ paddingLeft: 16, color: "#333", fontSize: 13 }}>
+                          {Array.isArray(prizes) ? (
+                            prizes.map((prize, i) => (
+                              <li key={i}>{prize}</li>
+                            ))
+                          ) : (
+                            <li>{JSON.stringify(prizes)}</li>
+                          )}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </section>
+              )}
             </div>
             {/* สมัครเข้าประกวด (moved to bottom) */}
             <div style={{ textAlign: 'center', margin: '24px 0 0 0' }}>
               <button
+                disabled={timeRemaining.isExpired}
                 style={{
                   padding: '8px 18px',
-                  background: '#70136C',
+                  background: timeRemaining.isExpired ? '#ccc' : '#70136C',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 6,
                   fontSize: 14,
                   fontWeight: 600,
-                  cursor: 'pointer',
+                  cursor: timeRemaining.isExpired ? 'not-allowed' : 'pointer',
                   boxShadow: '0 1px 4px rgba(0,184,169,0.08)',
                   transition: 'background 0.18s',
+                  opacity: timeRemaining.isExpired ? 0.6 : 1,
                 }}
-                onClick={() => navigate('/submit-competition')}
+                onClick={() => {
+                  if (timeRemaining.isExpired) {
+                    alert('การประกวดนี้ปิดรับสมัครแล้ว');
+                    return;
+                  }
+                  const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+                  if (!user) {
+                    alert('กรุณาเข้าสู่ระบบก่อนสมัครเข้าประกวด');
+                    navigate('/login');
+                    return;
+                  }
+                  navigate(`/submit-competition/${id}`);
+                }}
               >
-                สมัครเข้าประกวดนี้
+                {timeRemaining.isExpired ? 'ปิดรับสมัครแล้ว' : 'สมัครเข้าประกวดนี้'}
               </button>
             </div>
           </div>
@@ -113,9 +333,11 @@ const ContestDetail = () => {
           <div>
             <h2 style={{ fontSize: 15, color: '#222', fontWeight: 700, marginBottom: 8 }}>คุณสมบัติผู้สมัคร</h2>
             <ul style={{ color: '#009688', fontSize: 12, margin: 0, paddingLeft: 12, fontWeight: 500 }}>
-              <li>นักเรียน</li>
-              <li>นิสิต นักศึกษา</li>
-              <li>ประชาชนทั่วไป</li>
+              {levelNames ? (
+                <li>{levelNames}</li>
+              ) : (
+                <li>ทุกคนสามารถสมัครได้</li>
+              )}
             </ul>
           </div>
          
