@@ -2,7 +2,7 @@ import React from 'react';
 import TopNav from '../components/TopNav';
 import { Card, Row, Col, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-
+import '../App.css';
 // Mock activities (copy from ActivitiesList.jsx)
 const allActivities = [
   {

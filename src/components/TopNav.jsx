@@ -52,8 +52,8 @@ const TopNav = () => {
                 </span>
                 <div className="dropdown-content">
                   <Link to="/competition/student">ระดับประถม</Link>
-                  <Link to="/competition/university">ระดับมัธยม</Link>
-                  <Link to="/competition/general">ระดับนักศึกษา</Link>
+                  <Link to="/competition/secondary">ระดับมัธยม</Link>
+                  <Link to="/competition/university">ระดับนักศึกษา</Link>
                   <Link to="/competition/general">ระดับประชาชนทั่วไป</Link>
                 </div>
               </li>

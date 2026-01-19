@@ -5,9 +5,14 @@
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* แก้จุดที่ 1: เปลี่ยนจาก center เป็น flex-start เพื่อไม่ให้ลอยขึ้นไปชน Header */
+  align-items: flex-start; 
   background: #f5f6fa;
   padding: 16px;
+  
+  /* แก้จุดที่ 2: ดันลงมา 100px เพื่อหลบ Header สีม่วงด้านบน */
+  padding-top: 100px; 
+  box-sizing: border-box;
 }
 
 /* ===============================
@@ -20,6 +25,8 @@
   max-width: 360px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  /* เพิ่มระยะห่างด้านล่าง เผื่อหน้าจอยาว */
+  margin-bottom: 40px; 
 }
 
 .auth-card h2 {

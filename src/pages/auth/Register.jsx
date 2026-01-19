@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthHeader from '../../components/AuthHeader';
-import '../../styles/Auth.css';
+import '../../App.css';
 
 const Register = () => {
   const navigate = useNavigate();

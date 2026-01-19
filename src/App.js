@@ -18,6 +18,7 @@ import GeneralCompetitions from './pages/GeneralCompetitions';
 import ContestDetail from './pages/ContestDetail';
 import CompetitionResults from './pages/CompetitionResults';
 import About from './pages/public/About';
+import SecondaryCompetitions from './pages/SecondaryCompetitions';
 function App() {
   return (
     <Router>
@@ -38,6 +39,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/results" element={<CompetitionResults />} />
         <Route path="/about" element={<About />} />
+        <Route path="/competition/secondary" element={<SecondaryCompetitions />} />
       </Routes>
     </Router>
   );

@@ -1,34 +1,53 @@
+/* 1. Import Font (ต้องอยู่บรรทัดแรกสุด ห้ามลบ) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;700&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100&family=Roboto:wght@300;400;500;700&display=swap');
+
+/* 2. บังคับใช้ฟอนต์ Prompt เป็นหลักทั้งเว็บ */
+* {
+  font-family: 'Prompt', 'Roboto', 'Noto Sans Thai', sans-serif !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Styles สำหรับ Body */
+body {
+  /* background-color: #ffffff !important; */ /* <--- ถ้าต้องการพื้นหลังสีขาว ให้เอา comment บรรทัดนี้ออก และใส่ comment บรรทัดข้างล่างแทน */
+  background-color: #000000;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  /* เพิ่ม font smoothing เพื่อความคมชัดบน Mac/iOS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- ส่วนประกอบอื่นๆ ของเว็บไซต์ --- */
+
 /* TopMenu dropdown hover effect */
 .menu-dropdown-hover:hover + .menu-dropdown-content,
 .menu-dropdown-content:hover {
   display: block !important;
 }
+
 /* Make dropdown caret (arrow) white in TopNav */
 .dropdown-toggle-white::after {
   color: #fff !important;
   filter: brightness(1000%);
 }
-/* ตั้งค่า fontFamily สำหรับทุกข้อความในเว็บไซต์ */
-* {
-  font-family: 'Roboto', 'Noto Sans Thai', sans-serif;
-  margin: 0;
-  padding: 0;
-  
-}
 
-.space{
- position: fixed;
- display: flex;
+.space {
+  position: fixed;
+  display: flex;
 }
 
 .App {
   text-align: center;
-  
 }
-/* ในไฟล์ CSS */
+
 .pre-line-text {
-  white-space: pre-line; /* แสดงผล \n เป็นการขึ้นบรรทัดใหม่ */
-  
+  white-space: pre-line;
 }
 
 .App-logo {
@@ -61,62 +80,60 @@
   position: fixed;
   top: 0;
   width: 100%;
-  z-index: 1000; /* ป้องกันไม่ให้เนื้อหาบังเมนู */
+  z-index: 1000;
 }
 
 .content {
-  padding-top: 70px; /* ปรับให้ตรงกับความสูงของเมนู */
+  padding-top: 70px;
 }
 
 .navbar-toggler:focus,
 .navbar-toggler:active {
   background-color: white;
-  color: black; /* หากต้องการให้ไอคอนหรือข้อความเป็นสีดำ */
+  color: black;
 }
+
 .navbar-brand.active, .nav-link.active {
-  color: white !important; /* เปลี่ยนเป็นสีขาว */
-  font-size: 1.2rem; /* ขยายขนาดตัวอักษร */
-  font-weight: bold; /* เพิ่มความหนา */
+  color: white !important;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .category-button {
   font-size: 1.2em;
   padding: 15px;
-  border-radius: 10px; /* ขอบมนของปุ่ม */
-  height: 100px; /* ความสูงคงที่ */
-  width: 100%; /* ความกว้างเต็ม */
   border-radius: 10px;
+  height: 100px;
+  width: 100%;
   border: 2px solid #CC0066;
-  display: flex; /* ใช้ Flexbox */
-  align-items: center; /* จัดเนื้อหาให้อยู่กลางแนวตั้ง */
-  justify-content: center; /* จัดเนื้อหาให้อยู่กลางแนวนอน */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* เพิ่มเอฟเฟกต์นุ่มนวล */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .category-button.selected {
-  background-color: #4F95DA; /* สีเมื่อเลือก */
+  background-color: #4F95DA;
 }
 
 .category-button.default {
-  background-color: #8BD2EC; /* สีเมื่อไม่เลือก */
+  background-color: #8BD2EC;
 }
+
 .my-cart {
   padding: 20px;
-  font-family: Arial, sans-serif;
+  /* font-family กำหนดที่ * แล้ว แต่ใส่ย้ำได้ */
+  font-family: 'Prompt', sans-serif !important; 
 }
 
 h1 {
   text-align: center;
-  
+  margin: 0;
 }
 
 .order-summary {
@@ -149,54 +166,44 @@ h1 {
   background-color: #0056b3;
 }
 
-
-
-
 .clickable-logo-card:hover small {
-  color: white; /* เปลี่ยนสีของชื่อร้านเมื่อโฮเวอร์ */
+  color: white;
 }
 
 .clickable-logo-card:hover img {
-  transform: scale(1.1); /* ทำให้โลโก้ใหญ่ขึ้นเมื่อโฮเวอร์ */
-  transition: transform 0.3s ease; /* เพิ่มการเปลี่ยนแปลงขนาดของโลโก้ */
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
 }
+
 @media (max-width: 768px) {
   .product-detail-container {
     display: block;
     padding: 0 15px;
   }
-
   .product-detail-title {
     font-size: 28px;
   }
-
   .product-detail-price {
     font-size: 20px;
   }
-
   .quantity-selector {
     display: flex;
     justify-content: center;
     margin-bottom: 15px;
   }
-
   .related-products {
     margin-top: 30px;
   }
-
   .related-product-card {
     margin-bottom: 20px;
   }
 }
 
 .nav-link:hover {
-  color: #FFD700; /* สีทองเมื่อชี้เมาส์ */
+  color: #FFD700;
 }
 
-
-
-
-/* CSS */
+/* Button 57 */
 .button-57 {
   position: relative;
   overflow: hidden;
@@ -260,10 +267,8 @@ h1 {
   transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
 }
 
-
-/* CSS */
+/* Button 40 */
 .button-40 {
-  
   background-color: #111827;
   border: 1px solid transparent;
   border-radius: .75rem;
@@ -271,7 +276,7 @@ h1 {
   color: #FFFFFF;
   cursor: pointer;
   flex: 0 0 auto;
-  font-family: "Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  font-family: 'Prompt', "Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.5rem;
@@ -304,24 +309,13 @@ h1 {
   }
 }
 
-/* styles.css */
-body {
-  background-color: #ffffff !important; /* ใช้ !important เพื่อให้มีผลสูงสุด */
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-color: #000000;
-  
-}
-
-
+/* Rocher Font Setup (เฉพาะส่วน) */
 @font-face {
   font-family: 'Rocher';
   src: url(https://assets.codepen.io/9632/RocherColorGX.woff2);
 }
 
-.body {
+.body-rocher {
   font-family: 'Rocher';
   text-align: center;
   font-size: 50px;
@@ -330,10 +324,6 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-h1 {
-  margin: 0;
 }
 
 @font-palette-values --Grays {
@@ -351,20 +341,11 @@ h1 {
   base-palette: 7;
 }
 
-.grays {
-  font-palette: --Grays;
-}
+.grays { font-palette: --Grays; }
+.purples { font-palette: --Purples; }
+.mint { font-palette: --Mint; }
 
-.purples {
-  font-palette: --Purples;
-}
-
-.mint {
-  font-palette: --Mint;
-}
-
-
-/* CSS */
+/* Button 35 */
 .button-35 {
   align-items: center;
   background-color: #fff;
@@ -375,7 +356,7 @@ h1 {
   cursor: pointer;
   display: inline-flex;
   flex: 1 1 auto;
-  font-family: Inter,sans-serif;
+  font-family: 'Prompt', Inter,sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
   justify-content: center;
@@ -396,6 +377,7 @@ h1 {
 .button-35:hover {
   box-shadow: #000000 0 0 0 3px, transparent 0 0 0 0;
 }
+
 .dropdown-submenu {
   position: relative;
 }
@@ -405,6 +387,7 @@ h1 {
   left: 100%;
   margin-top: -6px;
 }
+
 .nav-item.dropdown:hover .dropdown-menu {
   display: block;
 }
@@ -412,18 +395,19 @@ h1 {
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
 }
-/* From Uiverse.io by cssbuttons-io */ 
+
+/* Custom Button */
 .custom-button {
   width: 170px;
   height: 50px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  background: red;
   border: none;
   border-radius: 5px;
   box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
   background: #e62222;
+  transition: 200ms;
 }
 
 .custom-button, .custom-button span {
@@ -473,6 +457,8 @@ h1 {
 .custom-button:active .custom-icon svg {
   transform: scale(0.8);
 }
+
+/* Checkbox Wrapper */
 .checkbox-wrapper-4 * {
   box-sizing: border-box;
   color: white;
@@ -569,35 +555,19 @@ h1 {
   }
 }
 
-@-moz-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-
-@-webkit-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-
-@-o-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-
 @keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
+  50% { transform: scale(0.9); }
 }
+
 .custom-radio-label {
-  color: black; /* เปลี่ยนสีข้อความเป็นสีดำ */
+  color: black;
 }
+
+/* Product Card */
 .product-card {
   position: relative;
   width: 100%;
+  min-width: 200px;
   background-color: rgba(255, 255, 255, 0.074);
   border: 1px solid rgba(255, 255, 255, 0.222);
   -webkit-backdrop-filter: blur(20px);
@@ -607,15 +577,14 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* เงาเบาๆ */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .product-card:hover {
-  transform: translateY(-15px); /* ขยับการ์ดขึ้นเมื่อเอาเมาส์จ่อ */
-  box-shadow: 0px 10px 15px rgba(193, 0, 0, 0.1) !important; /* เพิ่มเงาดำเข้ม */
-  border: 1px solid rgba(255, 255, 255, 0.454); /* ขอบการ์ดเปลี่ยนเมื่อโฮเวอร์ */
+  transform: translateY(-15px);
+  box-shadow: 0px 10px 15px rgba(193, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.454);
 }
-
 
 .product-card .product-image-container {
   height: 250px;
@@ -648,7 +617,9 @@ h1 {
   font-weight: bold;
   color: #CC0066;
   margin-bottom: 10px;
-  text-truncate: ellipsis;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .product-card .product-card-body .price {
@@ -719,7 +690,8 @@ h1 {
   transform: translate(-50%, -50%);
   text-align: center;
 }
-/* From Uiverse.io by vinodjangid07 */ 
+
+/* Delete Button */
 .button {
   width: 50px;
   height: 50px;
@@ -771,6 +743,7 @@ h1 {
   opacity: 1;
   transform: translateY(30px);
 }
+
 .round-button {
   border-radius: 50%;
   width: 30px;
@@ -779,36 +752,33 @@ h1 {
   justify-content: center;
   align-items: center;
   padding: 0;
-  border: 1px solid #000; /* ขอบสีดำ */
-  background-color: transparent; /* สีพื้นโปร่งใส */
-  color: #000; /* สีตัวอักษรเป็นสีดำ */
+  border: 1px solid #000;
+  background-color: transparent;
+  color: #000;
 }
 
 .round-button:hover {
-  background-color: #f5f5f5; /* สีพื้นหลังเมื่อ hover */
+  background-color: #f5f5f5;
   color: #000;
 }
-/* Custom Styled Checkout Button */
+
+/* Styled Checkout Button */
 .styled-checkout-button {
   border-radius: 8px;
   border: 1px solid #fff;
-  background: #c20e0e!important; /* เปลี่ยนสีพื้นหลังที่นี่ */
+  background: #c20e0e !important;
   box-shadow: 0px 2px 0px 0px rgba(220, 52, 52, 0.5);
   backdrop-filter: blur(15px);
   position: relative;
   transition: all 0.3s ease-in-out;
-
-
   padding-inline: 5rem;
-  width: 100%; /* ใช้ 100% ความกว้างของคอนเทนเนอร์ */
-
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #fff;
   gap: 10px;
-
   outline: none;
   overflow: hidden;
   font-size: 15px;
@@ -834,12 +804,7 @@ h1 {
   position: absolute;
   width: 100px;
   height: 100%;
-  background-image: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 30%,
-    rgba(255, 255, 255, 0.8),
-    rgba(255, 255, 255, 0) 70%
-  );
+  background-image: linear-gradient(120deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 70%);
   top: 0;
   left: -100px;
   opacity: 0.6;
@@ -850,17 +815,12 @@ h1 {
 }
 
 @keyframes shine {
-  0% {
-    left: -100px;
-  }
-  60% {
-    left: 100%;
-  }
-  to {
-    left: 100%;
-  }
+  0% { left: -100px; }
+  60% { left: 100%; }
+  to { left: 100%; }
 }
-/* From Uiverse.io by alexmaracinaru */ 
+
+/* CTA */
 .cta {
   border: none;
   background: none;
@@ -911,7 +871,8 @@ h1 {
   transform: scaleX(1);
   transform-origin: bottom left;
 }
-/* From Uiverse.io by absoluteSTrange */
+
+/* Custom Btn */
 .custom-btn {
   padding: 17px 40px;
   border-radius: 10px;
@@ -931,14 +892,15 @@ h1 {
 
 .custom-btn:active {
   background-color: rgb(255, 56, 86);
-  /*50, 168, 80*/
   box-shadow: rgb(201, 46, 70) 0px 0px 0px 0px;
   transform: translateY(5px);
   transition: 200ms;
 }
+
+/* Cart Icon */
 .cart-icon {
   position: relative;
-  display: outline-flex;
+  display: inline-flex;
   align-items: center;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
@@ -948,15 +910,9 @@ h1 {
 }
 
 @keyframes cartAnimation {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.5);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1); }
 }
 
 .cart-icon .badge {
@@ -968,25 +924,18 @@ h1 {
   background-color: rgb(15, 11, 11);
 }
 
-
-
-
-/* CSS สำหรับการทำ fade-in */
+/* Fade In */
 .fade-in {
   opacity: 0;
   animation: fadeIn 1s ease-in-out forwards;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-
+/* Styled Button */
 .styled-button {
   background: transparent;
   position: relative;
@@ -1036,6 +985,7 @@ h1 {
 .styled-button:hover::before {
   box-shadow: inset 0 0 0 10em rgb(24, 119, 242);
 }
+
 .horizontal-scroll {
   overflow-x: auto;
   white-space: nowrap;
@@ -1046,23 +996,13 @@ h1 {
   flex-wrap: nowrap;
 }
 
-.product-card {
-  min-width: 200px;
-}
-
-/* From Uiverse.io by ElgyoshiMa91846 */ 
-/* This is an example, feel free to delete this code */
+/* Tooltips (Elgy) */
 .elgy-tooltip-container {
-  background: rgb(3, 169, 244);
-  background: linear-gradient(
-    138deg,
-    rgba(3, 169, 244, 1) 15%,
-    rgba(63, 180, 233, 1) 65%
-  );
+  background: linear-gradient(138deg, rgba(3, 169, 244, 1) 15%, rgba(63, 180, 233, 1) 65%);
   position: fixed;
   bottom: 40px;
   right: 50px;
-  z-index: 9999;  /* Ensure this is high enough to be on top */
+  z-index: 9999;
   cursor: pointer;
   font-size: 17px;
   padding: 0.7em 0.7em;
@@ -1075,6 +1015,7 @@ h1 {
   background: #fff;
   transition: all 0.6s;
 }
+
 .elgy-tooltip-container .text {
   display: flex;
   align-items: center;
@@ -1082,13 +1023,15 @@ h1 {
   fill: #fff;
   transition: all 0.2s;
 }
+
 .elgy-tooltip-container:hover .text {
   fill: rgb(3, 169, 244);
   transition: all 0.6s;
 }
 
-/* Inicio do tooltip twitter */
-.elgy-tooltip1 {
+/* Tooltip Children Styles (Unified for brevity) */
+.elgy-tooltip1, .elgy-tooltip2, .elgy-tooltip3, .elgy-tooltip4, 
+.elgy-tooltip5, .elgy-tooltip6, .elgy-tooltip7, .elgy-tooltip8 {
   position: absolute;
   top: 100%;
   left: 50%;
@@ -1096,321 +1039,49 @@ h1 {
   opacity: 0;
   visibility: hidden;
   background: #fff;
-  fill: #03a9f4;
   padding: 10px;
   border-radius: 50px;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s,
-    top 0.3s,
-    background 0.3s;
+  transition: opacity 0.3s, visibility 0.3s, top 0.3s, background 0.3s;
   z-index: 1;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.elgy-tooltip-container:hover .tooltip1 {
-  top: 150%;
-  opacity: 1;
-  visibility: visible;
-  background: #fff;
-  border-radius: 50px;
-  transform: translate(-50%, -5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.elgy-tooltip-container:hover .elgy-tooltip1:hover {
-  background: #03a9f4;
-  fill: #fff;
-}
-/* Fim do tooltip twitter */
+/* Individual Tooltip Colors & Positions on Hover */
+.elgy-tooltip1 { fill: #03a9f4; }
+.elgy-tooltip-container:hover .elgy-tooltip1 { top: 150%; opacity: 1; visibility: visible; transform: translate(-50%, -5px); display: flex; }
+.elgy-tooltip-container:hover .elgy-tooltip1:hover { background: #03a9f4; fill: #fff; }
 
-/* Inicio do tooltip facebook */
-.elgy-tooltip2 {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  visibility: hidden;
-  background: #fff;
-  fill: #0462df;
-  padding: 10px;
-  border-radius: 50px;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s,
-    top 0.3s,
-    background 0.3s;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+.elgy-tooltip2 { fill: #0462df; }
+.elgy-tooltip-container:hover .elgy-tooltip2 { top: -120%; opacity: 1; visibility: visible; transform: translate(-50%, -5px); display: flex; }
+.elgy-tooltip-container:hover .elgy-tooltip2:hover { background: #0462df; fill: #fff; }
 
-.elgy-tooltip-container:hover .elgy-tooltip2 {
-  top: -120%;
-  opacity: 1;
-  visibility: visible;
-  background: #fff;
-  transform: translate(-50%, -5px);
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.elgy-tooltip3 { left: 60%; transform: translateX(80%); fill: #1db954; }
+.elgy-tooltip-container:hover .elgy-tooltip3 { top: 10%; opacity: 1; visibility: visible; transform: translate(85%, -5px); display: flex; }
+.elgy-tooltip-container:hover .elgy-tooltip3:hover { background: #1db954; fill: #fff; }
 
-.elgy-tooltip-container:hover .elgy-tooltip2:hover {
-  background: #0462df;
-  fill: #fff;
-}
-/* Fim do tooltip facebook */
+.elgy-tooltip4 { left: -190%; transform: translateX(70%); fill: #8c9eff; }
+.elgy-tooltip-container:hover .elgy-tooltip4 { top: 10%; opacity: 1; visibility: visible; transform: translate(70%, -5px); display: flex; }
+.elgy-tooltip-container:hover .elgy-tooltip4:hover { background: #8c9eff; fill: #fff; }
 
-/* Inicio do tooltip whatsApp */
-.elgy-tooltip3 {
-  position: absolute;
-  top: 100%;
-  left: 60%;
-  transform: translateX(80%);
-  opacity: 0;
-  visibility: hidden;
-  background: #fff;
-  fill: #1db954;
-  padding: 10px;
-  border-radius: 50px;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s,
-    top 0.3s,
-    background 0.3s;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+.elgy-tooltip5 { left: -145%; transform: translateX(70%); fill: #bd081c; }
+.elgy-tooltip-container:hover .elgy-tooltip5 { top: -78%; opacity: 1; visibility: visible; transform: translate(70%, -5px); display: flex; }
+.elgy-tooltip-container:hover .elgy-tooltip5:hover { background: #bd081c; fill: #fff; }
 
-.elgy-tooltip-container:hover .elgy-tooltip3 {
-  top: 10%;
-  opacity: 1;
-  visibility: visible;
-  background: #fff;
-  transform: translate(85%, -5px);
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.elgy-tooltip-container:hover .elgy-tooltip3:hover {
-  background: #1db954;
-  fill: #fff;
-}
-/* Fim do tooltip whatsApp */
+.elgy-tooltip6 { left: 35%; transform: translateX(70%); fill: #ea4c89; }
+.elgy-tooltip-container:hover .elgy-tooltip6 { top: -79%; opacity: 1; visibility: visible; transform: translate(70%, -5px); display: flex; }
+.elgy-tooltip-container:hover .elgy-tooltip6:hover { background: #ea4c89; fill: #fff; }
 
-/* Inicio do tooltip Discord */
-.elgy-tooltip4 {
-  position: absolute;
-  top: 100%;
-  left: -190%;
-  transform: translateX(70%);
-  opacity: 0;
-  visibility: hidden;
-  background: #fff;
-  fill: #8c9eff;
-  padding: 10px;
-  border-radius: 50px;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s,
-    top 0.3s,
-    background 0.3s;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+.elgy-tooltip7 { left: 39%; transform: translateX(70%); fill: #000; }
+.elgy-tooltip-container:hover .elgy-tooltip7 { top: 104%; opacity: 1; visibility: visible; transform: translate(70%, -5px); display: flex; }
+.elgy-tooltip-container:hover .elgy-tooltip7:hover { background: #000; fill: #fff; }
 
-.elgy-tooltip-container:hover .elgy-tooltip4 {
-  top: 10%;
-  opacity: 1;
-  visibility: visible;
-  background: #fff;
-  transform: translate(70%, -5px);
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.elgy-tooltip-container:hover .elgy-tooltip4:hover {
-  background: #8c9eff;
-  fill: #fff;
-}
-/* Fim do tooltip Discord */
+.elgy-tooltip8 { left: -150%; transform: translateX(70%); fill: #ff4500; }
+.elgy-tooltip-container:hover .elgy-tooltip8 { top: 101%; opacity: 1; visibility: visible; transform: translate(70%, -5px); display: flex; }
+.elgy-tooltip-container:hover .elgy-tooltip8:hover { background: #ff4500; fill: #fff; }
 
-/* Inicio do tooltip pinterest */
-.elgy-tooltip5 {
-  position: absolute;
-  top: 100%;
-  left: -145%;
-  transform: translateX(70%);
-  opacity: 0;
-  visibility: hidden;
-  background: #fff;
-  fill: #bd081c;
-  padding: 10px;
-  border-radius: 50px;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s,
-    top 0.3s,
-    background 0.3s;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+.elgy-tooltip9 { position: absolute; top: 0; left: -115%; opacity: 0; visibility: hidden; width: 150px; height: 150px; z-index: -1; }
+.elgy-tooltip-container:hover .elgy-tooltip9 { top: -110%; opacity: 1; visibility: visible; border-radius: 50%; z-index: -1; }
 
-.elgy-tooltip-container:hover .elgy-tooltip5 {
-  top: -78%;
-  opacity: 1;
-  visibility: visible;
-  background: #fff;
-  transform: translate(70%, -5px);
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.elgy-tooltip-container:hover .elgy-tooltip5:hover {
-  background: #bd081c;
-  fill: #fff;
-}
-/* Fim do tooltip pinterest */
-
-/* Inicio do tooltip dribbble */
-.elgy-tooltip6 {
-  position: absolute;
-  top: 100%;
-  left: 35%;
-  transform: translateX(70%);
-  opacity: 0;
-  visibility: hidden;
-  background: #fff;
-  fill: #ea4c89;
-  padding: 10px;
-  border-radius: 50px;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s,
-    top 0.3s,
-    background 0.3s;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.elgy-tooltip-container:hover .elgy-tooltip6 {
-  top: -79%;
-  opacity: 1;
-  visibility: visible;
-  background: #fff;
-  transform: translate(70%, -5px);
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.elgy-tooltip-container:hover .elgy-tooltip6:hover {
-  background: #ea4c89;
-  fill: #fff;
-}
-/* Fim do tooltip dribbble */
-
-/* Inicio do tooltip github */
-.elgy-tooltip7 {
-  position: absolute;
-  top: 100%;
-  left: 39%;
-  transform: translateX(70%);
-  opacity: 0;
-  visibility: hidden;
-  background: #fff;
-  fill: #000;
-  padding: 10px;
-  border-radius: 50px;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s,
-    top 0.3s,
-    background 0.3s;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.elgy-tooltip-container:hover .elgy-tooltip7 {
-  top: 104%;
-  opacity: 1;
-  visibility: visible;
-  background: #fff;
-  transform: translate(70%, -5px);
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.elgy-tooltip-container:hover .elgy-tooltip7:hover {
-  background: #000;
-  fill: #fff;
-}
-/* Fim do tooltip github */
-
-/* Inicio do tooltip reddit */
-.elgy-tooltip8 {
-  position: absolute;
-  top: 100%;
-  left: -150%;
-  transform: translateX(70%);
-  opacity: 0;
-  visibility: hidden;
-  background: #fff;
-  fill: #ff4500;
-  padding: 10px;
-  border-radius: 50px;
-  transition:
-    opacity 0.3s,
-    visibility 0.3s,
-    top 0.3s,
-    background 0.3s;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.elgy-tooltip-container:hover .elgy-tooltip8 {
-  top: 101%;
-  opacity: 1;
-  visibility: visible;
-  background: #fff;
-  transform: translate(70%, -5px);
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.elgy-tooltip-container:hover .elgy-tooltip8:hover {
-  background: #ff4500;
-  fill: #fff;
-}
-/* Fim do tooltip reddit */
-
-/* Inicio do tooltip fixo */
-.elgy-tooltip9 {
-  position: absolute;
-  top: 0;
-  left: -115%;
-  opacity: 0;
-  visibility: hidden;
-  width: 150px;
-  height: 150px;
-  z-index: -1;
-}
-
-.elgy-tooltip-container:hover .elgy-tooltip9 {
-  top: -110%;
-  opacity: 1;
-  visibility: visible;
-  border-radius: 50%;
-  z-index: -1;
-}
 .elgy-tooltip-container button {
   position: absolute;
   top: 0;
@@ -1422,7 +1093,7 @@ h1 {
   color: white;
   border: none;
   cursor: pointer;
-  z-index: 1001; /* Ensure it stays above other elements */
+  z-index: 1001;
 }
 
 .elgy-tooltip-container button:hover {
@@ -1430,8 +1101,7 @@ h1 {
   color: #03a9f4;
 }
 
-/* From Uiverse.io by Li-Deheng */ 
-/* Button Container */
+/* Button Container (Li-Deheng) */
 .btn-conteiner {
   display: flex;
   justify-content: center;
@@ -1441,11 +1111,10 @@ h1 {
   --color-shadow: #00000080;
 }
 
-/* Button Content */
 .btn-content {
   display: flex;
   align-items: center;
-  padding: 10px 40px; /* ขยาย padding เพื่อให้ปุ่มมีขนาดใหญ่และชัดเจน */
+  padding: 10px 40px;
   text-decoration: none;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
@@ -1453,15 +1122,15 @@ h1 {
   color: var(--color-text);
   background: var(--color-background);
   transition: all 0.4s ease;
-  border-radius: 30px; /* ปรับขอบมนให้สัมพันธ์กับขนาดปุ่ม */
+  border-radius: 30px;
   box-shadow: 0 0 0.4em var(--color-shadow);
 }
 
 .btn-content:hover,
 .btn-content:focus {
   transition: all 0.3s ease;
-  box-shadow: 0 0 1em var(--color-outline); /* เพิ่ม shadow ให้สอดคล้องกับขนาดปุ่ม */
-  outline: none; /* เอา outline ออก */
+  box-shadow: 0 0 1em var(--color-outline);
+  outline: none;
 }
 
 .btn-content .icon-arrow {
@@ -1471,52 +1140,31 @@ h1 {
 }
 
 .btn-content:hover .icon-arrow {
-  margin-right: 15px; /* ลด margin เพื่อให้สอดคล้องกับขนาดปุ่ม */
+  margin-right: 15px;
 }
 
-/* SVG Arrow Styles */
 .icon-arrow {
   width: 20px;
   margin-left: 10px;
   position: relative;
-  
 }
 
-/* SVG Animations */
 #arrow-icon-one,
 #arrow-icon-two {
   transition: transform 0.4s;
 }
 
-#arrow-icon-one {
-  transform: translateX(-50%);
-}
-
-#arrow-icon-two {
-  transform: translateX(-30%);
-}
-
-.btn-content:hover #arrow-icon-one {
-  transform: translateX(0%);
-}
-
-.btn-content:hover #arrow-icon-two {
-  transform: translateX(0%);
-}
+#arrow-icon-one { transform: translateX(-50%); }
+#arrow-icon-two { transform: translateX(-30%); }
+.btn-content:hover #arrow-icon-one { transform: translateX(0%); }
+.btn-content:hover #arrow-icon-two { transform: translateX(0%); }
 
 @keyframes color_anim {
   0%, 100% { fill: white; }
   50% { fill: var(--color-background); }
 }
 
-/* Removing the unnecessary outline animation */
-@keyframes btn-content {
-  0% { box-shadow: 0 0 0.2em var(--color-outline); }
-  100% { box-shadow: 0 0 0.4em var(--color-outline); }
-}
-
-
-/* From Uiverse.io by vinodjangid07 */ 
+/* Btn (purple) */
 .Btn {
   position: relative;
   display: flex;
@@ -1562,7 +1210,7 @@ h1 {
   box-shadow: 2px 2px 0px rgb(140, 32, 212);
 }
 
-/* From Uiverse.io by eirikvold */
+/* Gradient Btn */
 .gradient-btn {
   font-family: inherit;
   font-size: 18px;
@@ -1622,26 +1270,24 @@ h1 {
 }
 
 .custom-search-btn {
-  background-color: #FF5733; /* พื้นหลังใหม่ */
-  color: #FFFFFF;            /* สีข้อความ */
-  border: none;              /* ลบเส้นขอบออก */
+  background-color: #FF5733;
+  color: #FFFFFF;
+  border: none;
 }
 
 .custom-search-btn:hover {
-  background-color: #C70039; /* สีพื้นหลังเมื่อ hover */
+  background-color: #C70039;
 }
 
 #foot {
   margin-top: 1rem;
   padding: 1rem;
   background-color: black;
-  display: contents;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  /* display: contents; อาจมีปัญหากับ Layout แนะนำให้ใช้ block หรือ flex ถ้ามีปัญหาการแสดงผล */
+  display: contents; 
 }
 
-/* From Uiverse.io by vikiWayne */ 
+/* Custom Fade Button */
 .custom-fade-button {
   padding: 1em 2em;
   border: none;
@@ -1660,25 +1306,7 @@ h1 {
 
 .custom-fade-button:hover {
   color: #ffffff;
-  transform: scale(1.1);
-  outline: 2px solid #70bdca;
-  box-shadow: 4px 5px 17px -4px #268391;
-}
-
-.custom-fade-button::before {
-  content: "";
-  position: absolute;
-  left: -50px;
-  top: 0;
-  width: 0;
-  height: 100%;
   background-color: #2c9caf;
-  transform: skewX(45deg);
-  z-index: -1;
-  transition: width 1000ms;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #2c9caf;
 }
-
-.custom-fade-button:hover::before {
-  width: 250%;
-}
-

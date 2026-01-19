@@ -3,62 +3,61 @@ import TopNav from '../components/TopNav';
 import { Card, Row, Col, Container, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-// ข้อมูลจำลองสำหรับประชาชนทั่วไป
-const generalActivities = [
+const secondaryActivities = [
   {
     id: 1,
-    title: 'ประกวดร้องเพลง "ลูกทุ่งเสียงทอง" ครั้งที่ 7',
-    type: 'ประเภทเดี่ยว (ไม่จำกัดแนวเพลง)',
-    qualification: 'ประชาชนทั่วไป ไม่จำกัดอายุ',
+    title: 'การประกวดสุนทรพจน์เยาวชน ครั้งที่ 5',
+    type: 'ประเภทเดี่ยว',
+    qualification: 'นักเรียนมัธยมศึกษาตอนต้น (ม.1-3)',
     dateRange: 'วันนี้ - 31 ต.ค. 2568',
-    image: '/assets/images/hug.jpg', // ใช้รูปเดิมตามที่คุณมี
+    image: '/assets/images/speech.jpg',
     status: 'open'
   },
   {
     id: 2,
-    title: 'การประกวดถ่ายภาพ "วิถีไทย วิถีธรรม"',
-    type: 'ประเภทผลงานภาพถ่าย',
-    qualification: 'ประชาชนทั่วไป และช่างภาพอิสระ',
-    dateRange: '1 ก.ย. - 30 พ.ย. 2568',
-    image: '/assets/images/photo.jpg', // สมมติรูป (ถ้าไม่มีจะขึ้นสีเทา)
+    title: 'กวีวัจนะ: สืบสานตำนานไทย (ระดับมัธยม)',
+    type: 'ประเภททีม 3 คน',
+    qualification: 'นักเรียนมัธยมศึกษาตอนปลาย (ม.4-6)',
+    dateRange: '1 ส.ค. - 30 ก.ย. 2568',
+    image: '/assets/images/kawee.jpg',
     status: 'open'
   },
   {
     id: 3,
-    title: 'ประกวดคำขวัญรณรงค์ "รักษ์โลก รักษ์เรา"',
-    type: 'ประเภทงานเขียน',
-    qualification: 'ประชาชนทั่วไป',
-    dateRange: 'วันนี้ - 15 ธ.ค. 2568',
-    image: null, // กรณีไม่มีรูป
+    title: 'ประกวดแต่งกลอนสด หัวข้อ "โลกยุคใหม่"',
+    type: 'ประเภทเดี่ยว',
+    qualification: 'นักเรียนมัธยมศึกษาทุกระดับชั้น',
+    dateRange: 'วันนี้ - 15 พ.ย. 2568',
+    image: null,
     status: 'open'
   },
 ];
 
-const GeneralCompetitions = () => (
+const SecondaryCompetitions = () => (
   <>
     <TopNav />
     
-    {/* ปรับ Layout ให้ชิดด้านบน (paddingTop: 30px) */}
+    {/* ปรับ Layout ให้ชิดด้านบน (paddingTop: 30px) และเว้นด้านล่างพอประมาณ */}
     <Container style={{ paddingTop: '30px', paddingBottom: '50px' }}>
       
-      {/* Header: สีม่วงเข้ม ตัวหนา จัดกึ่งกลาง */}
+      {/* Header: สีม่วงเข้ม (#5a0f56) ตัวหนา จัดกึ่งกลาง */}
       <div className="text-center mb-4">
         <h2 style={{ 
           fontWeight: 'bold', 
           color: '#5a0f56', 
-          fontSize: '2rem',
+          fontSize: '2rem', 
           margin: 0 
         }}>
-          กิจกรรมสำหรับประชาชนทั่วไป
+          กิจกรรมสำหรับมัธยม
         </h2>
       </div>
 
       <Row xs={1} md={2} lg={3} className="g-4">
-          {generalActivities.map(activity => (
+          {secondaryActivities.map(activity => (
             <Col key={activity.id}>
               {/* Link ครอบ Card เพื่อให้คลิกได้ทั้งใบ */}
               <Link 
-                to={`/general/${activity.id}`} 
+                to={`/secondary/${activity.id}`} 
                 style={{ textDecoration: 'none', color: 'inherit' }}
               >
                 <Card 
@@ -141,4 +140,4 @@ const GeneralCompetitions = () => (
   </>
 );
 
-export default GeneralCompetitions;
+export default SecondaryCompetitions;

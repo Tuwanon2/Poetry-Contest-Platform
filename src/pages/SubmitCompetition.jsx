@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // 1. เพิ่ม import
 import TopNav2 from "../components/TopNav2";
-import "./SubmitCompetition.css";
-
+import "./../styles/SubmitCompetition.css";
+import { FaChalkboardTeacher, FaUserGraduate, FaUniversity, FaUsers } from "react-icons/fa";
 const POEM_PATTERNS = {
   "กลอนแปด": { linesPerStanza: 4, initialStanzas: 2, label: "กลอนแปด" },
   "กาพย์ยานี 11": { linesPerStanza: 4, initialStanzas: 1, label: "กาพย์ยานี" },
@@ -23,6 +24,7 @@ function LevelRadioCard({ label, icon, checked, onClick }) {
 }
 
 export default function SubmitCompetition() {
+  const navigate = useNavigate(); // 2. ประกาศ navigate
   const defaultType = "กลอนแปด";
   const defaultPattern = POEM_PATTERNS[defaultType];
 
@@ -43,10 +45,10 @@ export default function SubmitCompetition() {
   const [step, setStep] = useState(0);
 
   const levels = [
-    { label: "ประถม", icon: <span role="img" aria-label="ประถม">🎒</span> },
-    { label: "มัธยม", icon: <span role="img" aria-label="มัธยม">🏫</span> },
-    { label: "มหาวิทยาลัย", icon: <span role="img" aria-label="มหาวิทยาลัย">🎓</span> },
-    { label: "ประชาชนทั่วไป", icon: <span role="img" aria-label="ประชาชนทั่วไป">🏢</span> },
+    { label: "ประถม", icon: <FaChalkboardTeacher /> },
+  { label: "มัธยม", icon: <FaUserGraduate /> },
+  { label: "มหาวิทยาลัย", icon: <FaUniversity /> },
+  { label: "ประชาชนทั่วไป", icon: <FaUsers /> },
   ];
 
   const poemTypes = [
@@ -67,20 +69,16 @@ export default function SubmitCompetition() {
     }));
   };
 
-  // --- แก้ไข: เช็คก่อนเปลี่ยนประเภทกลอน ---
   const handlePoemTypeChange = (type) => {
-    // ถ้าประเภทที่เลือกเหมือนเดิม ไม่ต้องทำอะไร
     if (type === form.poemType) return;
 
-    // เช็คว่ามีข้อความเขียนไว้หรือยัง
     const hasContent = form.poemLines.some(line => line && line.trim() !== "");
 
     if (hasContent) {
       const confirmChange = window.confirm("หากเปลี่ยนประเภทกลอน เนื้อหาที่กรอกไว้จะถูกลบทั้งหมด คุณแน่ใจหรือไม่?");
-      if (!confirmChange) return; // ถ้ากด Cancel ให้ยกเลิกการเปลี่ยน
+      if (!confirmChange) return;
     }
 
-    // ถ้าไม่มีข้อความ หรือ ยืนยันแล้ว -> เปลี่ยนได้
     const pattern = POEM_PATTERNS[type];
     setForm((f) => ({
       ...f,
@@ -139,7 +137,6 @@ export default function SubmitCompetition() {
   const handleNext = (e) => {
     e.preventDefault();
 
-    // === ตรวจสอบหน้า 1 ===
     if (step === 0) {
       if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.level) {
         alert("กรุณากรอกข้อมูลให้ครบทุกช่อง และเลือกระดับการแข่งขัน");
@@ -151,7 +148,6 @@ export default function SubmitCompetition() {
       }
       setStep(1);
     } 
-    // === ตรวจสอบหน้า 2 ===
     else if (step === 1) {
       if (!form.title || form.title.trim() === "") {
         alert("กรุณากรอกหัวข้อกลอน");
@@ -164,7 +160,6 @@ export default function SubmitCompetition() {
       
       let currentLines = [...form.poemLines];
       
-      // Auto-Clean บทว่างท้ายสุด
       while (currentLines.length > minLines) {
         const lastStanzaStart = currentLines.length - linesPerStanza;
         const lastStanzaLines = currentLines.slice(lastStanzaStart);
@@ -177,7 +172,6 @@ export default function SubmitCompetition() {
         }
       }
 
-      // เช็คว่าวรรคที่เหลือมีช่องว่างไหม
       const hasEmptyLineInRemaining = currentLines.some(line => !line || line.trim() === "");
       if (hasEmptyLineInRemaining) {
         alert("กรุณากรอกเนื้อหากลอนให้ครบทุกวรรค");
@@ -189,8 +183,15 @@ export default function SubmitCompetition() {
     }
   };
 
+  // 3. แก้ไขฟังก์ชัน handleBack
   const handleBack = () => {
-    setStep((prev) => Math.max(0, prev - 1));
+    if (step === 0) {
+      // หากอยู่หน้าแรก ให้ย้อนกลับไปหน้า contest-detail
+      navigate("/contest-detail");
+    } else {
+      // หากอยู่หน้าอื่น ให้ย้อนกลับไปขั้นตอนก่อนหน้า
+      setStep((prev) => prev - 1);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -271,7 +272,7 @@ export default function SubmitCompetition() {
       </div>
 
       <div className="layout-container">
-        <div className="sidebar">
+        <div className="sidebar" style={{ borderRight: 'none' }}>
           <img src="/assets/images/hug.jpg" alt="โปสเตอร์การแข่งขัน" className="poster-img" />
           <div className="contest-title">
             ประกวดเรื่องสั้นฉันทลักษณ์ ครั้งที่ 7<br />
@@ -417,7 +418,6 @@ export default function SubmitCompetition() {
                   <div className="step2-title">
                     <span style={{ fontSize: 22 }}></span> ขั้นตอนที่ 2: รายละเอียดกลอน
                   </div>
-                  <div className="step2-divider" />
                 </div>
 
                 <div className="label-with-tooltip">

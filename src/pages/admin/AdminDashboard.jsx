@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../../styles/AdminDashboard.css";
 import Icon from "../../components/Icon";
-
+import '../../App.css';
 // Import Sections (อันนี้ถูกต้องแล้ว ถ้าไฟล์อยู่ใน folder sections ข้างๆ กัน)
 import OverviewSection from "./sections/OverviewSection";
 import CompetitionsSection from "./sections/CompetitionsSection";
