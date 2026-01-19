@@ -44,9 +44,11 @@ const Login = () => {
       const user = res.data?.user;
       const username = user?.Username || user?.username || form.email;
       const userRole = user?.role || user?.Role || '';
+      const userId = user?.id || user?.ID || user?.user_id || user?.UserID;
       const storage = form.remember ? window.localStorage : window.sessionStorage;
       try {
         storage.setItem('username', username);
+        if (userId) storage.setItem('user_id', userId.toString());
         if (user) storage.setItem('user', JSON.stringify(user));
         if (res.data?.token) storage.setItem('token', res.data.token);
         // Trigger storage event for TopNav to update

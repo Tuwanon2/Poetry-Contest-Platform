@@ -11,6 +11,14 @@ const ContestDetail = () => {
   const [contest, setContest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchContest = async () => {
@@ -309,17 +317,49 @@ const ContestDetail = () => {
                   transition: 'background 0.18s',
                   opacity: timeRemaining.isExpired ? 0.6 : 1,
                 }}
-                onClick={() => {
+                onClick={async () => {
                   if (timeRemaining.isExpired) {
                     alert('การประกวดนี้ปิดรับสมัครแล้ว');
                     return;
                   }
+                  
+                  // 1. เช็ค login
                   const user = localStorage.getItem('user') || sessionStorage.getItem('user');
                   if (!user) {
                     alert('กรุณาเข้าสู่ระบบก่อนสมัครเข้าประกวด');
                     navigate('/login');
                     return;
                   }
+                  
+                  // 2. เช็คว่าเคยส่งการประกวดนี้หรือยัง
+                  const userId = sessionStorage.getItem('user_id') || localStorage.getItem('user_id');
+                  if (userId) {
+                    try {
+                      const response = await axios.get(`${API_BASE_URL}/submissions/user/${userId}`);
+                      const submissions = response.data || [];
+                      
+                      // เช็คว่ามี submission ของการประกวดนี้หรือไม่
+                      const existingSubmission = submissions.find(
+                        sub => sub.competition_id === parseInt(id)
+                      );
+                      
+                      if (existingSubmission) {
+                        const confirmView = window.confirm(
+                          'คุณเคยส่งผลงานเข้าประกวดนี้แล้ว คุณต้องการดูสถานะการส่งประกวดของคุณหรือไม่?'
+                        );
+                        
+                        if (confirmView) {
+                          navigate('/my-works');
+                        }
+                        return;
+                      }
+                    } catch (err) {
+                      console.error('Error checking submissions:', err);
+                      // ถ้า error ก็ให้ไปต่อได้
+                    }
+                  }
+                  
+                  // 3. ถ้าไม่เคยส่ง ให้ไปหน้าส่งผลงาน
                   navigate(`/submit-competition/${id}`);
                 }}
               >

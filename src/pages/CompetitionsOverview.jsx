@@ -1,6 +1,6 @@
 import React from "react";
 
-import TopNav2 from "../components/TopNav2";
+import TopNav from "../components/TopNav";
 import SidebarNav from "../components/SidebarNav";
 import { SidebarNavContext } from "../components/SidebarNavContext";
 
@@ -68,7 +68,7 @@ export default function CompetitionsOverview() {
         <SidebarNav current={sidebarPage} onNavigate={setSidebarPage} />
 
         <div style={{ flex: 1, marginLeft: 220, minHeight: "100vh" }}>
-          <TopNav2 />
+          <TopNav />
 
           <div style={{ width: "100%", background: "transparent" }}>
             <div

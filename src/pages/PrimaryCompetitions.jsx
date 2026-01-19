@@ -2,14 +2,13 @@ import React from 'react';
 import TopNav from '../components/TopNav';
 import ActivitiesList from '../components/ActivitiesList';
 
-const StudentCompetitions = () => (
+const PrimaryCompetitions = () => (
   <>
     <TopNav />
     <div style={{ paddingTop: '80px' }}>
-      <ActivitiesList filterCategory="นักเรียน" />
+      <ActivitiesList filterCategory="ประถม" />
     </div>
   </>
 );
 
-export default StudentCompetitions;
-
+export default PrimaryCompetitions;

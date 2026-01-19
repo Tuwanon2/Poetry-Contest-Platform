@@ -1,4 +1,4 @@
-import TopNav2 from "../components/TopNav2";
+import TopNav from "../components/TopNav";
 import React, { useState } from "react";
 import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers } from "react-icons/fa";
 
@@ -162,7 +162,7 @@ export default function CreateCompetition() {
 
   return (
     <>
-      <TopNav2 />
+      <TopNav />
 
       <div style={{ maxWidth: 900, margin: "28px auto 40px auto", padding: "0 20px" }}>
         <div

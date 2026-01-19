@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import TopNav2 from "../components/TopNav2";
+import TopNav from "../components/TopNav";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const paperStyle = {
@@ -61,7 +61,7 @@ const JudgeWorkDetail = () => {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9fb' }}>
-      <TopNav2 />
+      <TopNav />
       <div style={paperStyle}>
        
         <div style={{ marginBottom: 18, color: '#70136C', fontWeight: 600, fontSize: '1.13rem' }}>{work.topic || work.title}</div>

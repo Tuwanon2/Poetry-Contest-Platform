@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import TopNav2 from "../components/TopNav2";
+import TopNav from "../components/TopNav";
 import "./SubmitCompetition.css";
 import { FaChalkboardTeacher, FaUserGraduate, FaUniversity, FaUsers } from "react-icons/fa";
 const API_BASE_URL = 'http://localhost:8080/api/v1';
@@ -348,7 +348,7 @@ export default function SubmitCompetition() {
       console.log('✅ Submission successful:', response.data);
       
       alert("ส่งใบสมัครสำเร็จ!");
-      navigate(`/contest-detail/${id}`);
+      navigate('/my-works');
     } catch (err) {
       console.error('❌ Submission error:', err);
       alert("เกิดข้อผิดพลาดในการส่งใบสมัคร: " + (err.response?.data?.error || err.message));
@@ -448,7 +448,7 @@ export default function SubmitCompetition() {
   if (loading) {
     return (
       <>
-        <TopNav2 />
+        <TopNav />
         <div style={{ textAlign: 'center', padding: '100px' }}>
           <p style={{ color: '#00796b', fontSize: '1.2rem' }}>กำลังโหลดข้อมูล...</p>
         </div>
@@ -459,7 +459,7 @@ export default function SubmitCompetition() {
   if (error || !contest) {
     return (
       <>
-        <TopNav2 />
+        <TopNav />
         <div style={{ textAlign: 'center', padding: '100px' }}>
           <p style={{ color: '#d32f2f', fontSize: '1.2rem' }}>{error || 'ไม่พบข้อมูลการประกวด'}</p>
         </div>
@@ -469,7 +469,7 @@ export default function SubmitCompetition() {
 
   return (
     <>
-      <TopNav2 />
+      <TopNav />
       <div className="top-text-container">
         <span className="top-text">
           ✏️ กรอกรายละเอียดกลอนของคุณอย่างประณีต เพื่อส่งเข้าประกวด {contest.title}
