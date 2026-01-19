@@ -16,16 +16,6 @@ const menu = [
     to: '/competitions-overview',
   },
   {
-    label: 'เข้าสู่หน้าผู้ดูแลระบบ',
-    icon: (
-      <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-        <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
-        <path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="currentColor" strokeWidth="2"/>
-      </svg>
-    ),
-    to: '/admin',
-  },
-  {
     label: 'กรรมการให้คะแนน',
     icon: (
       <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
@@ -97,7 +87,16 @@ export default function SidebarHome({ open = true, setOpen }) {
           <div className="sidebar-divider" />
           <button
             className="sidebar-menu-btn create-btn"
-            onClick={() => handleNavigate('/create-competition')}
+            onClick={() => {
+              const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+              if (!user) {
+                alert('กรุณาเข้าสู่ระบบก่อนสร้างการประกวด');
+                navigate('/login');
+                setOpen && setOpen(false);
+                return;
+              }
+              handleNavigate('/create-competition');
+            }}
           >
             <span className="sidebar-menu-icon">
               <svg width="22" height="22" fill="none" viewBox="0 0 24 24">

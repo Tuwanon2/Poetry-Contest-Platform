@@ -8,35 +8,19 @@ const API_BASE_URL = 'http://localhost:8080/api/v1';
 const ContestDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-
-  // --- States ---
   const [contest, setContest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // State สำหรับเช็คขนาดหน้าจอ (Responsive)
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const isMobile = windowWidth < 768;
 
-  // State สำหรับ Countdown
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  // --- Effects ---
-
-  // 1. Check Window Size
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // 2. Fetch API
   useEffect(() => {
     const fetchContest = async () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests/${id}`);
         console.log('🔍 Contest Detail API Response:', response.data);
+        console.log('📋 Available keys:', Object.keys(response.data));
+        console.log('📅 Start date field:', response.data.start_date, response.data.StartDate);
+        console.log('📅 End date field:', response.data.end_date, response.data.EndDate);
         setContest(response.data);
         setError(null);
       } catch (err) {
@@ -47,58 +31,110 @@ const ContestDetail = () => {
       }
     };
 
-    if (id) fetchContest();
+    if (id) {
+      fetchContest();
+    }
   }, [id]);
 
-  // 3. Countdown Logic
-  useEffect(() => {
-    if (!contest) return;
-    
-    const calculateTime = () => {
-      const endDate = contest.end_date || contest.EndDate;
-      if (!endDate) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-      
-      const now = new Date().getTime();
-      const target = new Date(endDate).getTime();
-      const distance = target - now;
-
-      if (distance > 0) {
-        return {
-          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((distance % (1000 * 60)) / 1000),
-        };
-      }
-      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    };
-
-    setTimeLeft(calculateTime());
-    const interval = setInterval(() => {
-      setTimeLeft(calculateTime());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [contest]);
-
-  // --- Helper Functions ---
   const formatDate = (dateString) => {
     if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('th-TH', {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('th-TH', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
-  const padNumber = (num) => String(num).padStart(2, '0');
+  const calculateTimeRemaining = (endDate) => {
+    if (!endDate) {
+      console.log('⚠️ No endDate provided');
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false };
+    }
+    
+    const now = new Date();
+    // แปลง endDate ให้เป็น Date object
+    let end = new Date(endDate);
+    
+    // ตรวจสอบว่า Date object ถูกต้องหรือไม่
+    if (isNaN(end.getTime())) {
+      console.error('❌ Invalid date:', endDate);
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false };
+    }
+    
+    console.log('⏰ Calculating time:', { now: now.toISOString(), end: end.toISOString() });
+    
+    const diff = end - now;
+    
+    if (diff <= 0) {
+      console.log('⏰ Contest expired');
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
+    }
+    
+    const result = {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+      seconds: Math.floor((diff % (1000 * 60)) / 1000),
+      isExpired: false,
+    };
+    
+    console.log('⏰ Time remaining:', result);
+    return result;
+  };
 
-  // --- Loading / Error Views ---
+  const getContestStatus = () => {
+    if (!contest) return 'loading';
+    const now = new Date();
+    const startDate = new Date(contest.start_date || contest.StartDate);
+    const endDate = new Date(contest.end_date || contest.EndDate);
+    
+    if (now < startDate) return 'upcoming';
+    if (now > endDate) return 'closed';
+    return 'open';
+  };
+
+  const [timeRemaining, setTimeRemaining] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false });
+
+  useEffect(() => {
+    if (contest && (contest.end_date || contest.EndDate)) {
+      const endDate = contest.end_date || contest.EndDate;
+      
+      console.log('📅 Contest data:', {
+        title: contest.title || contest.Title,
+        start_date: contest.start_date || contest.StartDate,
+        end_date: endDate,
+        full_contest: contest
+      });
+      
+      // คำนวณทันที
+      const initialTime = calculateTimeRemaining(endDate);
+      setTimeRemaining(initialTime);
+      
+      // ตั้ง interval เพื่ออัพเดตทุกวินาที
+      const interval = setInterval(() => {
+        const newTime = calculateTimeRemaining(endDate);
+        setTimeRemaining(newTime);
+        
+        // ถ้าหมดเวลาแล้ว ให้หยุด interval
+        if (newTime.isExpired) {
+          clearInterval(interval);
+        }
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    } else {
+      console.warn('⚠️ No contest or end_date available');
+    }
+  }, [contest]);
+
   if (loading) {
     return (
       <>
         <TopNav />
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', fontFamily: '"Sarabun", sans-serif' }}>
+        <div style={{ textAlign: 'center', padding: '100px' }}>
           <p style={{ color: '#00796b', fontSize: '1.2rem' }}>กำลังโหลดข้อมูล...</p>
         </div>
       </>
@@ -109,205 +145,199 @@ const ContestDetail = () => {
     return (
       <>
         <TopNav />
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', fontFamily: '"Sarabun", sans-serif' }}>
+        <div style={{ textAlign: 'center', padding: '100px' }}>
           <p style={{ color: '#d32f2f', fontSize: '1.2rem' }}>{error || 'ไม่พบข้อมูลการประกวด'}</p>
         </div>
       </>
     );
   }
 
-  // --- Data Preparation ---
   const levels = contest.levels || [];
   const levelNames = levels.map(l => l.level_name || l.name || '').filter(Boolean).join(', ') || 'ทุกระดับ';
   
-  let posterUrl = '/assets/images/hug.jpg';
+  // จัดการ poster URL
+  let posterUrl = null;
   if (contest.poster_url || contest.PosterURL) {
     const posterPath = contest.poster_url || contest.PosterURL;
-    posterUrl = posterPath.startsWith('http') ? posterPath : `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    if (posterPath.startsWith('http')) {
+      posterUrl = posterPath;
+    } else {
+      posterUrl = `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    }
   }
-
+  
   return (
     <>
       <TopNav />
-      {/* Main Container */}
-      <div 
-        style={{ 
-          width: '100%', 
-          maxWidth: '1440px', 
-          margin: '0 auto',   
-          background: '#fff', 
-          minHeight: '100vh', 
-          fontFamily: '"Sarabun", sans-serif', 
-          display: 'flex', 
-          flexWrap: 'wrap', 
-          paddingTop: isMobile ? 10 : 20,
-          paddingBottom: 100 // Padding for Sticky Footer
-        }}
-      >
-        
-        {/* Left: Main Content */}
-        <div style={{ 
-            flex: isMobile ? '1 1 100%' : '3 1 700px', 
-            minWidth: 0, 
-            padding: isMobile ? '0 16px 30px 16px' : '0 24px 40px 24px' 
-        }}>
-            <div>
-              {/* Header Title */}
-              <div style={{ marginBottom: 20 }}>
-                <h1 style={{ 
-                    color: "#00796b", 
-                    margin: 0, 
-                    fontSize: isMobile ? '24px' : '28px', 
-                    fontWeight: 600, 
-                    lineHeight: 1.3 
-                }}>
+      <div style={{ width: '100vw', maxWidth: '100vw', margin: 0, background: '#fff', borderRadius: 0, boxShadow: 'none', padding: 0, display: 'flex', flexDirection: 'row', minHeight: '100vh', fontSize: '15px' }}>
+        {/* Main Content */}
+        <div style={{ flex: 2, minWidth: 0, padding: '0 0 18px 0' }}>
+          <div style={{ width: '100%', background: '#fff', borderRadius: 0, boxShadow: 'none', padding: 0 }}>
+            <div style={{ padding: '18px 18px 0 18px' }}>
+              <div style={{ color: "#00796b", fontWeight: 400, fontSize: 24, marginBottom: 10, textAlign: 'left', lineHeight: 1.2, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontWeight: 400, fontSize: 24 }}>
                   {contest.title || contest.Title}
-                </h1>
-                <div style={{ fontSize: '16px', color: '#444', marginTop: 10 }}>
-                  <span style={{ fontWeight: 600 }}>ปิดรับผลงาน:</span> {formatDate(contest.end_date || contest.EndDate)}
+                </span>
+              </div>
+              <div style={{ textAlign: 'left', fontSize: 15, color: '#222', margin: '14px 0 6px 0', fontWeight: 400 }}>
+                {timeRemaining.isExpired ? (
+                  <span style={{ color: '#d32f2f', fontWeight: 600 }}>
+                    หมดเวลารับสมัครแล้ว (ปิดรับเมื่อ {formatDate(contest.end_date || contest.EndDate)})
+                  </span>
+                ) : (
+                  <>
+                    เปิดรับผลงานถึงวันที่ {formatDate(contest.end_date || contest.EndDate)}
+                  </>
+                )}
+              </div>
+              {!timeRemaining.isExpired && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e0e0e0', borderTop: '1px solid #e0e0e0', padding: '7px 0 5px 0', marginBottom: 6 }}>
+                  {[String(timeRemaining.days).padStart(2, '0'), String(timeRemaining.hours).padStart(2, '0'), String(timeRemaining.minutes).padStart(2, '0'), String(timeRemaining.seconds).padStart(2, '0')].map((num, idx) => (
+                    <div key={idx} style={{ flex: 1, textAlign: 'center' }}>
+                      <div style={{ color: timeRemaining.days === 0 && timeRemaining.hours < 24 ? '#d32f2f' : '#d84315', fontWeight: 700, fontSize: 18, letterSpacing: 1 }}>{num}</div>
+                      <div style={{ color: '#444', fontSize: 11, marginTop: 1 }}>
+                        {['วัน', 'ชั่วโมง', 'นาที', 'วินาที'][idx]}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-
-              {/* Countdown Bar */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                gap: isMobile ? 10 : 20,
-                background: '#f9f9f9',
-                border: '1px solid #eee',
-                borderRadius: 8,
-                padding: '15px', 
-                marginBottom: 20 
-              }}>
-                {[
-                  { label: "Days", value: timeLeft.days },
-                  { label: "Hours", value: timeLeft.hours },
-                  { label: "Minutes", value: timeLeft.minutes },
-                  { label: "Seconds", value: timeLeft.seconds }
-                ].map((item, idx) => (
-                  <div key={idx} style={{ textAlign: 'center', minWidth: isMobile ? 50 : 60 }}>
-                    <div style={{ color: '#d84315', fontWeight: 700, fontSize: isMobile ? '20px' : '24px', lineHeight: 1 }}>
-                      {padNumber(item.value)}
-                    </div>
-                    <div style={{ color: '#666', fontSize: '12px', marginTop: 4, textTransform: 'uppercase' }}>
-                      {item.label}
-                    </div>
+              )}
+              {timeRemaining.isExpired && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '1px solid #e0e0e0', borderTop: '1px solid #e0e0e0', padding: '12px 0', marginBottom: 6, background: '#ffebee' }}>
+                  <div style={{ color: '#d32f2f', fontWeight: 600, fontSize: 15 }}>
+                    ⏰ การประกวดนี้ปิดรับสมัครแล้ว
                   </div>
-                ))}
+                </div>
+              )}
+            </div>
+            {posterUrl ? (
+              <img 
+                src={posterUrl} 
+                alt="โปสเตอร์การประกวด" 
+                style={{ width: "100%", maxHeight: 320, objectFit: "contain", borderRadius: 0, margin: 0, background: '#e0f2f1', display: 'block' }}
+                onError={(e) => { 
+                  console.log('❌ Poster failed to load:', e.target.src);
+                  e.target.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div style={{ width: "100%", height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', color: '#999', fontSize: 14 }}>
+                ไม่พบรูปโปสเตอร์
               </div>
+            )}
+            <div style={{ padding: '18px' }}>
+              {(contest.purpose || contest.Purpose) && (
+                <section style={{ marginBottom: 24 }}>
+                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>แนวคิด/วัตถุประสงค์</h2>
+                  <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
+                    {contest.purpose || contest.Purpose}
+                  </div>
+                </section>
+              )}
+              
+              {(contest.description || contest.Description) && (
+                <section style={{ marginBottom: 24 }}>
+                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>รายละเอียด</h2>
+                  <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
+                    {contest.description || contest.Description}
+                  </div>
+                </section>
+              )}
 
-              {/* Poster Image */}
-              <div style={{ width: '100%', marginBottom: 25, borderRadius: 8, overflow: 'hidden', border: '1px solid #eee', background: '#f5f5f5' }}>
-                 <img 
-                    src={posterUrl} 
-                    alt="โปสเตอร์ประกวด" 
-                    style={{ width: "100%", maxHeight: 450, objectFit: "contain", display: 'block' }} 
-                    onError={(e) => { 
-                      if (e.target.src !== `${window.location.origin}/assets/images/hug.jpg`) {
-                        e.target.src = '/assets/images/hug.jpg'; 
-                      }
-                    }}
-                 />
-              </div>
-
-              {/* Dynamic Content Sections */}
-              <div style={{ padding: '0' }}>
-                {(contest.purpose || contest.Purpose) && (
-                  <section style={{ marginBottom: 30 }}>
-                    <h2 style={{ color: "#00695c", fontSize: '18px', borderBottom: '2px solid #b2dfdb', paddingBottom: 8, marginBottom: 12 }}>แนวคิด/วัตถุประสงค์</h2>
-                    <div style={{ paddingLeft: 10, color: "#333", fontSize: '15px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                      {contest.purpose || contest.Purpose}
-                    </div>
-                  </section>
-                )}
-
-                {(contest.description || contest.Description) && (
-                  <section style={{ marginBottom: 30 }}>
-                    <h2 style={{ color: "#00695c", fontSize: '18px', borderBottom: '2px solid #b2dfdb', paddingBottom: 8, marginBottom: 12 }}>รายละเอียด</h2>
-                    <div style={{ paddingLeft: 10, color: "#333", fontSize: '15px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                      {contest.description || contest.Description}
-                    </div>
-                  </section>
-                )}
-
-                {/* Rules Section (Dynamic from Levels) */}
-                {levels.length > 0 && levels.some(l => l.rules) && (
-                  <section style={{ marginBottom: 30 }}>
-                    <h2 style={{ color: "#00695c", fontSize: '18px', borderBottom: '2px solid #b2dfdb', paddingBottom: 8, marginBottom: 12 }}>กติกาการประกวด</h2>
-                    {levels.map((level, idx) => (
-                      level.rules && (
-                        <div key={idx} style={{ marginBottom: 15 }}>
-                          {levels.length > 1 && (
-                            <h3 style={{ color: "#00796b", fontSize: '16px', marginBottom: 6, fontWeight: 600 }}>
-                              {level.level_name || level.name}
-                            </h3>
-                          )}
-                          <div style={{ paddingLeft: 10, color: "#333", fontSize: '15px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                            {level.rules}
-                          </div>
+              {levels.length > 0 && levels.some(l => l.rules) && (
+                <section style={{ marginBottom: 24 }}>
+                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>กติกาการประกวด</h2>
+                  {levels.map((level, idx) => (
+                    level.rules && (
+                      <div key={idx} style={{ marginBottom: 12 }}>
+                        {levels.length > 1 && (
+                          <h3 style={{ color: "#00796b", fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
+                            {level.level_name || level.name}
+                          </h3>
+                        )}
+                        <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
+                          {level.rules}
                         </div>
-                      )
-                    ))}
-                  </section>
-                )}
+                      </div>
+                    )
+                  ))}
+                </section>
+              )}
 
-                {/* Prizes Section (Dynamic from Levels) */}
-                {levels.length > 0 && levels.some(l => l.prizes) && (
-                  <section style={{ marginBottom: 30 }}>
-                    <h2 style={{ color: "#00695c", fontSize: '18px', borderBottom: '2px solid #b2dfdb', paddingBottom: 8, marginBottom: 12 }}>รางวัล</h2>
-                    {levels.map((level, idx) => {
-                      if (!level.prizes) return null;
-                      let prizes = [];
-                      try {
-                        prizes = typeof level.prizes === 'string' ? JSON.parse(level.prizes) : level.prizes;
-                      } catch (e) {
-                        prizes = [level.prizes];
-                      }
-
-                      return (
-                        <div key={idx} style={{ marginBottom: 15 }}>
-                          {levels.length > 1 && (
-                            <h3 style={{ color: "#00796b", fontSize: '16px', marginBottom: 6, fontWeight: 600 }}>
-                              {level.level_name || level.name}
-                            </h3>
+              {levels.length > 0 && levels.some(l => l.prizes) && (
+                <section style={{ marginBottom: 24 }}>
+                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>รางวัล</h2>
+                  {levels.map((level, idx) => {
+                    if (!level.prizes) return null;
+                    const prizes = typeof level.prizes === 'string' ? JSON.parse(level.prizes) : level.prizes;
+                    return (
+                      <div key={idx} style={{ marginBottom: 12 }}>
+                        {levels.length > 1 && (
+                          <h3 style={{ color: "#00796b", fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
+                            {level.level_name || level.name}
+                          </h3>
+                        )}
+                        <ul style={{ paddingLeft: 16, color: "#333", fontSize: 13 }}>
+                          {Array.isArray(prizes) ? (
+                            prizes.map((prize, i) => (
+                              <li key={i}>{prize}</li>
+                            ))
+                          ) : (
+                            <li>{JSON.stringify(prizes)}</li>
                           )}
-                          <ul style={{ paddingLeft: 25, color: "#333", fontSize: '15px', lineHeight: 1.6 }}>
-                            {Array.isArray(prizes) ? (
-                              prizes.map((prize, i) => <li key={i}>{prize}</li>)
-                            ) : (
-                              <li>{String(prizes)}</li>
-                            )}
-                          </ul>
-                        </div>
-                      );
-                    })}
-                  </section>
-                )}
-              </div>
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </section>
+              )}
+            </div>
+            {/* สมัครเข้าประกวด (moved to bottom) */}
+            <div style={{ textAlign: 'center', margin: '24px 0 0 0' }}>
+              <button
+                disabled={timeRemaining.isExpired}
+                style={{
+                  padding: '8px 18px',
+                  background: timeRemaining.isExpired ? '#ccc' : '#70136C',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: timeRemaining.isExpired ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 1px 4px rgba(0,184,169,0.08)',
+                  transition: 'background 0.18s',
+                  opacity: timeRemaining.isExpired ? 0.6 : 1,
+                }}
+                onClick={() => {
+                  if (timeRemaining.isExpired) {
+                    alert('การประกวดนี้ปิดรับสมัครแล้ว');
+                    return;
+                  }
+                  const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+                  if (!user) {
+                    alert('กรุณาเข้าสู่ระบบก่อนสมัครเข้าประกวด');
+                    navigate('/login');
+                    return;
+                  }
+                  navigate(`/submit-competition/${id}`);
+                }}
+              >
+                {timeRemaining.isExpired ? 'ปิดรับสมัครแล้ว' : 'สมัครเข้าประกวดนี้'}
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* Right: Sidebar */}
-        <div style={{ 
-            flex: isMobile ? '1 1 100%' : '1 1 280px', 
-            padding: isMobile ? '0 16px 24px 16px' : '0 24px 24px 24px' 
-        }}>
-          <div style={{ 
-            background: '#fafbfc', 
-            border: '1px solid #e0e0e0', 
-            borderRadius: 8, 
-            padding: '20px',
-            position: isMobile ? 'static' : 'sticky',
-            top: 20 
-          }}>
-            <h2 style={{ fontSize: '16px', color: '#222', fontWeight: 700, marginBottom: 15, borderBottom: '1px solid #ddd', paddingBottom: 10 }}>
-              คุณสมบัติผู้สมัคร
-            </h2>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-               <li style={{ color: '#00796b', fontSize: '14px', display: 'flex', alignItems: 'flex-start' }}>
-                 <span style={{ marginRight: 8, fontSize: 18, lineHeight: 1 }}>•</span> 
-                 <span>{levelNames || 'ทุกคนสามารถสมัครได้'}</span>
-               </li>
+        {/* Sidebar */}
+        <div style={{ flex: 1, minWidth: 220, maxWidth: 280, borderLeft: '1px solid #eee', background: '#fafbfc', padding: '18px 12px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <h2 style={{ fontSize: 15, color: '#222', fontWeight: 700, marginBottom: 8 }}>คุณสมบัติผู้สมัคร</h2>
+            <ul style={{ color: '#009688', fontSize: 12, margin: 0, paddingLeft: 12, fontWeight: 500 }}>
+              {levelNames ? (
+                <li>{levelNames}</li>
+              ) : (
+                <li>ทุกคนสามารถสมัครได้</li>
+              )}
             </ul>
           </div>
         </div>

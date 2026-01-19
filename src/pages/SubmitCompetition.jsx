@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // 1. เพิ่ม import
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import TopNav2 from "../components/TopNav2";
-import "./../styles/SubmitCompetition.css";
+import "./SubmitCompetition.css";
 import { FaChalkboardTeacher, FaUserGraduate, FaUniversity, FaUsers } from "react-icons/fa";
+const API_BASE_URL = 'http://localhost:8080/api/v1';
+
 const POEM_PATTERNS = {
   "กลอนแปด": { linesPerStanza: 4, initialStanzas: 2, label: "กลอนแปด" },
   "กาพย์ยานี 11": { linesPerStanza: 4, initialStanzas: 1, label: "กาพย์ยานี" },
@@ -24,7 +27,12 @@ function LevelRadioCard({ label, icon, checked, onClick }) {
 }
 
 export default function SubmitCompetition() {
-  const navigate = useNavigate(); // 2. ประกาศ navigate
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [contest, setContest] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const defaultType = "กลอนแปด";
   const defaultPattern = POEM_PATTERNS[defaultType];
 
@@ -44,22 +52,111 @@ export default function SubmitCompetition() {
 
   const [step, setStep] = useState(0);
 
-  const levels = [
-    { label: "ประถม", icon: <FaChalkboardTeacher /> },
-  { label: "มัธยม", icon: <FaUserGraduate /> },
-  { label: "มหาวิทยาลัย", icon: <FaUniversity /> },
-  { label: "ประชาชนทั่วไป", icon: <FaUsers /> },
-  ];
+  // Fetch contest data
+  useEffect(() => {
+    const fetchContest = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_BASE_URL}/contests/${id}`);
+        console.log('🔍 Contest data for submission:', response.data);
+        setContest(response.data);
+        
+        // ตั้งค่า default ตาม contest
+        const levels = response.data.levels || [];
+        if (levels.length === 1) {
+          // ถ้ามีระดับเดียว ล็อคเลย
+          const singleLevel = levels[0].level_name || levels[0].name;
+          const topicName = levels[0].topic_enabled && levels[0].topic_name ? levels[0].topic_name : '';
+          setForm(prev => ({ ...prev, level: singleLevel, title: topicName }));
+        }
+        
+        // ตั้งค่า poem type ตาม level แรก
+        if (levels.length > 0 && levels[0].poem_types && levels[0].poem_types.length > 0) {
+          const firstType = levels[0].poem_types[0];
+          const pattern = POEM_PATTERNS[firstType] || defaultPattern;
+          setForm(prev => ({
+            ...prev,
+            poemType: firstType,
+            poemLines: Array(pattern.linesPerStanza * pattern.initialStanzas).fill("")
+          }));
+        }
+        
+        setError(null);
+      } catch (err) {
+        console.error('❌ Error fetching contest:', err);
+        setError('ไม่สามารถโหลดข้อมูลการประกวดได้');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const poemTypes = [
-    { label: "กลอนแปด", value: "กลอนแปด" },
-    { label: "กาพย์ยานี 11", value: "กาพย์ยานี 11" },
-    { label: "กาพย์ฉบัง 16", value: "กาพย์ฉบัง 16" },
-    { label: "โคลงสี่สุภาพ", value: "โคลงสี่สุภาพ" },
-    { label: "สักวา", value: "สักวา" },
-    { label: "ดอกสร้อย", value: "ดอกสร้อย" },
-    { label: "อินทรวิเชียรฉันท์", value: "อินทรวิเชียรฉันท์" },
-  ];
+    if (id) {
+      fetchContest();
+    }
+  }, [id]);
+
+  // อัพเดต title เมื่อ level เปลี่ยน (สำหรับ topic ที่ล็อค)
+  useEffect(() => {
+    if (!contest || !contest.levels || !form.level) return;
+    
+    const selectedLevel = contest.levels.find(l => 
+      (l.level_name || l.name) === form.level
+    );
+    
+    if (selectedLevel && selectedLevel.topic_enabled && selectedLevel.topic_name) {
+      // ถ้า level นี้ล็อคหัวข้อ ตั้งค่าหัวข้อตาม level
+      setForm(prev => ({ ...prev, title: selectedLevel.topic_name }));
+    } else if (form.title && contest.levels.some(l => l.topic_name === form.title)) {
+      // ถ้าเปลี่ยนไป level ที่ไม่ล็อคหัวข้อ และ title เดิมเป็นหัวข้อที่ล็อคของ level อื่น ให้ลบออก
+      setForm(prev => ({ ...prev, title: '' }));
+    }
+  }, [form.level, contest]);
+
+  // Dynamic levels และ poem types ตาม contest
+  const getAvailableLevels = () => {
+    if (!contest || !contest.levels) return [];
+    
+    const levelIcons = {
+      "ประถม": <span role="img" aria-label="ประถม">🎒</span>,
+      "มัธยม": <span role="img" aria-label="มัธยม">🏫</span>,
+      "มหาวิทยาลัย": <span role="img" aria-label="มหาวิทยาลัย">🎓</span>,
+      "ประชาชนทั่วไป": <span role="img" aria-label="ประชาชนทั่วไป">🏢</span>
+    };
+    
+    return contest.levels.map(level => {
+      const levelName = level.level_name || level.name;
+      return {
+        label: levelName,
+        icon: levelIcons[levelName] || <span>📝</span>
+      };
+    });
+  };
+
+  const getAvailablePoemTypes = () => {
+    if (!contest || !contest.levels || !form.level) return [];
+    
+    // หา level ที่เลือก
+    const selectedLevel = contest.levels.find(l => 
+      (l.level_name || l.name) === form.level
+    );
+    
+    if (!selectedLevel || !selectedLevel.poem_types) return [];
+    
+    return selectedLevel.poem_types.map(type => ({
+      label: type,
+      value: type
+    }));
+  };
+  
+  const isTopicLocked = () => {
+    if (!contest || !contest.levels) return false;
+    const selectedLevel = contest.levels.find(l => 
+      (l.level_name || l.name) === form.level
+    );
+    return selectedLevel?.topic_enabled && selectedLevel?.topic_name;
+  };
+
+  const levels = getAvailableLevels();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -149,7 +246,9 @@ export default function SubmitCompetition() {
       setStep(1);
     } 
     else if (step === 1) {
-      if (!form.title || form.title.trim() === "") {
+      // เช็คหัวข้อ (ถ้าไม่ล็อคต้องกรอก)
+      const topicLocked = isTopicLocked();
+      if (!topicLocked && (!form.title || form.title.trim() === "")) {
         alert("กรุณากรอกหัวข้อกลอน");
         return;
       }
@@ -194,13 +293,97 @@ export default function SubmitCompetition() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("SUBMIT DATA:", form);
-    alert("ส่งใบสมัครสำเร็จ!");
+    
+    try {
+      // แปลง poemLines เป็นรูปแบบ & และ %
+      const pattern = POEM_PATTERNS[form.poemType];
+      const linesPerStanza = pattern.linesPerStanza;
+      let formattedPoem = '';
+      
+      for (let i = 0; i < form.poemLines.length; i++) {
+        formattedPoem += form.poemLines[i];
+        
+        // ถ้าไม่ใช่บรรทัดสุดท้าย
+        if (i < form.poemLines.length - 1) {
+          // ถ้าเป็นบรรทัดสุดท้ายของบท ใส่ %
+          if ((i + 1) % linesPerStanza === 0) {
+            formattedPoem += '%';
+          } else {
+            // ถ้าไม่ใช่ ใส่ &
+            formattedPoem += '&';
+          }
+        }
+      }
+      
+      // ดึง user_id จาก localStorage/sessionStorage
+      let userId = null;
+      const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          userId = user.id || user.ID || user.user_id;
+        } catch (err) {
+          console.error('Failed to parse user:', err);
+        }
+      }
+      
+      const submissionData = {
+        competition_id: parseInt(id),
+        user_id: userId,
+        name: `${form.firstName} ${form.lastName}`,
+        email: form.email,
+        phone: form.phone,
+        level_name: form.level,
+        title: form.title,
+        poem_type: form.poemType,
+        content: formattedPoem,
+        document: form.file ? await uploadFile(form.file) : null
+      };
+      
+      console.log('📤 Submitting:', submissionData);
+      
+      const response = await axios.post(`${API_BASE_URL}/submissions`, submissionData);
+      console.log('✅ Submission successful:', response.data);
+      
+      alert("ส่งใบสมัครสำเร็จ!");
+      navigate(`/contest-detail/${id}`);
+    } catch (err) {
+      console.error('❌ Submission error:', err);
+      alert("เกิดข้อผิดพลาดในการส่งใบสมัคร: " + (err.response?.data?.error || err.message));
+    }
+  };
+  
+  const uploadFile = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axios.post(`${API_BASE_URL}/upload`, formData);
+    return response.data.url;
   };
 
   const steps = ["รายละเอียดผู้ประกวด", "รายละเอียดกลอน", "ยืนยัน"];
+
+  // จัดการ poster URL
+  let posterUrl = '/assets/images/hug.jpg';
+  if (contest && (contest.poster_url || contest.PosterURL)) {
+    const posterPath = contest.poster_url || contest.PosterURL;
+    if (posterPath.startsWith('http')) {
+      posterUrl = posterPath;
+    } else {
+      posterUrl = `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    }
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('th-TH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   const renderPoemInputs = () => {
     const pattern = POEM_PATTERNS[form.poemType];
@@ -262,34 +445,84 @@ export default function SubmitCompetition() {
     });
   };
 
+  if (loading) {
+    return (
+      <>
+        <TopNav2 />
+        <div style={{ textAlign: 'center', padding: '100px' }}>
+          <p style={{ color: '#00796b', fontSize: '1.2rem' }}>กำลังโหลดข้อมูล...</p>
+        </div>
+      </>
+    );
+  }
+
+  if (error || !contest) {
+    return (
+      <>
+        <TopNav2 />
+        <div style={{ textAlign: 'center', padding: '100px' }}>
+          <p style={{ color: '#d32f2f', fontSize: '1.2rem' }}>{error || 'ไม่พบข้อมูลการประกวด'}</p>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <TopNav2 />
       <div className="top-text-container">
         <span className="top-text">
-          ✏️ กรอกรายละเอียดกลอนของคุณอย่างประณีต เพื่อส่งเข้าประกวดในหัวข้อ…
+          ✏️ กรอกรายละเอียดกลอนของคุณอย่างประณีต เพื่อส่งเข้าประกวด {contest.title}
         </span>
       </div>
 
       <div className="layout-container">
-        <div className="sidebar" style={{ borderRight: 'none' }}>
-          <img src="/assets/images/hug.jpg" alt="โปสเตอร์การแข่งขัน" className="poster-img" />
+        <div className="sidebar">
+          <img 
+            src={posterUrl} 
+            alt="โปสเตอร์การแข่งขัน" 
+            className="poster-img"
+            onError={(e) => { 
+              if (e.target.src !== `${window.location.origin}/assets/images/hug.jpg`) {
+                e.target.src = '/assets/images/hug.jpg'; 
+              }
+            }}
+          />
           <div className="contest-title">
-            ประกวดเรื่องสั้นฉันทลักษณ์ ครั้งที่ 7<br />
-            “ป้องโลกด้วยกอด กอดโลกด้วยกลอน”
+            {contest.title || contest.Title}
           </div>
-          <div className="rules-box">
-            <div className="rules-title">กติกาสำคัญ</div>
-            <ul className="rules-list">
-              <li>ส่งกลอนจำนวน <b>12 วรรค</b> (6 บท)</li>
-              <li>กลอนต้องเป็น <b>กลอนสุภาพ</b> เท่านั้น</li>
-              <li>เนื้อหาต้องสอดคล้องกับหัวข้อประกวด</li>
-              <li>ปิดรับสมัคร: <b>31 ธันวาคม 2568</b></li>
-            </ul>
-            <div className="rules-note">
-              *โปรดตรวจสอบความถูกต้องก่อนส่งผลงาน
+          {contest.description && (
+            <div className="rules-box">
+              <div className="rules-title">รายละเอียด</div>
+              <div style={{ padding: '10px', fontSize: '13px', color: '#333', whiteSpace: 'pre-wrap' }}>
+                {contest.description}
+              </div>
             </div>
-          </div>
+          )}
+          {contest.levels && contest.levels.length > 0 && contest.levels.some(l => l.rules) && (
+            <div className="rules-box">
+              <div className="rules-title">กติกาสำคัญ</div>
+              <div style={{ padding: '10px', fontSize: '13px', color: '#333', whiteSpace: 'pre-wrap' }}>
+                {contest.levels.map((level, idx) => (
+                  level.rules && (
+                    <div key={idx} style={{ marginBottom: 10 }}>
+                      {contest.levels.length > 1 && (
+                        <div style={{ fontWeight: 600, marginBottom: 5 }}>
+                          {level.level_name || level.name}:
+                        </div>
+                      )}
+                      {level.rules}
+                    </div>
+                  )
+                ))}
+              </div>
+              {contest.end_date && (
+                <div className="rules-note">
+                  ปิดรับสมัคร: {formatDate(contest.end_date)}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="form-card">
@@ -367,17 +600,23 @@ export default function SubmitCompetition() {
 
                 <div className="form-group">
                   <label className="input-label">เลือกระดับการแข่งขัน</label>
-                  <div className="level-grid">
-                    {levels.map(({ label, icon }) => (
-                      <LevelRadioCard
-                        key={label}
-                        label={label}
-                        icon={icon}
-                        checked={form.level === label}
-                        onClick={() => setForm({ ...form, level: label })}
-                      />
-                    ))}
-                  </div>
+                  {levels.length === 1 ? (
+                    <div style={{ padding: '10px', background: '#f0f0f0', borderRadius: 8, marginBottom: 10 }}>
+                      <b>ระดับ:</b> {levels[0].label} 
+                    </div>
+                  ) : (
+                    <div className="level-grid">
+                      {levels.map(({ label, icon }) => (
+                        <LevelRadioCard
+                          key={label}
+                          label={label}
+                          icon={icon}
+                          checked={form.level === label}
+                          onClick={() => setForm({ ...form, level: label })}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {form.level && form.level !== "ประชาชนทั่วไป" && (
@@ -419,37 +658,51 @@ export default function SubmitCompetition() {
                     <span style={{ fontSize: 22 }}></span> ขั้นตอนที่ 2: รายละเอียดกลอน
                   </div>
                 </div>
-
-                <div className="label-with-tooltip">
-                  <label className="input-label" style={{ color: '#70136C', marginBottom: 0 }}>หัวข้อกลอน</label>
-                  <span className="tooltip-icon" title="หัวข้อกลอนควรสอดคล้องกับธีมประกวด">?</span>
-                </div>
                 
-                <input
-                  name="title"
-                  type="text"
-                  value={form.title}
-                  onChange={handleChange}
-                  className="input-field input-highlight"
-                  placeholder="เช่น กอดโลกด้วยกลอน..."
-                  style={{ marginBottom: 18 }}
-                />
-
-                <div className="poem-type-wrapper">
-                  <label className="poem-type-label">เลือกประเภทกลอน</label>
-                  <div className="poem-type-list">
-                    {poemTypes.map(pt => (
-                      <button
-                        key={pt.value}
-                        type="button"
-                        className={`btn-poem-type ${form.poemType === pt.value ? "selected" : ""}`}
-                        onClick={() => handlePoemTypeChange(pt.value)}
-                      >
-                        {pt.label}
-                      </button>
-                    ))}
+                {isTopicLocked() ? (
+                  <div style={{ padding: '10px', background: '#f0f0f0', borderRadius: 8, marginBottom: 18 }}>
+                    <b>หัวข้อ:</b> {form.title} 
                   </div>
-                </div>
+                ) : (
+                  <input
+                    name="title"
+                    type="text"
+                    value={form.title}
+                    onChange={handleChange}
+                    className="input-field input-highlight"
+                    placeholder="เช่น กอดโลกด้วยกลอน..."
+                    style={{ marginBottom: 18 }}
+                  />
+                )}
+
+                {(() => {
+                  const poemTypes = getAvailablePoemTypes();
+                  
+                
+                  
+                  if (poemTypes.length === 1) {
+                    return (
+                      <div style={{ padding: '10px', background: '#f0f0f0', borderRadius: 8, marginBottom: 18 }}>
+                        <b>ประเภท:</b> {poemTypes[0].label} (ล็อคตามการประกวด)
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div className="poem-type-list">
+                      {poemTypes.map(pt => (
+                        <button
+                          key={pt.value}
+                          type="button"
+                          className={`btn-poem-type ${form.poemType === pt.value ? "selected" : ""}`}
+                          onClick={() => handlePoemTypeChange(pt.value)}
+                        >
+                          {pt.label}
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
 
                 <div className="form-group">
                   <div className="label-with-tooltip">

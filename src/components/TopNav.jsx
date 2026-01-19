@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 import SidebarHome from './SidebarHome';
@@ -7,8 +7,42 @@ import './TopNav.css';
 const TopNav = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+
+  // ตรวจสอบ login status
+  useEffect(() => {
+    const checkAuth = () => {
+      const user = sessionStorage.getItem('user') || localStorage.getItem('user');
+      const storedUsername = sessionStorage.getItem('username') || localStorage.getItem('username');
+      if (user || storedUsername) {
+        setIsLoggedIn(true);
+        setUsername(storedUsername || '');
+      } else {
+        setIsLoggedIn(false);
+        setUsername('');
+      }
+    };
+    checkAuth();
+    // Listen for storage changes
+    window.addEventListener('storage', checkAuth);
+    // Also listen when navigating (for same-tab login)
+    const handleLocationChange = () => checkAuth();
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, [location]); // Re-check when location changes
+
+  const handleLogout = () => {
+    // Clear all auth data
+    sessionStorage.clear();
+    localStorage.clear();
+    setIsLoggedIn(false);
+    setUsername('');
+    navigate('/');
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -64,7 +98,20 @@ const TopNav = () => {
 
           {/* RIGHT SECTION */}
           <div className="nav-right">
-            <Link to="/login" className="signin-btn">เข้าสู่ระบบ</Link>
+            {isLoggedIn ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <span style={{ fontSize: '14px', color: '#555' }}>สวัสดี, {username}</span>
+                <button 
+                  onClick={handleLogout}
+                  className="signin-btn"
+                  style={{ background: '#d32f2f', borderColor: '#d32f2f' }}
+                >
+                  ออกจากระบบ
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" className="signin-btn">เข้าสู่ระบบ</Link>
+            )}
           </div>
         </div>
       </nav>

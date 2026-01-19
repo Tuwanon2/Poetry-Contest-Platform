@@ -43,15 +43,23 @@ const Login = () => {
       // ตัวอย่าง: บันทึก user / token ตาม response แล้วไปหน้าแรก
       const user = res.data?.user;
       const username = user?.Username || user?.username || form.email;
+      const userRole = user?.role || user?.Role || '';
       const storage = form.remember ? window.localStorage : window.sessionStorage;
       try {
         storage.setItem('username', username);
         if (user) storage.setItem('user', JSON.stringify(user));
         if (res.data?.token) storage.setItem('token', res.data.token);
+        // Trigger storage event for TopNav to update
+        window.dispatchEvent(new Event('storage'));
       } catch (err) {
         console.warn('storage write failed', err);
       }
-      navigate('/');
+      // Redirect based on role
+      if (userRole.toLowerCase() === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.error || 'ไม่สามารถเข้าสู่ระบบได้');
     } finally {
