@@ -3,6 +3,7 @@ import TopNav from "../components/TopNav";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import '../App.css';
+
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 const ContestDetail = () => {
@@ -11,6 +12,19 @@ const ContestDetail = () => {
   const [contest, setContest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // ✅ เพิ่มส่วนนี้: ประกาศ state isMobile และตรวจสอบขนาดหน้าจอ
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  // ✅ จบส่วนที่เพิ่ม
 
   useEffect(() => {
     const fetchContest = async () => {

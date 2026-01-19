@@ -49,7 +49,7 @@ const GeneralCompetitions = () => (
           fontSize: '2rem',
           margin: 0 
         }}>
-          กิจกรรมสำหรับประชาชนทั่วไป
+          การประกวดระดับประชาชนทั่วไป
         </h2>
       </div>
 

@@ -48,7 +48,7 @@ const SecondaryCompetitions = () => (
           fontSize: '2rem', 
           margin: 0 
         }}>
-          กิจกรรมสำหรับมัธยม
+          การประกวดระดับมัธยม
         </h2>
       </div>
 

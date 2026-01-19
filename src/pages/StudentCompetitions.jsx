@@ -49,7 +49,7 @@ const StudentCompetitions = () => (
           fontSize: '2rem', 
           margin: 0 
         }}>
-          กิจกรรมสำหรับประถม
+          การประกวดระดับประถม
         </h2>
       </div>
 
