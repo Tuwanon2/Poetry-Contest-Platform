@@ -300,72 +300,6 @@ const ContestDetail = () => {
                 </section>
               )}
             </div>
-            {/* สมัครเข้าประกวด (moved to bottom) */}
-            <div style={{ textAlign: 'center', margin: '24px 0 0 0' }}>
-              <button
-                disabled={timeRemaining.isExpired}
-                style={{
-                  padding: '8px 18px',
-                  background: timeRemaining.isExpired ? '#ccc' : '#70136C',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 6,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: timeRemaining.isExpired ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 1px 4px rgba(0,184,169,0.08)',
-                  transition: 'background 0.18s',
-                  opacity: timeRemaining.isExpired ? 0.6 : 1,
-                }}
-                onClick={async () => {
-                  if (timeRemaining.isExpired) {
-                    alert('การประกวดนี้ปิดรับสมัครแล้ว');
-                    return;
-                  }
-                  
-                  // 1. เช็ค login
-                  const user = localStorage.getItem('user') || sessionStorage.getItem('user');
-                  if (!user) {
-                    alert('กรุณาเข้าสู่ระบบก่อนสมัครเข้าประกวด');
-                    navigate('/login');
-                    return;
-                  }
-                  
-                  // 2. เช็คว่าเคยส่งการประกวดนี้หรือยัง
-                  const userId = sessionStorage.getItem('user_id') || localStorage.getItem('user_id');
-                  if (userId) {
-                    try {
-                      const response = await axios.get(`${API_BASE_URL}/submissions/user/${userId}`);
-                      const submissions = response.data || [];
-                      
-                      // เช็คว่ามี submission ของการประกวดนี้หรือไม่
-                      const existingSubmission = submissions.find(
-                        sub => sub.competition_id === parseInt(id)
-                      );
-                      
-                      if (existingSubmission) {
-                        const confirmView = window.confirm(
-                          'คุณเคยส่งผลงานเข้าประกวดนี้แล้ว คุณต้องการดูสถานะการส่งประกวดของคุณหรือไม่?'
-                        );
-                        
-                        if (confirmView) {
-                          navigate('/my-works');
-                        }
-                        return;
-                      }
-                    } catch (err) {
-                      console.error('Error checking submissions:', err);
-                      // ถ้า error ก็ให้ไปต่อได้
-                    }
-                  }
-                  
-                  // 3. ถ้าไม่เคยส่ง ให้ไปหน้าส่งผลงาน
-                  navigate(`/submit-competition/${id}`);
-                }}
-              >
-                {timeRemaining.isExpired ? 'ปิดรับสมัครแล้ว' : 'สมัครเข้าประกวดนี้'}
-              </button>
-            </div>
           </div>
         </div>
         {/* Sidebar */}
@@ -404,33 +338,83 @@ const ContestDetail = () => {
         }}
       >
         <button
+            disabled={timeRemaining.isExpired}
             style={{
                 pointerEvents: 'auto', // Button is clickable
                 padding: isMobile ? '12px 30px' : '14px 45px',
-                background: 'linear-gradient(45deg, #70136C, #8e24aa)',
+                background: timeRemaining.isExpired ? '#ccc' : 'linear-gradient(45deg, #70136C, #8e24aa)',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 50,
                 fontSize: isMobile ? '16px' : '18px',
                 fontWeight: 700,
                 letterSpacing: '0.5px',
-                cursor: 'pointer',
-                boxShadow: '0 6px 25px rgba(112, 19, 108, 0.4)',
+                cursor: timeRemaining.isExpired ? 'not-allowed' : 'pointer',
+                boxShadow: timeRemaining.isExpired ? 'none' : '0 6px 25px rgba(112, 19, 108, 0.4)',
                 transition: 'all 0.25s ease',
                 minWidth: isMobile ? '80%' : '260px',
-                maxWidth: '400px'
+                maxWidth: '400px',
+                opacity: timeRemaining.isExpired ? 0.6 : 1,
             }}
             onMouseOver={(e) => { 
-                e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'; 
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(112, 19, 108, 0.5)'; 
+                if (!timeRemaining.isExpired) {
+                  e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'; 
+                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(112, 19, 108, 0.5)'; 
+                }
             }}
             onMouseOut={(e) => { 
-                e.currentTarget.style.transform = 'translateY(0) scale(1)'; 
-                e.currentTarget.style.boxShadow = '0 6px 25px rgba(112, 19, 108, 0.4)'; 
+                if (!timeRemaining.isExpired) {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)'; 
+                  e.currentTarget.style.boxShadow = '0 6px 25px rgba(112, 19, 108, 0.4)'; 
+                }
             }}
-            onClick={() => navigate(`/submit-competition/${id}`)}
+            onClick={async () => {
+              if (timeRemaining.isExpired) {
+                alert('การประกวดนี้ปิดรับสมัครแล้ว');
+                return;
+              }
+              
+              // 1. เช็ค login
+              const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+              if (!user) {
+                alert('กรุณาเข้าสู่ระบบก่อนสมัครเข้าประกวด');
+                navigate('/login');
+                return;
+              }
+              
+              // 2. เช็คว่าเคยส่งการประกวดนี้หรือยัง
+              const userId = sessionStorage.getItem('user_id') || localStorage.getItem('user_id');
+              if (userId) {
+                try {
+                  const response = await axios.get(`${API_BASE_URL}/submissions/user/${userId}`);
+                  const submissions = response.data || [];
+                  
+                  // เช็คว่ามี submission ของการประกวดนี้หรือไม่
+                  const existingSubmission = submissions.find(
+                    sub => sub.competition_id === parseInt(id)
+                  );
+                  
+                  if (existingSubmission) {
+                    const confirmView = window.confirm(
+                      'คุณเคยส่งผลงานเข้าประกวดนี้แล้ว คุณต้องการดูสถานะการส่งประกวดของคุณหรือไม่?'
+                    );
+                    
+                    if (confirmView) {
+                      navigate('/my-works');
+                    }
+                    return;
+                  }
+                } catch (err) {
+                  console.error('Error checking submissions:', err);
+                  // ถ้า error ก็ให้ไปต่อได้
+                }
+              }
+              
+              // 3. ถ้าไม่เคยส่ง ให้ไปหน้าส่งผลงาน
+              navigate(`/submit-competition/${id}`);
+            }}
         >
-            สมัครเข้าประกวดนี้
+            {timeRemaining.isExpired ? 'ปิดรับสมัครแล้ว' : 'สมัครเข้าประกวดนี้'}
         </button>
       </div>
 

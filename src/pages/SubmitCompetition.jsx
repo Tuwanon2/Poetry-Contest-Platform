@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import TopNav from "../components/TopNav";
-import "./SubmitCompetition.css";
+import "../styles/SubmitCompetition.css";
 import { FaChalkboardTeacher, FaUserGraduate, FaUniversity, FaUsers } from "react-icons/fa";
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
