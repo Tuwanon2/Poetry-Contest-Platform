@@ -108,11 +108,12 @@ type KlonDatabase interface {
 	// Results
 	GetResults(ctx context.Context, contestID int) ([]map[string]interface{}, error)
 	// Submissions / works
-	CreateSubmission(ctx context.Context, userID int, contestID int, title, content string) (Work, error)
-	GetSubmission(ctx context.Context, workID int) (Work, error)
-	UpdateSubmission(ctx context.Context, workID int, title, content string) (Work, error)
-	DeleteSubmission(ctx context.Context, workID int) error
-	GetSubmissionStatus(ctx context.Context, workID int) (map[string]interface{}, error)
+	CreateSubmission(ctx context.Context, competitionID int, userID *int, name, email, phone, levelName, title, poemType, content, document string) (map[string]interface{}, error)
+	GetSubmission(ctx context.Context, submissionID int) (map[string]interface{}, error)
+	UpdateSubmission(ctx context.Context, submissionID int, title, content string) (map[string]interface{}, error)
+	DeleteSubmission(ctx context.Context, submissionID int) error
+	GetSubmissionStatus(ctx context.Context, submissionID int) (map[string]interface{}, error)
+	GetUserSubmissions(ctx context.Context, userID int) ([]map[string]interface{}, error)
 	// Profile
 	GetProfile(ctx context.Context, userID int) (User, error)
 	UpdateProfile(ctx context.Context, userID int, updates map[string]interface{}) (User, error)

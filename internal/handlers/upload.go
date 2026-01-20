@@ -35,9 +35,9 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
         return
     }
 
-    // Create directory structure: uploads/posters/YYYY/MM/
+    // Create directory structure: /DB_poem/uploads/posters/YYYY/MM/
     now := time.Now()
-    uploadDir := filepath.Join(".", "uploads", "posters", fmt.Sprintf("%d", now.Year()), fmt.Sprintf("%02d", now.Month()))
+    uploadDir := filepath.Join("/DB_poem", "uploads", "posters", fmt.Sprintf("%d", now.Year()), fmt.Sprintf("%02d", now.Month()))
     if err := os.MkdirAll(uploadDir, 0755); err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create upload directory"})
         return

@@ -26,12 +26,13 @@ func Register(v1 *gin.RouterGroup, kh *handlers.KlonHandlers) {
     // Uploads
     v1.POST("/upload", kh.UploadPoster)
 
-    // Submission
-    v1.POST("/submission", kh.CreateSubmission)
+    // Submission (Public - สมัครเข้าประกวด)
+    v1.POST("/submissions", kh.CreateSubmission)
     v1.GET("/submission/:id", kh.GetSubmission)
     v1.PUT("/submission/:id", kh.UpdateSubmission)
     v1.DELETE("/submission/:id", kh.DeleteSubmission)
     v1.GET("/submission/:id/status", kh.GetSubmissionStatus)
+    v1.GET("/submissions/user/:userId", kh.GetUserSubmissions)
 
     // Profile
     v1.GET("/profile", kh.GetProfile)

@@ -8,15 +8,40 @@ import (
 
 func (h *KlonHandlers) CreateSubmission(c *gin.Context) {
     var req struct {
-        UserID    int    `json:"user_id"`
-        ContestID int    `json:"contest_id"`
-        Title     string `json:"title"`
-        Content   string `json:"content"`
+        CompetitionID int    `json:"competition_id" binding:"required"`
+        UserID        *int   `json:"user_id"`
+        Name          string `json:"name" binding:"required"`
+        Email         string `json:"email" binding:"required"`
+        Phone         string `json:"phone"`
+        LevelName     string `json:"level_name" binding:"required"`
+        Title         string `json:"title" binding:"required"`
+        PoemType      string `json:"poem_type" binding:"required"`
+        Content       string `json:"content" binding:"required"`
+        Document      string `json:"document"`
     }
-    if err := c.ShouldBindJSON(&req); err != nil { c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}); return }
-    w, err := h.db.CreateSubmission(c.Request.Context(), req.UserID, req.ContestID, req.Title, req.Content)
-    if err != nil { c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}); return }
-    c.JSON(http.StatusCreated, w)
+    if err := c.ShouldBindJSON(&req); err != nil { 
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return 
+    }
+    
+    submission, err := h.db.CreateSubmission(
+        c.Request.Context(),
+        req.CompetitionID,
+        req.UserID,
+        req.Name,
+        req.Email,
+        req.Phone,
+        req.LevelName,
+        req.Title,
+        req.PoemType,
+        req.Content,
+        req.Document,
+    )
+    if err != nil { 
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return 
+    }
+    c.JSON(http.StatusCreated, submission)
 }
 
 func (h *KlonHandlers) GetSubmission(c *gin.Context) {
@@ -46,4 +71,11 @@ func (h *KlonHandlers) GetSubmissionStatus(c *gin.Context) {
     st, err := h.db.GetSubmissionStatus(c.Request.Context(), id)
     if err != nil { c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}); return }
     c.JSON(http.StatusOK, st)
+}
+
+func (h *KlonHandlers) GetUserSubmissions(c *gin.Context) {
+    userID, _ := strconv.Atoi(c.Param("userId"))
+    submissions, err := h.db.GetUserSubmissions(c.Request.Context(), userID)
+    if err != nil { c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}); return }
+    c.JSON(http.StatusOK, submissions)
 }

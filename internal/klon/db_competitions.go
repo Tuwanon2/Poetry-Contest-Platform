@@ -29,8 +29,22 @@ func (p *PostgresKlonDB) ListContests(ctx context.Context) ([]Competition, error
             return nil, err
         }
         if poster.Valid { c.PosterURL = poster.String }
-        if startDate.Valid { c.RegistrationStart = startDate.Time.Format(time.RFC3339) }
-        if endDate.Valid { c.RegistrationEnd = endDate.Time.Format(time.RFC3339) }
+        
+        // Build levels JSON from competition_levels table
+        levels, _ := p.fetchLevelsForCompetition(ctx, c.ID)
+        if len(levels) > 0 {
+            b, _ := json.Marshal(levels)
+            c.Levels = json.RawMessage(b)
+        }
+        
+        if startDate.Valid {
+            c.StartDate = startDate.Time.Format(time.RFC3339)
+            c.RegistrationStart = startDate.Time.Format(time.RFC3339)
+        }
+        if endDate.Valid {
+            c.EndDate = endDate.Time.Format(time.RFC3339)
+            c.RegistrationEnd = endDate.Time.Format(time.RFC3339)
+        }
         if maxScore.Valid { c.MaxScore = int(maxScore.Int64) }
         if updated.Valid { c.UpdatedAt = updated.Time }
         c.OrganizerID = organizerID
@@ -58,8 +72,14 @@ func (p *PostgresKlonDB) GetContestByID(ctx context.Context, id int) (Competitio
         b, _ := json.Marshal(levels)
         c.Levels = json.RawMessage(b)
     }
-    if startDate.Valid { c.RegistrationStart = startDate.Time.Format(time.RFC3339) }
-    if endDate.Valid { c.RegistrationEnd = endDate.Time.Format(time.RFC3339) }
+    if startDate.Valid {
+        c.StartDate = startDate.Time.Format(time.RFC3339)
+        c.RegistrationStart = startDate.Time.Format(time.RFC3339)
+    }
+    if endDate.Valid {
+        c.EndDate = endDate.Time.Format(time.RFC3339)
+        c.RegistrationEnd = endDate.Time.Format(time.RFC3339)
+    }
     if maxScore.Valid { c.MaxScore = int(maxScore.Int64) }
     if updated.Valid { c.UpdatedAt = updated.Time }
     return c, nil
@@ -85,8 +105,22 @@ func (p *PostgresKlonDB) SearchContests(ctx context.Context, q string) ([]Compet
             return nil, err
         }
         if poster.Valid { c.PosterURL = poster.String }
-        if startDate.Valid { c.RegistrationStart = startDate.Time.Format(time.RFC3339) }
-        if endDate.Valid { c.RegistrationEnd = endDate.Time.Format(time.RFC3339) }
+        
+        // Build levels JSON from competition_levels table
+        levels, _ := p.fetchLevelsForCompetition(ctx, c.ID)
+        if len(levels) > 0 {
+            b, _ := json.Marshal(levels)
+            c.Levels = json.RawMessage(b)
+        }
+        
+        if startDate.Valid {
+            c.StartDate = startDate.Time.Format(time.RFC3339)
+            c.RegistrationStart = startDate.Time.Format(time.RFC3339)
+        }
+        if endDate.Valid {
+            c.EndDate = endDate.Time.Format(time.RFC3339)
+            c.RegistrationEnd = endDate.Time.Format(time.RFC3339)
+        }
         if maxScore.Valid { c.MaxScore = int(maxScore.Int64) }
         if updated.Valid { c.UpdatedAt = updated.Time }
         c.OrganizerID = organizerID

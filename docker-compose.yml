@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
     restart: unless-stopped
+    volumes:
+      - ../DB_poem/uploads:/DB_poem/uploads
 
   db:
     image: postgres:17-alpine
