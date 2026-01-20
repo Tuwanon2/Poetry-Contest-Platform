@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS submissions (
     title VARCHAR(255),
     poem_type VARCHAR(100),
     content TEXT,
+    status VARCHAR(50) DEFAULT 'pending',
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -152,6 +153,11 @@ END$$;
 INSERT INTO users (username, password_hash, full_name, email, role)
 SELECT 'admin', '123456', 'Administrator', 'admin@example.com', 'admin'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
+
+-- create a test user
+INSERT INTO users (username, password_hash, full_name, email, role)
+SELECT 'test', '123456', 'test test', 'test@gmail.com', 'applicant'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'test');
 
 -- OPTIONAL: small migration helper (manual) to move `levels` JSONB into `competition_levels`.
 -- If you previously stored a `levels` JSONB in `competitions`, run a script that reads competitions.levels
