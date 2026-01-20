@@ -100,6 +100,7 @@ type KlonDatabase interface {
 	// Auth
 	Register(ctx context.Context, user User, password string) (User, error)
 	Login(ctx context.Context, username, password string) (User, error)
+	GoogleLogin(ctx context.Context, email, fullName, googleID string) (User, error)
 	Logout(ctx context.Context, userID int) error
 	// Contests
 	ListContests(ctx context.Context) ([]Competition, error)

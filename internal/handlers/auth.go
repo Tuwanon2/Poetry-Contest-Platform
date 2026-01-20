@@ -26,3 +26,26 @@ func (h *KlonHandlers) Login(c *gin.Context) {
 func (h *KlonHandlers) Logout(c *gin.Context) {
     c.Status(http.StatusOK)
 }
+
+func (h *KlonHandlers) GoogleLogin(c *gin.Context) {
+    var req struct {
+        Email    string `json:"email"`
+        FullName string `json:"full_name"`
+        GoogleID string `json:"google_id"`
+        Provider string `json:"provider"`
+    }
+    
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    // ตรวจสอบว่า user มีในระบบหรือไม่โดยใช้ email
+    user, err := h.db.GoogleLogin(c.Request.Context(), req.Email, req.FullName, req.GoogleID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{"user": user})
+}

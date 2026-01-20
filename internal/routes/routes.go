@@ -22,6 +22,7 @@ func Register(v1 *gin.RouterGroup, kh *handlers.KlonHandlers) {
     // Auth
     v1.POST("/auth/login", kh.Login)
     v1.POST("/auth/logout", kh.Logout)
+    v1.POST("/auth/google-login", kh.GoogleLogin)
 
     // Uploads
     v1.POST("/upload", kh.UploadPoster)

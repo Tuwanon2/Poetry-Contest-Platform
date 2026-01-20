@@ -104,6 +104,42 @@ func (p *PostgresKlonDB) Login(ctx context.Context, username, password string) (
 
 func (p *PostgresKlonDB) Logout(ctx context.Context, userID int) error { return nil }
 
+func (p *PostgresKlonDB) GoogleLogin(ctx context.Context, email, fullName, googleID string) (User, error) {
+    // ตรวจสอบว่า user มีในระบบหรือไม่
+    var u User
+    err := p.db.QueryRowContext(ctx, `
+        SELECT user_id, username, full_name, email, role, created_at 
+        FROM users 
+        WHERE email=$1
+    `, email).Scan(&u.ID, &u.Username, &u.FullName, &u.Email, &u.Role, &u.CreatedAt)
+    
+    if err != nil {
+        // ถ้าไม่พบ user ให้สร้างใหม่
+        var newID int
+        err = p.db.QueryRowContext(ctx, `
+            INSERT INTO users (username, full_name, email, role, password_hash)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING user_id
+        `, email, fullName, email, "user", googleID).Scan(&newID)
+        
+        if err != nil {
+            return User{}, fmt.Errorf("failed to create user from Google login: %w", err)
+        }
+        
+        // ดึงข้อมูล user ที่สร้างใหม่
+        u = User{
+            ID:       newID,
+            Username: email,
+            FullName: fullName,
+            Email:    email,
+            Role:     "user",
+            CreatedAt: time.Now(),
+        }
+    }
+    
+    return u, nil
+}
+
 func (p *PostgresKlonDB) GetProfile(ctx context.Context, userID int) (User, error) {
     var u User
     err := p.db.QueryRowContext(ctx, `SELECT user_id, username, full_name, email, role, created_at FROM users WHERE user_id=$1`, userID).Scan(&u.ID, &u.Username, &u.FullName, &u.Email, &u.Role, &u.CreatedAt)
