@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TopNav2 from "../components/TopNav2";
+import TopNav from "../components/TopNav";
 import { useNavigate } from "react-router-dom";
 
 // Mock data
@@ -62,7 +62,7 @@ const JudgeScoring = () => {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9fb' }}>
-      <TopNav2 />
+      <TopNav />
       {/* ALERTS */}
       <div style={{ background: '#fffbe6', color: '#e67e22', fontWeight: 600, fontSize: '1.08rem', padding: '12px 0', textAlign: 'center', borderBottom: '1.5px solid #ffe0b2' }}>
         {alertMsg}

@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
-const SecondaryCompetitions = () => {
+const PrimaryCompetitions = () => {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,18 +16,16 @@ const SecondaryCompetitions = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
-        console.log('📚 All contests:', response.data);
         
-        // กรองเฉพาะการประกวดระดับมัธยม
-        const secondaryContests = (response.data || []).filter(contest => {
+        // กรองเฉพาะการประกวดระดับประถม
+        const primaryContests = (response.data || []).filter(contest => {
           const levels = contest.levels || [];
           return levels.some(level => 
-            (level.level_name || level.name || '').includes('มัธยม')
+            (level.level_name || level.name || '').includes('ประถม')
           );
         });
         
-        console.log('🎓 Secondary contests:', secondaryContests);
-        setContests(secondaryContests);
+        setContests(primaryContests);
         setError(null);
       } catch (err) {
         console.error('❌ Error fetching contests:', err);
@@ -95,7 +93,6 @@ const SecondaryCompetitions = () => {
       
       <Container style={{ paddingTop: '30px', paddingBottom: '50px' }}>
         
-        {/* Header */}
         <div className="text-center mb-4">
           <h2 style={{ 
             fontWeight: 'bold', 
@@ -103,14 +100,14 @@ const SecondaryCompetitions = () => {
             fontSize: '2rem', 
             margin: 0 
           }}>
-            กิจกรรมสำหรับมัธยม
+            กิจกรรมสำหรับประถม
           </h2>
         </div>
 
         {contests.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <p style={{ color: '#999', fontSize: '1.1rem' }}>
-              ไม่มีการประกวดสำหรับระดับมัธยมในขณะนี้
+              ไม่มีการประกวดสำหรับระดับประถมในขณะนี้
             </p>
           </div>
         ) : (
@@ -147,7 +144,6 @@ const SecondaryCompetitions = () => {
                       }}
                     >
                       
-                      {/* Image Section */}
                       <div style={{ height: '200px', backgroundColor: '#e9ecef', position: 'relative' }}>
                         {posterUrl ? (
                           <img 
@@ -162,59 +158,23 @@ const SecondaryCompetitions = () => {
                           </div>
                         )}
 
-                        {/* Status Badge */}
                         {status === 'open' && (
-                          <Badge 
-                            bg="success" 
-                            style={{ 
-                              position: 'absolute', 
-                              top: '12px', 
-                              right: '12px',
-                              fontSize: '0.85rem',
-                              fontWeight: 'normal',
-                              padding: '6px 12px',
-                              borderRadius: '20px'
-                            }}
-                          >
+                          <Badge bg="success" style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '0.85rem', fontWeight: 'normal', padding: '6px 12px', borderRadius: '20px' }}>
                             เปิดรับสมัคร
                           </Badge>
                         )}
                         {status === 'upcoming' && (
-                          <Badge 
-                            bg="warning" 
-                            text="dark"
-                            style={{ 
-                              position: 'absolute', 
-                              top: '12px', 
-                              right: '12px',
-                              fontSize: '0.85rem',
-                              fontWeight: 'normal',
-                              padding: '6px 12px',
-                              borderRadius: '20px'
-                            }}
-                          >
+                          <Badge bg="warning" text="dark" style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '0.85rem', fontWeight: 'normal', padding: '6px 12px', borderRadius: '20px' }}>
                             เร็วๆ นี้
                           </Badge>
                         )}
                         {status === 'closed' && (
-                          <Badge 
-                            bg="secondary" 
-                            style={{ 
-                              position: 'absolute', 
-                              top: '12px', 
-                              right: '12px',
-                              fontSize: '0.85rem',
-                              fontWeight: 'normal',
-                              padding: '6px 12px',
-                              borderRadius: '20px'
-                            }}
-                          >
+                          <Badge bg="secondary" style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '0.85rem', fontWeight: 'normal', padding: '6px 12px', borderRadius: '20px' }}>
                             ปิดรับสมัคร
                           </Badge>
                         )}
                       </div>
 
-                      {/* Content Body */}
                       <Card.Body className="d-flex flex-column p-4">
                         <Card.Title style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#000', marginBottom: '16px' }}>
                           {contest.title || contest.Title}
@@ -241,4 +201,4 @@ const SecondaryCompetitions = () => {
   );
 };
 
-export default SecondaryCompetitions;
+export default PrimaryCompetitions;

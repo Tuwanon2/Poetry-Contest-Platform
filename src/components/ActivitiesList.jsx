@@ -155,6 +155,8 @@ const ActivitiesList = ({ filterCategory }) => {
       <Container className="my-5">
         <div style={{ marginBottom: 32 }}>
           <h2 className="mb-1" style={{ fontWeight: 'bold', color: '#70136C', fontSize: '1.15rem' }}>
+            {filterCategory === 'ประถม' && 'สำหรับระดับประถมศึกษา'}
+            {filterCategory === 'มัธยม' && 'สำหรับระดับมัธยมศึกษา'}
             {filterCategory === 'นักเรียน' && 'สำหรับนักเรียน'}
             {(filterCategory === 'นักศึกษา' || filterCategory === 'นิสิต') && 'สำหรับนักศึกษา / นิสิต'}
             {filterCategory === 'ประชาชนทั่วไป' && 'สำหรับประชาชนทั่วไป'}

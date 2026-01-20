@@ -1,38 +1,6 @@
 import React from 'react';
 import TopNav from '../components/TopNav';
-import { Card, Row, Col, Container, Badge } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-
-// ข้อมูลจำลองสำหรับระดับประถมศึกษา
-const primaryActivities = [
-  {
-    id: 1,
-    title: 'ประกวดวาดภาพระบายสี หัวข้อ "เมืองในฝัน"',
-    type: 'ประเภทเดี่ยว',
-    qualification: 'นักเรียนประถมศึกษาตอนต้น (ป.1-3)',
-    dateRange: 'วันนี้ - 31 ต.ค. 2568',
-    image: '/assets/images/drawing.jpg', // ตัวอย่างรูป
-    status: 'open'
-  },
-  {
-    id: 2,
-    title: 'การแข่งขันเล่านิทานประกอบท่าทาง',
-    type: 'ประเภททีม 3 คน',
-    qualification: 'นักเรียนประถมศึกษาตอนปลาย (ป.4-6)',
-    dateRange: '1 ก.ย. - 30 ก.ย. 2568',
-    image: '/assets/images/storytelling.jpg',
-    status: 'open'
-  },
-  {
-    id: 3,
-    title: 'ประกวดคัดลายมือสื่อภาษาไทย',
-    type: 'ประเภทเดี่ยว',
-    qualification: 'นักเรียนประถมศึกษาทุกระดับชั้น',
-    dateRange: 'วันนี้ - 15 พ.ย. 2568',
-    image: null, // กรณีไม่มีรูป
-    status: 'open'
-  },
-];
+import ActivitiesList from '../components/ActivitiesList';
 
 const StudentCompetitions = () => (
   <>

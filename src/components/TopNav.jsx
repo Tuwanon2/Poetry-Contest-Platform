@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaUserCircle } from 'react-icons/fa';
 import SidebarHome from './SidebarHome';
 import './TopNav.css';
 
@@ -9,6 +9,7 @@ const TopNav = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,10 +29,16 @@ const TopNav = () => {
     checkAuth();
     // Listen for storage changes
     window.addEventListener('storage', checkAuth);
-    // Also listen when navigating (for same-tab login)
-    const handleLocationChange = () => checkAuth();
+    // Close profile menu when clicking outside
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.profile-dropdown-container')) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
     return () => {
       window.removeEventListener('storage', checkAuth);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, [location]); // Re-check when location changes
 
@@ -41,7 +48,7 @@ const TopNav = () => {
     localStorage.clear();
     setIsLoggedIn(false);
     setUsername('');
-    navigate('/');
+    navigate('/login');
   };
 
   const handleSearchSubmit = (e) => {
@@ -85,7 +92,7 @@ const TopNav = () => {
                   กิจกรรมการประกวด
                 </span>
                 <div className="dropdown-content">
-                  <Link to="/competition/student">ระดับประถม</Link>
+                  <Link to="/competition/primary">ระดับประถม</Link>
                   <Link to="/competition/secondary">ระดับมัธยม</Link>
                   <Link to="/competition/university">ระดับนักศึกษา</Link>
                   <Link to="/competition/general">ระดับประชาชนทั่วไป</Link>
@@ -99,15 +106,36 @@ const TopNav = () => {
           {/* RIGHT SECTION */}
           <div className="nav-right">
             {isLoggedIn ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ fontSize: '14px', color: '#555' }}>สวัสดี, {username}</span>
-                <button 
-                  onClick={handleLogout}
-                  className="signin-btn"
-                  style={{ background: '#d32f2f', borderColor: '#d32f2f' }}
-                >
-                  ออกจากระบบ
-                </button>
+              <div className="profile-dropdown-container">
+                <FaUserCircle 
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  style={{ 
+                    width: 40, 
+                    height: 40, 
+                    color: '#ffffff',
+                    cursor: 'pointer'
+                  }}
+                  title={username}
+                />
+                {isProfileMenuOpen && (
+                  <div className="profile-dropdown">
+                    <div className="profile-dropdown-menu">
+                      <div className="menu-item" onClick={() => { navigate('/profile'); setIsProfileMenuOpen(false); }}>
+                        ดูโปรไฟล์
+                      </div>
+                      <div className="menu-item" onClick={() => { navigate('/my-works'); setIsProfileMenuOpen(false); }}>
+                        ผลงานที่ส่งประกวด
+                      </div>
+                      <div className="menu-item" onClick={() => { navigate('/help'); setIsProfileMenuOpen(false); }}>
+                        ช่วยเหลือ/คู่มือ
+                      </div>
+                      <div className="menu-divider"></div>
+                      <div className="menu-item" onClick={() => { handleLogout(); setIsProfileMenuOpen(false); }}>
+                        ออกจากระบบ
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <Link to="/login" className="signin-btn">เข้าสู่ระบบ</Link>

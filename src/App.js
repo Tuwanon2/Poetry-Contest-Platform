@@ -12,24 +12,30 @@ import ContestList from './pages/ContestList';
 import ApplicantsList from './pages/ApplicantsList';
 import CreateCompetition from './pages/CreateCompetition';
 import AllCompetitions from './pages/AllCompetitions';
-import StudentCompetitions from './pages/StudentCompetitions';
 import UniversityCompetitions from './pages/UniversityCompetitions';
 import GeneralCompetitions from './pages/GeneralCompetitions';
+import PrimaryCompetitions from './pages/PrimaryCompetitions';
+import SecondaryCompetitions from './pages/SecondaryCompetitions';
 import ContestDetail from './pages/ContestDetail';
 import CompetitionResults from './pages/CompetitionResults';
 import About from './pages/public/About';
-import SecondaryCompetitions from './pages/SecondaryCompetitions';
+import SearchResults from './pages/SearchResults';
+import MyWorks from './pages/MyWorks';
+import SubmissionDetail from './pages/SubmissionDetail';
+
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/create-competition" element={<CreateCompetition />} />
         <Route path="/contest-detail/:id" element={<ContestDetail />} />
         <Route path="/submit-competition/:id" element={<SubmitCompetition />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/all-competitions" element={<AllCompetitions />} />
-        <Route path="/competition/student" element={<StudentCompetitions />} />
+        <Route path="/competition/primary" element={<PrimaryCompetitions />} />
+        <Route path="/competition/secondary" element={<SecondaryCompetitions />} />
         <Route path="/competition/university" element={<UniversityCompetitions />} />
         <Route path="/competition/general" element={<GeneralCompetitions />} />
         <Route path="/competitions-overview" element={<CompetitionsOverview />} />
@@ -39,7 +45,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/results" element={<CompetitionResults />} />
         <Route path="/about" element={<About />} />
-        <Route path="/competition/secondary" element={<SecondaryCompetitions />} />
+        <Route path="/my-works" element={<MyWorks />} />
+        <Route path="/submission/:submissionId" element={<SubmissionDetail />} />
       </Routes>
     </Router>
   );
