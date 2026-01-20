@@ -21,19 +21,6 @@ const ContestDetail = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // ✅ เพิ่มส่วนนี้: ประกาศ state isMobile และตรวจสอบขนาดหน้าจอ
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  // ✅ จบส่วนที่เพิ่ม
-
   useEffect(() => {
     const fetchContest = async () => {
       try {
