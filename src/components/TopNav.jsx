@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaSearch, FaUserCircle } from 'react-icons/fa';
-import SidebarHome from './SidebarHome';
 import './TopNav.css';
 
 const TopNav = () => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -64,11 +62,6 @@ const TopNav = () => {
         <div className="topnav-container">
           {/* LEFT SECTION */}
           <div className="nav-left">
-            {/* เรียกใช้ SidebarHome (ปุ่ม Hamburger จะแสดงตรงนี้) */}
-            <div className="sidebar-trigger-wrapper">
-              <SidebarHome open={isSidebarOpen} setOpen={setSidebarOpen} />
-            </div>
-
             <form onSubmit={handleSearchSubmit} className="search-form">
               <div className="search-input-wrapper">
                 <FaSearch className="search-icon" />
@@ -123,8 +116,14 @@ const TopNav = () => {
                       <div className="menu-item" onClick={() => { navigate('/profile'); setIsProfileMenuOpen(false); }}>
                         ดูโปรไฟล์
                       </div>
+                      <div className="menu-item" onClick={() => { navigate('/my-organizations'); setIsProfileMenuOpen(false); }}>
+                        Organizations ของฉัน
+                      </div>
                       <div className="menu-item" onClick={() => { navigate('/my-works'); setIsProfileMenuOpen(false); }}>
                         ผลงานที่ส่งประกวด
+                      </div>
+                      <div className="menu-item" onClick={() => { navigate('/judge/contests'); setIsProfileMenuOpen(false); }}>
+                        งานกรรมการ
                       </div>
                       <div className="menu-item" onClick={() => { navigate('/help'); setIsProfileMenuOpen(false); }}>
                         ช่วยเหลือ/คู่มือ

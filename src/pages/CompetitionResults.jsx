@@ -52,7 +52,7 @@ const winners = [
 ];
 
 const CompetitionResults = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('นักเรียน');
   const [selectedCompetition, setSelectedCompetition] = useState(null);
 

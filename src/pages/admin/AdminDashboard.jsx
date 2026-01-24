@@ -16,6 +16,8 @@ const SettingsSection = () => <div className="card">Settings Section Placeholder
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("overview");
 
+  console.log("AdminDashboard render - activeSection:", activeSection);
+
   const handleLogout = () => {
     if (window.confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
       // Clear all session and local storage

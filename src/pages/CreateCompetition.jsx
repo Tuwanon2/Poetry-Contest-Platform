@@ -1,5 +1,6 @@
 import TopNav from "../components/TopNav";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers } from "react-icons/fa";
 
 // =========================
@@ -89,6 +90,24 @@ const UploadBox = ({ file, onSelect }) => (
 // MAIN PAGE: CreateCompetition
 // =========================
 export default function CreateCompetition() {
+  const location = useLocation();
+  
+  // ดึง organizationId จาก localStorage ก่อน ถ้าไม่มีค่อยดูจาก location.state
+  const organizationIdFromStorage = localStorage.getItem('current_organization_id');
+  const organizationIdFromState = location.state?.organizationId;
+  const organizationId = organizationIdFromStorage 
+    ? parseInt(organizationIdFromStorage) 
+    : (organizationIdFromState || null);
+
+  console.log('Organization ID for competition:', organizationId); // Debug log
+
+  // Cleanup: ลบ localStorage เมื่อออกจากหน้าสร้างการประกวด
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem('current_organization_id');
+    };
+  }, []);
+  
   // ...existing code...
   // ประเภทกลอน (เลือกได้หลายข้อ)
   const poemTypeOptions = [
@@ -372,7 +391,6 @@ export default function CreateCompetition() {
                       cursor: "pointer",
                     }}
                     onClick={() => setStep(2)}
-                    disabled={!contestName || selectedLevels.length === 0 || !regOpen || !regClose}
                   >
                     ถัดไป
                   </button>
@@ -1609,7 +1627,7 @@ export default function CreateCompetition() {
                                     start_date: '',
                                     end_date: '',
                                     status: 'open',
-                                    organizer_id: null,
+                                    organization_id: organizationId, // เก็บ organization_id
                                     registration_start: regOpen || null,
                                     registration_end: regClose || null,
                                     max_score: maxScore,

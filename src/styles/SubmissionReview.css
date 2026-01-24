@@ -1,0 +1,359 @@
+.submission-review-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fb;
+}
+
+.submission-review-container {
+  flex: 1;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.review-header {
+  margin-bottom: 32px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #70136C;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  margin-bottom: 16px;
+}
+
+.back-btn:hover {
+  background: rgba(112, 19, 108, 0.08);
+}
+
+.review-title {
+  font-size: 2rem;
+  color: #70136C;
+  margin: 0;
+  font-weight: 700;
+}
+
+.review-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.review-section {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 24px 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.title-icon {
+  font-size: 1.8rem;
+}
+
+/* Applicant Section */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.info-value a {
+  color: #70136C;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.info-value a:hover {
+  color: #5a0f56;
+  text-decoration: underline;
+}
+
+.level-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #70136C 0%, #9C27B0 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.document-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #70136C;
+  color: white !important;
+  border-radius: 8px;
+  text-decoration: none !important;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.document-link:hover {
+  background: #5a0f56;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(112, 19, 108, 0.3);
+}
+
+/* Poem Section */
+.poem-info {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.poem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.poem-title {
+  font-size: 1.8rem;
+  color: #70136C;
+  margin: 0;
+  font-weight: 700;
+}
+
+.poem-type-badge {
+  padding: 8px 20px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.poem-content {
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+  border-left: 4px solid #70136C;
+  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+}
+
+.poem-section-content {
+  margin-bottom: 32px;
+}
+
+.poem-section-content:last-child {
+  margin-bottom: 0;
+}
+
+.section-subtitle {
+  color: #70136C;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+.verses-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+  row-gap: 20px;
+}
+
+.verse-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.verse-number {
+  color: #666;
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 28px;
+  padding-top: 2px;
+}
+
+.verse-line {
+  flex: 1;
+  position: relative;
+  padding-bottom: 10px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #222;
+}
+
+.verse-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #d0d0d0;
+}
+
+.poem-line {
+  font-size: 1.15rem;
+  color: #333;
+  margin: 8px 0;
+  font-family: 'Sarabun', sans-serif;
+}
+
+/* Status Section */
+.status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.status-label {
+  font-weight: 600;
+  color: #666;
+  min-width: 100px;
+}
+
+.status-badge {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.status-badge.status-pending {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.status-badge.status-approved {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.status-rejected {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.status-scored {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.status-value {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Actions */
+.review-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.action-btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-btn-bottom {
+  background: #f5f5f5;
+  color: #333;
+  border: 2px solid #ddd;
+}
+
+.back-btn-bottom:hover {
+  background: #e0e0e0;
+  border-color: #bbb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .submission-review-container {
+    padding: 16px;
+  }
+
+  .review-section {
+    padding: 20px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .poem-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .poem-content {
+    padding: 20px;
+  }
+
+  .verses-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .poem-line {
+    font-size: 1rem;
+  }
+}

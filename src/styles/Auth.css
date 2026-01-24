@@ -5,12 +5,9 @@
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  /* แก้จุดที่ 1: เปลี่ยนจาก center เป็น flex-start เพื่อไม่ให้ลอยขึ้นไปชน Header */
   align-items: flex-start; 
   background: #f5f6fa;
   padding: 16px;
-  
-  /* แก้จุดที่ 2: ดันลงมา 100px เพื่อหลบ Header สีม่วงด้านบน */
   padding-top: 100px; 
   box-sizing: border-box;
 }
@@ -25,7 +22,6 @@
   max-width: 360px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  /* เพิ่มระยะห่างด้านล่าง เผื่อหน้าจอยาว */
   margin-bottom: 40px; 
 }
 
@@ -59,6 +55,7 @@
   font-size: 0.95rem;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box; /* สำคัญ: ป้องกัน input ล้น card */
 }
 
 .auth-group input:focus {
@@ -113,9 +110,9 @@
 }
 
 /* ===============================
-   Button
+   Button (Main Login)
 ================================ */
-.auth-card button {
+.auth-card button[type="submit"] {
   width: 100%;
   padding: 12px;
   border: none;
@@ -128,11 +125,11 @@
   transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-.auth-card button:hover:not(:disabled) {
+.auth-card button[type="submit"]:hover:not(:disabled) {
   background: #5a0f56;
 }
 
-.auth-card button:disabled {
+.auth-card button[type="submit"]:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -212,6 +209,75 @@
 
 .auth-footer a:hover {
   text-decoration: underline;
+}
+
+/* ===============================
+   Divider
+================================ */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.auth-divider span {
+  padding: 0 10px;
+}
+
+/* ===============================
+   Google Button Wrapper
+================================ */
+.google-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* ===============================
+   Custom Google Button Style (เพิ่มใหม่)
+================================ */
+.google-btn-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #dadce0;
+    color: #3c4043;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 10px 12px;
+    border-radius: 8px; /* ปรับให้เท่ากับ input */
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    gap: 12px;
+    font-family: inherit;
+}
+
+.google-btn-custom:hover {
+    background-color: #f7f8f8;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-color: #d2e3fc;
+}
+
+.google-btn-custom:active {
+    background-color: #f1f3f4;
+}
+
+.google-btn-custom img {
+    width: 20px;
+    height: 20px;
+    display: block;
 }
 
 /* ===============================

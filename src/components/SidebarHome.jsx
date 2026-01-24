@@ -27,7 +27,7 @@ const menu = [
   },
 ];
 
-export default function SidebarHome({ open = true, setOpen }) {
+export default function SidebarHome({ open = false, setOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -82,31 +82,6 @@ export default function SidebarHome({ open = true, setOpen }) {
             );
           })}
         </nav>
-
-        <div className="sidebar-bottom">
-          <div className="sidebar-divider" />
-          <button
-            className="sidebar-menu-btn create-btn"
-            onClick={() => {
-              const user = localStorage.getItem('user') || sessionStorage.getItem('user');
-              if (!user) {
-                alert('กรุณาเข้าสู่ระบบก่อนสร้างการประกวด');
-                navigate('/login');
-                setOpen && setOpen(false);
-                return;
-              }
-              handleNavigate('/create-competition');
-            }}
-          >
-            <span className="sidebar-menu-icon">
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor"/>
-                <rect x="11" y="4" width="2" height="16" rx="1" fill="currentColor"/>
-              </svg>
-            </span>
-            <span className="sidebar-label">สร้างการประกวด</span>
-          </button>
-        </div>
       </aside>
     </>
   );

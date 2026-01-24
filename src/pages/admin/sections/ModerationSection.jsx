@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Icon from "../../../components/Icon";
+// import Icon from "../../../components/Icon";
 
 export default function ModerationSection() {
   const [reports, setReports] = useState([
@@ -19,8 +19,8 @@ export default function ModerationSection() {
             </div>
             <div style={{ background: "#f9f9f9", padding: 10, borderRadius: 5, margin: "10px 0" }}>"{r.content}"</div>
             <div style={{ display: "flex", gap: 10 }}>
-              <button className="btn-primary" style={{ background: "#27ae60" }} onClick={() => handleAction(r.id)}> <Icon name="check" size={14}/> Keep</button>
-              <button className="btn-primary" style={{ background: "#c0392b" }} onClick={() => handleAction(r.id)}> <Icon name="trash" size={14}/> Delete</button>
+              <button className="btn-primary" style={{ background: "#27ae60" }} onClick={() => handleAction(r.id)}> ✓ Keep</button>
+              <button className="btn-primary" style={{ background: "#c0392b" }} onClick={() => handleAction(r.id)}> 🗑️ Delete</button>
             </div>
           </div>
         ))
