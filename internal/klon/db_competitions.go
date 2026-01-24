@@ -10,7 +10,7 @@ import (
 
 // Contests & search
 func (p *PostgresKlonDB) ListContests(ctx context.Context) ([]Competition, error) {
-    rows, err := p.db.QueryContext(ctx, `SELECT competition_id, title, description, purpose, start_date, end_date, status, poster_url, max_score, created_at, updated_at, COALESCE(organizer_id,0) FROM competitions ORDER BY competition_id`)
+    rows, err := p.db.QueryContext(ctx, `SELECT competition_id, title, description, purpose, start_date, end_date, status, poster_url, max_score, created_at, updated_at, COALESCE(organization_id,0) FROM competitions ORDER BY competition_id`)
     if err != nil {
         return nil, err
     }
@@ -24,8 +24,8 @@ func (p *PostgresKlonDB) ListContests(ctx context.Context) ([]Competition, error
         var endDate sql.NullTime
         var maxScore sql.NullInt64
         var updated sql.NullTime
-        var organizerID int
-        if err := rows.Scan(&c.ID, &c.Title, &c.Description, &purpose, &startDate, &endDate, &c.Status, &poster, &maxScore, &c.CreatedAt, &updated, &organizerID); err != nil {
+        var organizationID int
+        if err := rows.Scan(&c.ID, &c.Title, &c.Description, &purpose, &startDate, &endDate, &c.Status, &poster, &maxScore, &c.CreatedAt, &updated, &organizationID); err != nil {
             return nil, err
         }
         if poster.Valid { c.PosterURL = poster.String }
@@ -47,7 +47,7 @@ func (p *PostgresKlonDB) ListContests(ctx context.Context) ([]Competition, error
         }
         if maxScore.Valid { c.MaxScore = int(maxScore.Int64) }
         if updated.Valid { c.UpdatedAt = updated.Time }
-        c.OrganizerID = organizerID
+        c.OrganizationID = organizationID
         res = append(res, c)
     }
     return res, nil
@@ -61,11 +61,12 @@ func (p *PostgresKlonDB) GetContestByID(ctx context.Context, id int) (Competitio
     var endDate sql.NullTime
     var maxScore sql.NullInt64
     var updated sql.NullTime
-    err := p.db.QueryRowContext(ctx, `SELECT competition_id, title, description, purpose, start_date, end_date, status, poster_url, max_score, created_at, updated_at, COALESCE(organizer_id,0) FROM competitions WHERE competition_id=$1`, id).Scan(&c.ID, &c.Title, &c.Description, &purpose, &startDate, &endDate, &c.Status, &poster, &maxScore, &c.CreatedAt, &updated, &c.OrganizerID)
+    err := p.db.QueryRowContext(ctx, `SELECT competition_id, title, description, purpose, start_date, end_date, status, poster_url, max_score, created_at, updated_at, COALESCE(organization_id,0) FROM competitions WHERE competition_id=$1`, id).Scan(&c.ID, &c.Title, &c.Description, &purpose, &startDate, &endDate, &c.Status, &poster, &maxScore, &c.CreatedAt, &updated, &c.OrganizationID)
     if err != nil {
         return Competition{}, err
     }
     if poster.Valid { c.PosterURL = poster.String }
+    if purpose.Valid { c.Purpose = purpose.String }
     // Build levels JSON from competition_levels table
     levels, _ := p.fetchLevelsForCompetition(ctx, id)
     if len(levels) > 0 {
@@ -86,7 +87,7 @@ func (p *PostgresKlonDB) GetContestByID(ctx context.Context, id int) (Competitio
 }
 
 func (p *PostgresKlonDB) SearchContests(ctx context.Context, q string) ([]Competition, error) {
-    rows, err := p.db.QueryContext(ctx, `SELECT competition_id, title, description, purpose, start_date, end_date, status, poster_url, max_score, created_at, updated_at, COALESCE(organizer_id,0) FROM competitions WHERE title ILIKE $1 ORDER BY competition_id`, "%"+q+"%")
+    rows, err := p.db.QueryContext(ctx, `SELECT competition_id, title, description, purpose, start_date, end_date, status, poster_url, max_score, created_at, updated_at, COALESCE(organization_id,0) FROM competitions WHERE title ILIKE $1 ORDER BY competition_id`, "%"+q+"%")
     if err != nil {
         return nil, err
     }
@@ -100,8 +101,8 @@ func (p *PostgresKlonDB) SearchContests(ctx context.Context, q string) ([]Compet
         var endDate sql.NullTime
         var maxScore sql.NullInt64
         var updated sql.NullTime
-        var organizerID int
-        if err := rows.Scan(&c.ID, &c.Title, &c.Description, &purpose, &startDate, &endDate, &c.Status, &poster, &maxScore, &c.CreatedAt, &updated, &organizerID); err != nil {
+        var organizationID int
+        if err := rows.Scan(&c.ID, &c.Title, &c.Description, &purpose, &startDate, &endDate, &c.Status, &poster, &maxScore, &c.CreatedAt, &updated, &organizationID); err != nil {
             return nil, err
         }
         if poster.Valid { c.PosterURL = poster.String }
@@ -123,7 +124,7 @@ func (p *PostgresKlonDB) SearchContests(ctx context.Context, q string) ([]Compet
         }
         if maxScore.Valid { c.MaxScore = int(maxScore.Int64) }
         if updated.Valid { c.UpdatedAt = updated.Time }
-        c.OrganizerID = organizerID
+        c.OrganizationID = organizationID
         res = append(res, c)
     }
     return res, nil
@@ -131,11 +132,12 @@ func (p *PostgresKlonDB) SearchContests(ctx context.Context, q string) ([]Compet
 
 // fetchLevelsForCompetition returns a slice of level objects (with poem_types and prizes)
 func (p *PostgresKlonDB) fetchLevelsForCompetition(ctx context.Context, competitionID int) ([]map[string]interface{}, error) {
-    rows, err := p.db.QueryContext(ctx, `SELECT cl.competition_level_id, l.name as level_name, cl.rules, cl.prizes, cl.topic_enabled, cl.topic_name, cl.poem_type_id FROM competition_levels cl LEFT JOIN levels l ON cl.level_id = l.level_id WHERE cl.competition_id=$1 ORDER BY cl.competition_level_id`, competitionID)
+    rows, err := p.db.QueryContext(ctx, `SELECT cl.competition_level_id, cl.level_id, l.name as level_name, cl.rules, cl.prizes, cl.topic_enabled, cl.topic_name, cl.poem_type_id FROM competition_levels cl LEFT JOIN levels l ON cl.level_id = l.level_id WHERE cl.competition_id=$1 ORDER BY cl.competition_level_id`, competitionID)
     if err != nil { return nil, err }
     defer rows.Close()
     var out []map[string]interface{}
     for rows.Next() {
+        var competitionLevelID int
         var levelID int
         var levelName string
         var rules sql.NullString
@@ -143,8 +145,8 @@ func (p *PostgresKlonDB) fetchLevelsForCompetition(ctx context.Context, competit
         var topicEnabled bool
         var topicName sql.NullString
         var poemTypeID sql.NullInt64
-        if err := rows.Scan(&levelID, &levelName, &rules, &prizesBytes, &topicEnabled, &topicName, &poemTypeID); err != nil { continue }
-        lvl := map[string]interface{}{"competition_level_id": levelID, "level_name": levelName}
+        if err := rows.Scan(&competitionLevelID, &levelID, &levelName, &rules, &prizesBytes, &topicEnabled, &topicName, &poemTypeID); err != nil { continue }
+        lvl := map[string]interface{}{"competition_level_id": competitionLevelID, "level_id": levelID, "level_name": levelName}
         if rules.Valid { lvl["rules"] = rules.String }
         lvl["topic_enabled"] = topicEnabled
         if topicName.Valid { lvl["topic_name"] = topicName.String }
@@ -167,6 +169,11 @@ func (p *PostgresKlonDB) fetchLevelsForCompetition(ctx context.Context, competit
         out = append(out, lvl)
     }
     return out, nil
+}
+
+// GetCompetitionLevels - Public function to get competition levels
+func (p *PostgresKlonDB) GetCompetitionLevels(ctx context.Context, competitionID int) ([]map[string]interface{}, error) {
+    return p.fetchLevelsForCompetition(ctx, competitionID)
 }
 
 // Results: compute avg score per work for a contest
@@ -208,10 +215,12 @@ func (p *PostgresKlonDB) CreateCompetition(ctx context.Context, comp Competition
     _, _ = p.db.ExecContext(ctx, `ALTER TABLE competitions ADD COLUMN IF NOT EXISTS purpose TEXT`)
     _, _ = p.db.ExecContext(ctx, `ALTER TABLE competitions ADD COLUMN IF NOT EXISTS start_date TIMESTAMP`)
     _, _ = p.db.ExecContext(ctx, `ALTER TABLE competitions ADD COLUMN IF NOT EXISTS end_date TIMESTAMP`)
-    _, _ = p.db.ExecContext(ctx, `ALTER TABLE competitions ADD COLUMN IF NOT EXISTS organizer_id INTEGER`)
     _, _ = p.db.ExecContext(ctx, `ALTER TABLE competitions ADD COLUMN IF NOT EXISTS poster_url TEXT`)
     _, _ = p.db.ExecContext(ctx, `ALTER TABLE competitions ADD COLUMN IF NOT EXISTS max_score INTEGER DEFAULT 10`)
     _, _ = p.db.ExecContext(ctx, `ALTER TABLE competitions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP`)
+    
+    // Debug log to check organization_id value
+    fmt.Printf("[CreateCompetition] Received organization_id: %d\n", comp.OrganizationID)
 
     var id int
     // Use registration dates as start/end dates
@@ -230,11 +239,13 @@ func (p *PostgresKlonDB) CreateCompetition(ctx context.Context, comp Competition
         purpose = sql.NullString{String: comp.Purpose, Valid: true}
     }
 
-    err := p.db.QueryRowContext(ctx, `INSERT INTO competitions (title, description, purpose, start_date, end_date, status, organizer_id, poster_url, max_score, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW(),NOW()) RETURNING competition_id`, comp.Title, comp.Description, purpose, startDate, endDate, comp.Status, comp.OrganizerID, comp.PosterURL, comp.MaxScore).Scan(&id)
+    err := p.db.QueryRowContext(ctx, `INSERT INTO competitions (title, description, purpose, start_date, end_date, status, organization_id, poster_url, max_score, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW(),NOW()) RETURNING competition_id`, comp.Title, comp.Description, purpose, startDate, endDate, comp.Status, comp.OrganizationID, comp.PosterURL, comp.MaxScore).Scan(&id)
     if err != nil {
+        fmt.Printf("[CreateCompetition] INSERT failed: %v\n", err)
         return Competition{}, err
     }
     comp.ID = id
+    fmt.Printf("[CreateCompetition] Successfully created competition_id=%d with organization_id=%d\n", id, comp.OrganizationID)
     // If judges provided as part of payload, try to insert them into judges table
     if len(comp.Judges) > 0 {
         fmt.Printf("Processing %d judges\n", len(comp.Judges))
@@ -395,17 +406,87 @@ func (p *PostgresKlonDB) CreateCompetition(ctx context.Context, comp Competition
 func (p *PostgresKlonDB) UpdateCompetition(ctx context.Context, id int, comp Competition) (Competition, error) {
     var startDate interface{} = nil
     var endDate interface{} = nil
-    if fmt.Sprintf("%v", comp.StartDate) != "" {
+    
+    // Use registration dates if provided
+    if comp.RegistrationStart != "" {
+        startDate = comp.RegistrationStart
+    } else if fmt.Sprintf("%v", comp.StartDate) != "" {
         startDate = comp.StartDate
     }
-    if fmt.Sprintf("%v", comp.EndDate) != "" {
+    
+    if comp.RegistrationEnd != "" {
+        endDate = comp.RegistrationEnd
+    } else if fmt.Sprintf("%v", comp.EndDate) != "" {
         endDate = comp.EndDate
     }
 
-    _, err := p.db.ExecContext(ctx, `UPDATE competitions SET title=$1, description=$2, start_date=$3, end_date=$4, status=$5 WHERE competition_id=$6`, comp.Title, comp.Description, startDate, endDate, comp.Status, id)
+    // Extract purpose
+    var purpose interface{} = nil
+    if comp.Purpose != "" {
+        purpose = comp.Purpose
+    }
+
+    // Update with all fields including poster_url and max_score
+    _, err := p.db.ExecContext(ctx, `
+        UPDATE competitions 
+        SET title=$1, description=$2, purpose=$3, start_date=$4, end_date=$5, 
+            status=$6, poster_url=$7, max_score=$8, updated_at=NOW()
+        WHERE competition_id=$9
+    `, comp.Title, comp.Description, purpose, startDate, endDate, comp.Status, comp.PosterURL, comp.MaxScore, id)
+    
     if err != nil {
         return Competition{}, err
     }
+    
+    // If levels are provided, update competition_levels
+    if len(comp.Levels) > 0 {
+        fmt.Printf("[UpdateCompetition] Updating levels data: %s\n", string(comp.Levels))
+        
+        // Parse levels JSON
+        var levelsData []map[string]interface{}
+        if err := json.Unmarshal(comp.Levels, &levelsData); err != nil {
+            fmt.Printf("[UpdateCompetition] Failed to parse levels: %v\n", err)
+        } else {
+            // Delete existing levels for this competition
+            _, err = p.db.ExecContext(ctx, `DELETE FROM competition_levels WHERE competition_id=$1`, id)
+            if err != nil {
+                fmt.Printf("[UpdateCompetition] Failed to delete old levels: %v\n", err)
+            } else {
+                // Insert new levels
+                for _, lvl := range levelsData {
+                    levelName, _ := lvl["level_name"].(string)
+                    rules, _ := lvl["rules"].(string)
+                    topicEnabled, _ := lvl["topic_enabled"].(bool)
+                    topicName, _ := lvl["topic_name"].(string)
+                    
+                    // Get level_id from levels table
+                    var levelID int
+                    err := p.db.QueryRowContext(ctx, `SELECT level_id FROM levels WHERE name=$1`, levelName).Scan(&levelID)
+                    if err != nil {
+                        fmt.Printf("[UpdateCompetition] Failed to get level_id for %s: %v\n", levelName, err)
+                        continue
+                    }
+                    
+                    // Get poem_type_id (default to 1 if not specified)
+                    poemTypeID := 1
+                    if ptID, ok := lvl["poem_type_id"].(float64); ok {
+                        poemTypeID = int(ptID)
+                    }
+                    
+                    // Insert competition_level
+                    _, err = p.db.ExecContext(ctx, `
+                        INSERT INTO competition_levels (competition_id, level_id, poem_type_id, rules, prizes, topic_enabled, topic_name)
+                        VALUES ($1, $2, $3, $4, '[]'::jsonb, $5, $6)
+                    `, id, levelID, poemTypeID, rules, topicEnabled, topicName)
+                    
+                    if err != nil {
+                        fmt.Printf("[UpdateCompetition] Failed to insert level %s: %v\n", levelName, err)
+                    }
+                }
+            }
+        }
+    }
+    
     return p.GetContestByID(ctx, id)
 }
 
@@ -477,17 +558,69 @@ func (p *PostgresKlonDB) RemoveJudge(ctx context.Context, judgeID int) error {
     return err
 }
 
-func (p *PostgresKlonDB) ListSubmissionsForContest(ctx context.Context, competitionID int) ([]Work, error) {
-    rows, err := p.db.QueryContext(ctx, `SELECT w.work_id, w.submission_id, w.title, w.content, w.submitted_at FROM works w JOIN submissions s ON w.submission_id = s.submission_id WHERE s.competition_id=$1 ORDER BY w.work_id`, competitionID)
-    if err != nil { return nil, err }
-    defer rows.Close()
-    res := make([]Work, 0)
-    for rows.Next() {
-        var w Work
-        if err := rows.Scan(&w.ID, &w.ApplicantID, &w.Title, &w.Content, &w.SubmittedAt); err != nil { return nil, err }
-        res = append(res, w)
+func (p *PostgresKlonDB) ListSubmissionsForContest(ctx context.Context, competitionID int) ([]map[string]interface{}, error) {
+    query := `
+        SELECT s.submission_id, s.competition_id, s.user_id, s.name, s.email, s.phone, 
+               s.level_name, s.title, s.poem_type, s.content, s.document, s.status, s.submitted_at
+        FROM submissions s
+        WHERE s.competition_id = $1
+        ORDER BY s.submitted_at DESC
+    `
+    
+    rows, err := p.db.QueryContext(ctx, query, competitionID)
+    if err != nil {
+        return nil, err
     }
-    return res, nil
+    defer rows.Close()
+
+    var submissions []map[string]interface{}
+    for rows.Next() {
+        var submissionID, competitionID int
+        var userID sql.NullInt64
+        var name, email, levelName, title, poemType, content, status string
+        var phone, document sql.NullString
+        var submittedAt string
+        
+        err := rows.Scan(
+            &submissionID, &competitionID, &userID, &name, &email, &phone, &levelName,
+            &title, &poemType, &content, &document, &status, &submittedAt,
+        )
+        if err != nil {
+            continue
+        }
+        
+        submission := map[string]interface{}{
+            "submission_id":   submissionID,
+            "competition_id":  competitionID,
+            "name":           name,
+            "participant_name": name,
+            "email":          email,
+            "level_name":     levelName,
+            "title":          title,
+            "poem_type":      poemType,
+            "content":        content,
+            "status":         status,
+            "submitted_at":   submittedAt,
+        }
+        
+        if userID.Valid {
+            submission["user_id"] = int(userID.Int64)
+        }
+        if phone.Valid {
+            submission["phone"] = phone.String
+        }
+        if document.Valid {
+            submission["document"] = document.String
+        }
+        
+        submissions = append(submissions, submission)
+    }
+    
+    if submissions == nil {
+        submissions = []map[string]interface{}{}
+    }
+    
+    return submissions, nil
 }
 
 func (p *PostgresKlonDB) ContestProgress(ctx context.Context, competitionID int) (map[string]int, error) {

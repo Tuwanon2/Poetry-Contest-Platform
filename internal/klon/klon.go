@@ -30,6 +30,7 @@ type Competition struct {
 	CreatedAt   time.Time       `json:"created_at"`
 	UpdatedAt   time.Time       `json:"updated_at"`
 	OrganizerID int             `json:"organizer_id,omitempty"`
+	OrganizationID int          `json:"organization_id,omitempty"`
 	PosterURL   string          `json:"poster_url,omitempty"`
 	Levels      json.RawMessage `json:"levels,omitempty"` // JSON per-level details
 	RegistrationStart string    `json:"registration_start,omitempty"`
@@ -63,20 +64,8 @@ type Judge struct {
 	CompetitionID int       `json:"competition_id"`
 	LevelID       int       `json:"level_id"`
 	Status        string    `json:"status"` // pending, accepted, rejected
+	InvitedBy     int       `json:"invited_by,omitempty"`
 	AssignedAt    time.Time `json:"assigned_at"`
-}
-
-// Assistant represents an assistant assigned to a competition
-type Assistant struct {
-	ID              int       `json:"id"`
-	UserID          int       `json:"user_id"`
-	CompetitionID   int       `json:"competition_id"`
-	Status          string    `json:"status"` // pending, accepted, rejected
-	CanView         bool      `json:"can_view"`
-	CanEdit         bool      `json:"can_edit"`
-	CanViewScores   bool      `json:"can_view_scores"`
-	CanAddAssistant bool      `json:"can_add_assistant"`
-	AssignedAt      time.Time `json:"assigned_at"`
 }
 
 // Score represents a score given by a judge to a work
@@ -124,13 +113,14 @@ type KlonDatabase interface {
 	CreateCompetition(ctx context.Context, comp Competition) (Competition, error)
 	UpdateCompetition(ctx context.Context, id int, comp Competition) (Competition, error)
 	DeleteCompetition(ctx context.Context, id int) error
+	GetCompetitionLevels(ctx context.Context, competitionID int) ([]map[string]interface{}, error)
 	MyContests(ctx context.Context, userID int) ([]Competition, error)
 	OpenContest(ctx context.Context, id int) error
 	CloseContest(ctx context.Context, id int) error
 	AddCoOrganizer(ctx context.Context, competitionID int, userID int) (int, error)
 	RemoveCoOrganizer(ctx context.Context, coOrganizerID int) error
 	RemoveJudge(ctx context.Context, judgeID int) error
-	ListSubmissionsForContest(ctx context.Context, competitionID int) ([]Work, error)
+	ListSubmissionsForContest(ctx context.Context, competitionID int) ([]map[string]interface{}, error)
 	ContestProgress(ctx context.Context, competitionID int) (map[string]int, error)
 	PostResults(ctx context.Context, competitionID int) error
 	// Applicant
@@ -142,20 +132,46 @@ type KlonDatabase interface {
 	// Judge
 	AssignJudge(ctx context.Context, judge Judge) (Judge, error)
 	ListJudges(ctx context.Context, competitionID int) ([]Judge, error)
-	// Assistant management
-	AssignAssistant(ctx context.Context, assistant Assistant) (Assistant, error)
-	InviteAssistant(ctx context.Context, assistant Assistant) (Assistant, error)
 	// Score
 	AddScore(ctx context.Context, score Score) (Score, error)
 	ListScores(ctx context.Context, workID int) ([]Score, error)
 
 	// Invitations & comments (judge workflows)
 	ListInvitations(ctx context.Context, userID int) ([]Invitation, error)
+	ListJudgeInvitations(ctx context.Context, userID int) ([]map[string]interface{}, error)
+	AcceptJudgeInvitation(ctx context.Context, judgeID int) error
+	RejectJudgeInvitation(ctx context.Context, judgeID int) error
 	AcceptInvitation(ctx context.Context, invitationID int) error
 	ListJudgeContests(ctx context.Context, userID int) ([]Competition, error)
-	ListJudgeContestSubmissions(ctx context.Context, userID int, competitionID int) ([]Work, error)
+	ListJudgeContestSubmissions(ctx context.Context, userID int, competitionID int) ([]map[string]interface{}, error)
 	AddComment(ctx context.Context, comment Comment) (Comment, error)
 	GetJudgeSummary(ctx context.Context, userID int, competitionID int) (map[string]interface{}, error)
+
+	// Organizations
+	GetUserOrganizations(ctx context.Context, userID int) ([]OrganizationWithMember, error)
+	CreateOrganization(ctx context.Context, org Organization) (Organization, error)
+	GetOrganization(ctx context.Context, orgID int) (Organization, error)
+	GetOrganizationMembers(ctx context.Context, orgID int) ([]map[string]interface{}, error)
+	InviteOrganizationMember(ctx context.Context, organizationID, userID int) error
+	UpdateMemberStatus(ctx context.Context, memberID int, status string) error
+	DeleteOrganizationMember(ctx context.Context, memberID int) error
+	GetCompetitionsByOrganizationID(ctx context.Context, organizationID int) ([]Competition, error)
+
+	// Organization Assistants (รวมใน organization_members แล้ว, role='assistant')
+	GetAssistants(ctx context.Context, orgID int) ([]map[string]interface{}, error)
+	InviteAssistant(ctx context.Context, organizationID, userID, invitedBy int, canView, canEdit, canViewScores, canAddAssistant, canCreateCompetition bool) error
+	UpdateAssistantPermissions(ctx context.Context, memberID int, canView, canEdit, canViewScores, canAddAssistant, canCreateCompetition bool) error
+	CheckUserCanCreateCompetition(ctx context.Context, userID, organizationID int) (bool, error)
+	
+	// Competition Judges (กรรมการระดับการประกวด)
+	CreateJudge(ctx context.Context, judge Judge) (Judge, error)
+	GetCompetitionJudges(ctx context.Context, competitionID int) ([]map[string]interface{}, error)
+	InviteCompetitionJudge(ctx context.Context, competitionID, userID, levelID, invitedBy int) error
+	RemoveCompetitionJudge(ctx context.Context, judgeID int) error
+
+	// Admin - Organizations
+	GetPendingOrganizations() ([]PendingOrganization, error)
+	UpdateOrganizationStatus(organizationID int, status string) error
 }
 
 // Invitation represents an invitation sent to a user to be a judge

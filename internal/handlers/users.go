@@ -30,12 +30,12 @@ func (h *KlonHandlers) ListUsers(c *gin.Context) {
 }
 
 func (h *KlonHandlers) SearchUsersByEmail(c *gin.Context) {
-    email := c.Query("email")
-    if email == "" {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "email query parameter required"})
+    q := c.Query("q")
+    if q == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "q query parameter required"})
         return
     }
-    users, err := h.db.SearchUsersByEmail(c.Request.Context(), email)
+    users, err := h.db.SearchUsersByEmail(c.Request.Context(), q)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return

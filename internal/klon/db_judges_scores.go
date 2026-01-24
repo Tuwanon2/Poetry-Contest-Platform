@@ -8,6 +8,24 @@ import (
     "fmt"
 )
 
+// CreateJudge - Create a judge invitation for a contest
+func (p *PostgresKlonDB) CreateJudge(ctx context.Context, judge Judge) (Judge, error) {
+    var id int
+    err := p.db.QueryRowContext(ctx,
+        `INSERT INTO judges (user_id, competition_id, level_id, status, invited_by, assigned_at) 
+         VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) 
+         RETURNING judge_id, assigned_at`,
+        judge.UserID, judge.CompetitionID, judge.LevelID, judge.Status, judge.InvitedBy,
+    ).Scan(&id, &judge.AssignedAt)
+    
+    if err != nil {
+        return Judge{}, err
+    }
+    
+    judge.ID = id
+    return judge, nil
+}
+
 // Invitations & comments & judge helpers
 func (p *PostgresKlonDB) ListInvitations(ctx context.Context, userID int) ([]Invitation, error) {
     // ensure table
@@ -40,19 +58,84 @@ func (p *PostgresKlonDB) AcceptInvitation(ctx context.Context, invitationID int)
 }
 
 func (p *PostgresKlonDB) ListJudgeContests(ctx context.Context, userID int) ([]Competition, error) {
-    rows, err := p.db.QueryContext(ctx, `SELECT c.competition_id, c.title, c.description, c.type, c.start_date, c.end_date, c.status, c.created_at, COALESCE(c.organizer_id,0) FROM competitions c JOIN judges j ON j.competition_id = c.competition_id WHERE j.user_id=$1 ORDER BY c.competition_id`, userID)
+    rows, err := p.db.QueryContext(ctx, `
+        SELECT COALESCE(c.competition_id, j.competition_id), 
+               COALESCE(c.title, 'การประกวดถูกลบแล้ว'), 
+               COALESCE(c.description, 'การประกวดนี้ถูกลบออกจากระบบแล้ว'), 
+               COALESCE(c.start_date::text, CURRENT_TIMESTAMP::text), 
+               COALESCE(c.end_date::text, CURRENT_TIMESTAMP::text), 
+               COALESCE(c.status, 'completed'), 
+               COALESCE(c.created_at, CURRENT_TIMESTAMP), 
+               COALESCE(c.organization_id, 0)
+        FROM judges j 
+        LEFT JOIN competitions c ON j.competition_id = c.competition_id 
+        WHERE j.user_id=$1 AND j.status='accepted'
+        ORDER BY j.competition_id`, userID)
     if err != nil { return nil, err }
     defer rows.Close()
     res := make([]Competition, 0)
     for rows.Next() {
         var c Competition
-        if err := rows.Scan(&c.ID, &c.Title, &c.Description, &c.Type, &c.StartDate, &c.EndDate, &c.Status, &c.CreatedAt, &c.OrganizerID); err != nil { return nil, err }
+        var startDate, endDate string
+        if err := rows.Scan(&c.ID, &c.Title, &c.Description, &startDate, &endDate, &c.Status, &c.CreatedAt, &c.OrganizationID); err != nil { 
+            return nil, err 
+        }
+        c.StartDate = startDate
+        c.EndDate = endDate
         res = append(res, c)
     }
     return res, nil
 }
 
-func (p *PostgresKlonDB) ListJudgeContestSubmissions(ctx context.Context, userID int, competitionID int) ([]Work, error) {
+// ListJudgeInvitations - Get pending judge invitations
+func (p *PostgresKlonDB) ListJudgeInvitations(ctx context.Context, userID int) ([]map[string]interface{}, error) {
+    rows, err := p.db.QueryContext(ctx, `
+        SELECT j.judge_id, j.competition_id, j.level_id, j.status, j.invited_by, j.assigned_at,
+               COALESCE(c.title, 'การประกวดถูกลบแล้ว'), 
+               COALESCE(c.description, ''), 
+               COALESCE(l.name, '')
+        FROM judges j
+        LEFT JOIN competitions c ON j.competition_id = c.competition_id
+        LEFT JOIN levels l ON j.level_id = l.level_id
+        WHERE j.user_id=$1 AND j.status='pending'
+        ORDER BY j.assigned_at DESC`, userID)
+    if err != nil { return nil, err }
+    defer rows.Close()
+    
+    var result []map[string]interface{}
+    for rows.Next() {
+        var judgeID, competitionID, levelID, invitedBy int
+        var status, title, description, levelName string
+        var assignedAt time.Time
+        
+        if err := rows.Scan(&judgeID, &competitionID, &levelID, &status, &invitedBy, &assignedAt, &title, &description, &levelName); err != nil {
+            continue
+        }
+        
+        result = append(result, map[string]interface{}{
+            "id": judgeID,
+            "judge_id": judgeID,
+            "competition_id": competitionID,
+            "level_id": levelID,
+            "level_name": levelName,
+            "status": status,
+            "invited_by": invitedBy,
+            "assigned_at": assignedAt,
+            "title": title,
+            "description": description,
+        })
+    }
+    
+    return result, nil
+}
+
+// RejectJudgeInvitation - Reject a judge invitation
+func (p *PostgresKlonDB) RejectJudgeInvitation(ctx context.Context, judgeID int) error {
+    _, err := p.db.ExecContext(ctx, `UPDATE judges SET status='rejected' WHERE judge_id=$1`, judgeID)
+    return err
+}
+
+func (p *PostgresKlonDB) ListJudgeContestSubmissions(ctx context.Context, userID int, competitionID int) ([]map[string]interface{}, error) {
     // ensure judge is assigned
     var exists bool
     err := p.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM judges WHERE user_id=$1 AND competition_id=$2)`, userID, competitionID).Scan(&exists)
@@ -134,53 +217,8 @@ func (p *PostgresKlonDB) ListJudges(ctx context.Context, competitionID int) ([]J
     return []Judge{}, nil
 }
 
-// AssignAssistant assigns or updates an assistant for a competition
-func (p *PostgresKlonDB) AssignAssistant(ctx context.Context, assistant Assistant) (Assistant, error) {
-    // ensure assistants table exists
-    _, _ = p.db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS assistants (assistant_id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE, competition_id INTEGER REFERENCES competitions(competition_id) ON DELETE CASCADE, permissions JSONB, assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, competition_id))`)
-
-    // insert or update
-    _, err := p.db.ExecContext(ctx, `INSERT INTO assistants (user_id, competition_id, permissions) VALUES ($1,$2,$3) ON CONFLICT (user_id, competition_id) DO UPDATE SET permissions = EXCLUDED.permissions, assigned_at = CURRENT_TIMESTAMP`, assistant.UserID, assistant.CompetitionID, nil)
-    if err != nil {
-        return Assistant{}, err
-    }
-
-    var id int
-    var assignedAt time.Time
-    err = p.db.QueryRowContext(ctx, `SELECT assistant_id, assigned_at FROM assistants WHERE user_id=$1 AND competition_id=$2`, assistant.UserID, assistant.CompetitionID).Scan(&id, &assignedAt)
-    if err != nil {
-        return Assistant{}, err
-    }
-    assistant.ID = id
-    assistant.AssignedAt = assignedAt
-    return assistant, nil
-}
-
-// InviteAssistant invites a user to be an assistant for a competition
-func (p *PostgresKlonDB) InviteAssistant(ctx context.Context, assistant Assistant) (Assistant, error) {
-    var id int
-    err := p.db.QueryRowContext(ctx, `
-        INSERT INTO assistants (user_id, competition_id, status, can_view, can_edit, can_view_scores, can_add_assistant)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        ON CONFLICT (user_id, competition_id) DO UPDATE SET
-            status = EXCLUDED.status,
-            can_view = EXCLUDED.can_view,
-            can_edit = EXCLUDED.can_edit,
-            can_view_scores = EXCLUDED.can_view_scores,
-            can_add_assistant = EXCLUDED.can_add_assistant,
-            assigned_at = CURRENT_TIMESTAMP
-        RETURNING assistant_id
-    `, assistant.UserID, assistant.CompetitionID, assistant.Status, assistant.CanView, assistant.CanEdit, assistant.CanViewScores, assistant.CanAddAssistant).Scan(&id)
-    
-    if err != nil {
-        return Assistant{}, err
-    }
-
-    assistant.ID = id
-    assistant.AssignedAt = time.Now()
-    return assistant, nil
-}
-
+// NOTE: AssignAssistant and InviteAssistant ถูกย้ายไป db_organizations.go แล้ว
+// เพราะ assistants ตอนนี้เป็น org-level ไม่ใช่ competition-level
 func (p *PostgresKlonDB) ListScores(ctx context.Context, workID int) ([]Score, error) {
     return []Score{}, nil
 }

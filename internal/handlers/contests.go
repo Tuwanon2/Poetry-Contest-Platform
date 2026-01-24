@@ -34,9 +34,32 @@ func (h *KlonHandlers) GetResults(c *gin.Context) {
     c.JSON(http.StatusOK, results)
 }
 
+func (h *KlonHandlers) GetCompetitionLevels(c *gin.Context) {
+    id, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid competition id"})
+        return
+    }
+    levels, err := h.db.GetCompetitionLevels(c.Request.Context(), id)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, levels)
+}
+
 func (h *KlonHandlers) CreateContest(c *gin.Context) {
     var comp klon.Competition
     if err := c.ShouldBindJSON(&comp); err != nil { c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()}); return }
+    
+    // เอาการตรวจสอบสิทธิ์ออก - ให้ทุกคนสร้างได้
+    // userID := c.GetInt("user_id")
+    // canCreate, err := h.db.CheckUserCanCreateCompetition(c.Request.Context(), userID, comp.OrganizationID)
+    // if err != nil || !canCreate {
+    //     c.JSON(http.StatusForbidden, gin.H{"error": "You don't have permission to create competition"})
+    //     return
+    // }
+    
     created, err := h.db.CreateCompetition(c.Request.Context(), comp)
     if err != nil { c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}); return }
     c.JSON(http.StatusCreated, created)
@@ -127,38 +150,5 @@ func (h *KlonHandlers) PostResults(c *gin.Context) {
     c.Status(http.StatusOK)
 }
 
-func (h *KlonHandlers) InviteAssistant(c *gin.Context) {
-    competitionID, _ := strconv.Atoi(c.Param("id"))
-    var req struct {
-        UserID          int  `json:"user_id"`
-        CanView         bool `json:"can_view"`
-        CanEdit         bool `json:"can_edit"`
-        CanViewScores   bool `json:"can_view_scores"`
-        CanAddAssistant bool `json:"can_add_assistant"`
-    }
-    if err := c.ShouldBindJSON(&req); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-
-    assistant := klon.Assistant{
-        UserID:          req.UserID,
-        CompetitionID:   competitionID,
-        CanView:         req.CanView,
-        CanEdit:         req.CanEdit,
-        CanViewScores:   req.CanViewScores,
-        CanAddAssistant: req.CanAddAssistant,
-        Status:          "pending",
-    }
-
-    created, err := h.db.InviteAssistant(c.Request.Context(), assistant)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-
-    // TODO: Send email notification to the user
-    // For now, we just return success
-    c.JSON(http.StatusCreated, created)
-}
-
+// NOTE: InviteAssistant ถูกย้ายไปที่ organizations.go แล้ว
+// เพราะ assistants ตอนนี้เป็น org-level ไม่ใช่ competition-level
