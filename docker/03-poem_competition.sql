@@ -13,7 +13,38 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- competitions: store global competition info
+-- organizations: represents organizing bodies/teams
+CREATE TABLE IF NOT EXISTS organizations (
+    organization_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT,
+    cover_image TEXT,
+    certificate_document TEXT,
+    creator_user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
+    status VARCHAR(20) DEFAULT 'approved', -- pending, approved, rejected
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- organization_members: tracks members with roles (creator, assistant, member)
+CREATE TABLE IF NOT EXISTS organization_members (
+    member_id SERIAL PRIMARY KEY,
+    organization_id INTEGER REFERENCES organizations(organization_id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    role VARCHAR(20) DEFAULT 'member', -- creator, assistant, member
+    status VARCHAR(20) DEFAULT 'pending', -- pending, accepted, rejected
+    -- Permissions for assistants
+    can_view BOOLEAN DEFAULT TRUE,
+    can_edit BOOLEAN DEFAULT FALSE,
+    can_view_scores BOOLEAN DEFAULT FALSE,
+    can_add_assistant BOOLEAN DEFAULT FALSE,
+    can_create_competition BOOLEAN DEFAULT FALSE,
+    invited_by INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(organization_id, user_id)
+);
+
+-- competitions: store global competition info (now linked to organizations)
 CREATE TABLE IF NOT EXISTS competitions (
     competition_id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -24,7 +55,7 @@ CREATE TABLE IF NOT EXISTS competitions (
     status VARCHAR(20) DEFAULT 'open',
     poster_url TEXT,
     max_score INTEGER DEFAULT 10,
-    organizer_id INTEGER,
+    organization_id INTEGER REFERENCES organizations(organization_id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -101,15 +132,20 @@ CREATE TABLE IF NOT EXISTS works (
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- judges: กรรมการในการประกวดแต่ละรายการ (ไม่ link กับ organization)
 CREATE TABLE IF NOT EXISTS judges (
     judge_id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
     competition_id INTEGER REFERENCES competitions(competition_id) ON DELETE CASCADE,
     level_id INTEGER REFERENCES levels(level_id) ON DELETE CASCADE,
     status VARCHAR(20) DEFAULT 'pending', -- pending, accepted, rejected
+    invited_by INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, competition_id, level_id)
 );
+
+-- NOTE: assistants table ถูกรวมเข้ากับ organization_members แล้ว
+-- ใช้ role='assistant' แทน
 
 CREATE TABLE IF NOT EXISTS scores (
     score_id SERIAL PRIMARY KEY,
@@ -121,18 +157,49 @@ CREATE TABLE IF NOT EXISTS scores (
     UNIQUE(judge_id, work_id)
 );
 
-CREATE TABLE IF NOT EXISTS assistants (
-    assistant_id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
-    competition_id INTEGER REFERENCES competitions(competition_id) ON DELETE CASCADE,
-    status VARCHAR(20) DEFAULT 'pending', -- pending, accepted, rejected
-    can_view BOOLEAN DEFAULT TRUE,
-    can_edit BOOLEAN DEFAULT FALSE,
-    can_view_scores BOOLEAN DEFAULT FALSE,
-    can_add_assistant BOOLEAN DEFAULT FALSE,
-    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, competition_id)
+-- submission_scores: กรรมการให้คะแนนแต่ละ submission
+CREATE TABLE IF NOT EXISTS submission_scores (
+    submission_score_id SERIAL PRIMARY KEY,
+    submission_id INTEGER REFERENCES submissions(submission_id) ON DELETE CASCADE,
+    judge_id INTEGER REFERENCES judges(judge_id) ON DELETE CASCADE,
+    score NUMERIC(5,2) NOT NULL,
+    comment TEXT,
+    scored_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(judge_id, submission_id)
 );
+
+-- Trigger function to set all permissions to TRUE for creators
+CREATE OR REPLACE FUNCTION set_creator_permissions()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.role = 'creator' THEN
+        NEW.can_view := TRUE;
+        NEW.can_edit := TRUE;
+        NEW.can_view_scores := TRUE;
+        NEW.can_add_assistant := TRUE;
+        NEW.can_create_competition := TRUE;
+        NEW.status := 'accepted';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Apply trigger to organization_members
+DROP TRIGGER IF EXISTS trigger_set_creator_permissions ON organization_members;
+CREATE TRIGGER trigger_set_creator_permissions
+    BEFORE INSERT OR UPDATE ON organization_members
+    FOR EACH ROW
+    EXECUTE FUNCTION set_creator_permissions();
+
+-- Update existing creators to have full permissions
+UPDATE organization_members 
+SET can_view = TRUE, 
+    can_edit = TRUE, 
+    can_view_scores = TRUE, 
+    can_add_assistant = TRUE, 
+    can_create_competition = TRUE,
+    status = 'accepted'
+WHERE role = 'creator';
 
 COMMIT;
 
