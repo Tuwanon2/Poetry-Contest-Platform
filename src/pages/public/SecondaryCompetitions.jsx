@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
-// Components
-import SidebarHome from '../../components/SidebarHome';
 import TopNav from '../../components/TopNav';
+import SidebarHome from '../../components/SidebarHome';
 import ContestFilters from '../../components/ContestFilters';
 
 // CSS: ใช้ไฟล์เดียวกับ ActivitiesList
@@ -30,17 +28,17 @@ const SecondaryCompetitions = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
-
+        
         // ✅ กรองเฉพาะ "มัธยม" (Logic เดิมของคุณ)
         const secondaryContests = (response.data || []).filter(contest => {
           const levels = contest.levels || contest.Levels || [];
-          return levels.some(level =>
+          return levels.some(level => 
             (level.level_name || level.name || '').includes('มัธยม') ||
             (level.level_name || level.name || '').includes('ม.ต้น') ||
             (level.level_name || level.name || '').includes('ม.ปลาย')
           );
         });
-
+        
         setContests(secondaryContests);
         setError(null);
       } catch (err) {
@@ -65,11 +63,11 @@ const SecondaryCompetitions = () => {
     const now = new Date();
     const startDate = new Date(contest.start_date || contest.StartDate);
     const endDate = new Date(contest.end_date || contest.EndDate);
-
+    
     // Theme สี Pastel (เหลือง/เทา/เขียว)
-    if (now < startDate) return { text: 'Coming Soon', bg: '#fff3cd', color: '#856404' };
-    if (now > endDate) return { text: 'Closed', bg: '#e9ecef', color: '#495057' };
-    return { text: 'Open', bg: '#d1e7dd', color: '#0f5132' };
+    if (now < startDate) return { text: 'Coming Soon', bg: '#fff3cd', color: '#856404' }; 
+    if (now > endDate) return { text: 'Closed', bg: '#e9ecef', color: '#495057' }; 
+    return { text: 'Open', bg: '#d1e7dd', color: '#0f5132' }; 
   };
 
   const getPosterUrl = (contest) => {
@@ -97,7 +95,7 @@ const SecondaryCompetitions = () => {
     const matchStatus = filterStatus === 'all' || statusKey === filterStatus;
     const matchTopic = filterTopic === 'all' || (contest.topic_type === filterTopic);
     const matchPoetry = filterPoetry === 'all' || (contest.poetry_type === filterPoetry);
-
+    
     return matchStatus && matchTopic && matchPoetry;
   });
 
@@ -111,13 +109,13 @@ const SecondaryCompetitions = () => {
         <TopNav />
 
         <div className="activities-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
-
+          
           {/* Header แบบ Center */}
-          <div className="section-wrapper" style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            marginBottom: '40px'
+          <div className="section-wrapper" style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            marginBottom: '40px' 
           }}>
             <h2 className="section-title main-header" style={{ textAlign: 'center' }}>
               กิจกรรมสำหรับมัธยมศึกษา
@@ -126,7 +124,7 @@ const SecondaryCompetitions = () => {
           </div>
 
           {/* Filter */}
-          <ContestFilters
+          <ContestFilters 
             filterStatus={filterStatus} setFilterStatus={setFilterStatus}
             filterTopic={filterTopic} setFilterTopic={setFilterTopic}
             filterPoetry={filterPoetry} setFilterPoetry={setFilterPoetry}
@@ -135,16 +133,16 @@ const SecondaryCompetitions = () => {
 
           {/* Grid Content */}
           {loading ? (
-            <div className="text-center mt-5" style={{ fontFamily: 'Kanit' }}>กำลังโหลดข้อมูล...</div>
+            <div className="text-center mt-5" style={{fontFamily:'Kanit'}}>กำลังโหลดข้อมูล...</div>
           ) : error ? (
-            <div className="text-center mt-5 text-danger" style={{ fontFamily: 'Kanit' }}>{error}</div>
+            <div className="text-center mt-5 text-danger" style={{fontFamily:'Kanit'}}>{error}</div>
           ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', // ✅ ปรับลดขนาดลงเพื่อให้ใส่ได้ 4 ช่อง
-              gap: '24px',
-              marginTop: '30px'
-            }}>
+            <div style={{ 
+  display: 'grid', 
+  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', // ✅ ปรับลดขนาดลงเพื่อให้ใส่ได้ 4 ช่อง
+  gap: '24px',
+  marginTop: '30px'
+}}>
               {filteredContests.length > 0 ? (
                 filteredContests.map(contest => {
                   const badge = getStatusBadge(contest);
@@ -155,19 +153,19 @@ const SecondaryCompetitions = () => {
                   const topicType = contest.topic_type || '-';
 
                   return (
-                    <Link
-                      key={contest.competition_id || contest.id}
-                      to={`/contest-detail/${contest.competition_id || contest.id}`}
+                    <Link 
+                      key={contest.competition_id || contest.id} 
+                      to={`/contest-detail/${contest.competition_id || contest.id}`} 
                       className="card-link-wrapper"
                     >
                       <div className="custom-card">
                         {/* Image Area */}
                         <div className="card-image-wrapper">
                           {posterUrl ? (
-                            <img src={posterUrl} alt={contest.title} className="card-img" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }} />
+                             <img src={posterUrl} alt={contest.title} className="card-img" onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='flex'}} />
                           ) : null}
                           <div className="no-image-placeholder" style={{ display: posterUrl ? 'none' : 'flex' }}>
-                            <span>ไม่มีรูปภาพ</span>
+                             <span>ไม่มีรูปภาพ</span>
                           </div>
                           <span className="status-badge" style={{ backgroundColor: badge.bg, color: badge.color }}>
                             {badge.text === 'Open' ? 'เปิดรับสมัคร' : badge.text === 'Closed' ? 'ปิดรับสมัคร' : 'เร็วๆ นี้'}
@@ -177,9 +175,9 @@ const SecondaryCompetitions = () => {
                         {/* Content Area */}
                         <div className="card-content">
                           <h3 className="card-title" title={contest.title}>
-                            {contest.title}
+                             {contest.title}
                           </h3>
-
+                          
                           <div className="card-row">
                             <span className="label-purple">ระดับ</span>
                             <span className="value-text">: {levels}</span>
@@ -189,16 +187,16 @@ const SecondaryCompetitions = () => {
                             <span className="value-text">: {poetryType}</span>
                           </div>
                           <div className="card-row">
-                            <span className="label-purple">หัวข้อ</span>
-                            <span className="value-text">: {topicType}</span>
+                             <span className="label-purple">หัวข้อ</span>
+                             <span className="value-text">: {topicType}</span>
                           </div>
 
                           <div className="modern-divider"></div>
 
                           <div className="card-footer-row">
                             <svg className="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <polyline points="12 6 12 12 16 14"></polyline>
+                               <circle cx="12" cy="12" r="10"></circle>
+                               <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
                             <span className="label-gray">ปิดรับสมัคร :</span>
                             <span className="value-date">{dateRange}</span>

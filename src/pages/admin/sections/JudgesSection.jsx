@@ -1,5 +1,5 @@
 import React from "react";
-import Icon from "../../../components/Icon";
+// import Icon from "../../../components/Icon";
 
 export default function JudgesSection() {
   const judges = [
@@ -16,8 +16,8 @@ export default function JudgesSection() {
       <div className="grid-2">
         {judges.map(j => (
           <div key={j.id} className="card" style={{ display: "flex", alignItems: "center", gap: 15 }}>
-            <div style={{ width: 50, height: 50, borderRadius: "50%", background: "#eee", display: "flex", alignItems: "center", justifyContent: "center" }}>
-               <Icon name="person" size={24} />
+            <div style={{ width: 50, height: 50, borderRadius: "50%", background: "#eee", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px" }}>
+               👤
             </div>
             <div style={{ flex: 1 }}>
               <h4 style={{ margin: "0 0 5px 0" }}>{j.name}</h4>

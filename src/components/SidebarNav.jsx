@@ -69,10 +69,9 @@ const toggleBtnStyle = {
 
 export default function SidebarNav({ current, onNavigate }) {
   const navItems = [
-    { key: 'overview', label: 'ภาพรวม (Overview)', icon: '👥' },
-    { key: 'edit', label: 'แก้ไขการประกวด', icon: '📝' },
-    { key: 'manage', label: 'จัดการผู้ช่วย/กรรมการ', icon: '🧑‍⚖️' },
-    { key: 'export', label: 'ส่งออก (Export)', icon: '📤' },
+    { key: 'overview', label: 'ภาพรวม', icon: '📊' },
+    { key: 'submissions', label: 'ผลงานที่ส่งเข้าประกวด', icon: '📝' },
+    { key: 'edit', label: 'แก้ไขการประกวด', icon: '✏️' },
   ];
   return (
     <div style={sidebarStyle}>

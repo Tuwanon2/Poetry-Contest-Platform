@@ -7,7 +7,7 @@ import SidebarHome from '../../components/SidebarHome';
 import TopNav from '../../components/TopNav';
 import ContestFilters from '../../components/ContestFilters';
 
-// CSS: ใช้ไฟล์เดียวกับ ActivitiesList
+// CSS: ใช้ไฟล์เดียวกับ ActivitiesList (ต้องมีไฟล์ ActivitiesList.css ในโฟลเดอร์เดียวกัน)
 import '../../components/ActivitiesList.css';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
@@ -30,7 +30,6 @@ const AllCompetitions = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
-        // สำหรับหน้านี้ โหลดข้อมูลทั้งหมดโดยไม่ต้องกรองระดับ
         setContests(response.data || []);
         setError(null);
       } catch (err) {
@@ -104,11 +103,11 @@ const AllCompetitions = () => {
 
         <div className="activities-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
           
-          {/* Header แบบ Center */}
+          {/* ✅ ปรับปรุงส่วน Header ให้จัดกึ่งกลาง */}
           <div className="section-wrapper" style={{ 
             display: 'flex', 
             flexDirection: 'column', 
-            alignItems: 'center', 
+            alignItems: 'center', /* จัดแกนขวาง (แนวนอน) ให้กึ่งกลาง */
             justifyContent: 'center', 
             marginBottom: '40px' 
           }}>
@@ -133,11 +132,11 @@ const AllCompetitions = () => {
           ) : (
             // Grid Layout
             <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', // Grid 4 columns style
-              gap: '24px',
-              marginTop: '30px'
-            }}>
+  display: 'grid', 
+  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', // ✅ ปรับลดขนาดลงเพื่อให้ใส่ได้ 4 ช่อง
+  gap: '24px',
+  marginTop: '30px'
+}}>
               {filteredContests.length > 0 ? (
                 filteredContests.map(contest => {
                   const badge = getStatusBadge(contest);
@@ -203,7 +202,7 @@ const AllCompetitions = () => {
                 })
               ) : (
                 <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: '#999' }}>
-                    ไม่พบรายการที่ค้นหา
+                   ไม่พบรายการที่ค้นหา
                 </div>
               )}
             </div>

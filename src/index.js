@@ -21,9 +21,10 @@ function Main() {
 }
 
 root.render(
-  <React.StrictMode>
+  // ปิด StrictMode ชั่วคราวเพื่อ debug
+  // <React.StrictMode>
     <Main />
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -4,7 +4,7 @@ import TopNav from '../../components/TopNav';
 import '../../styles/About.css';
 
 const About = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="about-layout">

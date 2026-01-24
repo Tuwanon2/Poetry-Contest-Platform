@@ -1,17 +1,24 @@
 /* 📂 src/pages/admin/sections/OverviewSection.jsx */
 import React, { useState } from 'react';
 import Icon from '../../../components/Icon';
-import AddMemberModal from '../../../components/AddMemberModal';
+// import AddMemberModal from '../../../components/AddMemberModal'; // ปิดชั่วคราว
 
 export default function OverviewSection() {
     const [isModalOpen, setModalOpen] = useState(false);
 
+    console.log("OverviewSection render - isModalOpen:", isModalOpen);
+
     return (
-        <div className="fade-in">
+        <div className="fade-in" style={{ 
+            background: 'white', 
+            padding: '30px', 
+            borderRadius: '10px',
+            minHeight: '600px' 
+        }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <h2 className="section-header" style={{ marginBottom: 0 }}>ภาพรวมระบบ (Overview)</h2>
-                <button className="btn-primary" onClick={() => setModalOpen(true)}>
-                    <span style={{ marginRight: 8, display: 'flex' }}><Icon name="plus" size={16} /></span>
+                <h2 className="section-header" style={{ marginBottom: 0, color: '#70136C', fontSize: '24px' }}>ภาพรวมระบบ (Overview)</h2>
+                <button className="btn-primary" onClick={() => alert('เปิด Modal (ปิดไว้ชั่วคราว)')}>
+                    <span style={{ marginRight: 8 }}>➕</span>
                     เพิ่มสมาชิกใหม่
                 </button>
             </div>
@@ -68,12 +75,12 @@ export default function OverviewSection() {
                 </div>
             </div>
 
-            {/* Modal Component */}
-            <AddMemberModal
+            {/* Modal Component - ปิดชั่วคราว */}
+            {/* <AddMemberModal
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onSave={() => alert('บันทึกข้อมูลเรียบร้อย!')}
-            />
+            /> */}
         </div>
     );
 }
@@ -87,8 +94,13 @@ function StatCard({ title, value, icon, color }) {
                     <span className="stat-title">{title}</span>
                     <div className="stat-value" style={{ color: color }}>{value}</div>
                 </div>
-                <div style={{ opacity: 0.2, color: color }}>
-                    <Icon name={icon} size={40} />
+                <div style={{ opacity: 0.2, color: color, fontSize: '40px' }}>
+                    {/* ใช้ emoji แทน Icon ชั่วคราวเพื่อป้องกัน error */}
+                    {icon === 'users' && '👥'}
+                    {icon === 'trophy' && '🏆'}
+                    {icon === 'scale' && '⚖️'}
+                    {icon === 'briefcase' && '💼'}
+                    {icon === 'user-check' && '✅'}
                 </div>
             </div>
         </div>

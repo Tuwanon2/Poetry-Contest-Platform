@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 // Components
-// --- ลบ SidebarHome ออกแล้ว ---
+import SidebarHome from '../../components/SidebarHome';
 import TopNav from '../../components/TopNav';
 import ContestFilters from '../../components/ContestFilters';
 
@@ -17,7 +17,7 @@ const UniversityCompetitions = () => {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // --- ลบ State sidebarOpen ออก ---
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // --- Filter States ---
   const [filterStatus, setFilterStatus] = useState('all');
@@ -102,11 +102,12 @@ const UniversityCompetitions = () => {
   });
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#FFFFFF', flexDirection: 'column' }}>
-      {/* --- ลบ Sidebar Component ออก --- */}
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#FFFFFF' }}>
+      {/* Sidebar */}
+      <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
 
-      {/* Main Content: ลบ marginLeft ที่เคยใช้กันที่ให้ Sidebar */}
-      <div style={{ flex: 1, width: '100%' }}>
+      {/* Main Content */}
+      <div style={{ flex: 1, marginLeft: sidebarOpen ? 240 : 0, transition: '0.3s' }}>
         <TopNav />
 
         <div className="activities-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
@@ -139,11 +140,11 @@ const UniversityCompetitions = () => {
             <div className="text-center mt-5 text-danger" style={{fontFamily:'Kanit'}}>{error}</div>
           ) : (
             <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-              gap: '24px',
-              marginTop: '30px'
-            }}>
+  display: 'grid', 
+  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', // ✅ ปรับลดขนาดลงเพื่อให้ใส่ได้ 4 ช่อง
+  gap: '24px',
+  marginTop: '30px'
+}}>
               {filteredContests.length > 0 ? (
                 filteredContests.map(contest => {
                   const badge = getStatusBadge(contest);
