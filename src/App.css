@@ -1,7 +1,25 @@
 /* 1. Import Font (ต้องอยู่บรรทัดแรกสุด ห้ามลบ) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;700&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100&family=Roboto:wght@300;400;500;700&display=swap');
+@font-face {
+  font-family: 'Rocher';
+  src: url(https://assets.codepen.io/9632/RocherColorGX.woff2);
+}
 
-/* 2. บังคับใช้ฟอนต์ Prompt เป็นหลักทั้งเว็บ */
+@font-palette-values --Grays {
+  font-family: Rocher;
+  base-palette: 9;
+}
+
+@font-palette-values --Purples {
+  font-family: Rocher;
+  base-palette: 6;
+}
+
+@font-palette-values --Mint {
+  font-family: Rocher;
+  base-palette: 7;
+}
+
 * {
   font-family: 'Prompt', 'Roboto', 'Noto Sans Thai', sans-serif !important;
   margin: 0;
@@ -9,29 +27,27 @@
   box-sizing: border-box;
 }
 
-/* Styles สำหรับ Body */
 body {
-  /* background-color: #ffffff !important; */ /* <--- ถ้าต้องการพื้นหลังสีขาว ให้เอา comment บรรทัดนี้ออก และใส่ comment บรรทัดข้างล่างแทน */
   background-color: #000000;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
   min-height: 100vh;
-  /* เพิ่ม font smoothing เพื่อความคมชัดบน Mac/iOS */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- ส่วนประกอบอื่นๆ ของเว็บไซต์ --- */
+h1 {
+  text-align: center;
+  margin: 0;
+}
 
-/* TopMenu dropdown hover effect */
 .menu-dropdown-hover:hover + .menu-dropdown-content,
 .menu-dropdown-content:hover {
   display: block !important;
 }
 
-/* Make dropdown caret (arrow) white in TopNav */
 .dropdown-toggle-white::after {
   color: #fff !important;
   filter: brightness(1000%);
@@ -127,13 +143,6 @@ body {
 
 .my-cart {
   padding: 20px;
-  /* font-family กำหนดที่ * แล้ว แต่ใส่ย้ำได้ */
-  font-family: 'Prompt', sans-serif !important; 
-}
-
-h1 {
-  text-align: center;
-  margin: 0;
 }
 
 .order-summary {
@@ -203,7 +212,6 @@ h1 {
   color: #FFD700;
 }
 
-/* Button 57 */
 .button-57 {
   position: relative;
   overflow: hidden;
@@ -267,7 +275,6 @@ h1 {
   transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
 }
 
-/* Button 40 */
 .button-40 {
   background-color: #111827;
   border: 1px solid transparent;
@@ -276,7 +283,6 @@ h1 {
   color: #FFFFFF;
   cursor: pointer;
   flex: 0 0 auto;
-  font-family: 'Prompt', "Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.5rem;
@@ -309,12 +315,6 @@ h1 {
   }
 }
 
-/* Rocher Font Setup (เฉพาะส่วน) */
-@font-face {
-  font-family: 'Rocher';
-  src: url(https://assets.codepen.io/9632/RocherColorGX.woff2);
-}
-
 .body-rocher {
   font-family: 'Rocher';
   text-align: center;
@@ -326,26 +326,10 @@ h1 {
   justify-content: center;
 }
 
-@font-palette-values --Grays {
-  font-family: Rocher;
-  base-palette: 9;
-}
-
-@font-palette-values --Purples {
-  font-family: Rocher;
-  base-palette: 6;
-}
-
-@font-palette-values --Mint {
-  font-family: Rocher;
-  base-palette: 7;
-}
-
 .grays { font-palette: --Grays; }
 .purples { font-palette: --Purples; }
 .mint { font-palette: --Mint; }
 
-/* Button 35 */
 .button-35 {
   align-items: center;
   background-color: #fff;
@@ -356,7 +340,6 @@ h1 {
   cursor: pointer;
   display: inline-flex;
   flex: 1 1 auto;
-  font-family: 'Prompt', Inter,sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
   justify-content: center;
@@ -388,15 +371,11 @@ h1 {
   margin-top: -6px;
 }
 
-.nav-item.dropdown:hover .dropdown-menu {
-  display: block;
-}
-
+.nav-item.dropdown:hover .dropdown-menu,
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
 }
 
-/* Custom Button */
 .custom-button {
   width: 170px;
   height: 50px;
@@ -410,14 +389,11 @@ h1 {
   transition: 200ms;
 }
 
-.custom-button, .custom-button span {
-  transition: 200ms;
-}
-
 .custom-button .custom-text {
   transform: translateX(35px);
   color: white;
   font-weight: bold;
+  transition: 200ms;
 }
 
 .custom-button .custom-icon {
@@ -429,6 +405,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: 200ms;
 }
 
 .custom-button svg {
@@ -458,7 +435,6 @@ h1 {
   transform: scale(0.8);
 }
 
-/* Checkbox Wrapper */
 .checkbox-wrapper-4 * {
   box-sizing: border-box;
   color: white;
@@ -563,7 +539,6 @@ h1 {
   color: black;
 }
 
-/* Product Card */
 .product-card {
   position: relative;
   width: 100%;
@@ -691,7 +666,6 @@ h1 {
   text-align: center;
 }
 
-/* Delete Button */
 .button {
   width: 50px;
   height: 50px;
@@ -762,7 +736,6 @@ h1 {
   color: #000;
 }
 
-/* Styled Checkout Button */
 .styled-checkout-button {
   border-radius: 8px;
   border: 1px solid #fff;
@@ -820,7 +793,6 @@ h1 {
   to { left: 100%; }
 }
 
-/* CTA */
 .cta {
   border: none;
   background: none;
@@ -872,7 +844,6 @@ h1 {
   transform-origin: bottom left;
 }
 
-/* Custom Btn */
 .custom-btn {
   padding: 17px 40px;
   border-radius: 10px;
@@ -897,7 +868,6 @@ h1 {
   transition: 200ms;
 }
 
-/* Cart Icon */
 .cart-icon {
   position: relative;
   display: inline-flex;
@@ -924,7 +894,6 @@ h1 {
   background-color: rgb(15, 11, 11);
 }
 
-/* Fade In */
 .fade-in {
   opacity: 0;
   animation: fadeIn 1s ease-in-out forwards;
@@ -935,7 +904,6 @@ h1 {
   to { opacity: 1; }
 }
 
-/* Styled Button */
 .styled-button {
   background: transparent;
   position: relative;
@@ -996,7 +964,6 @@ h1 {
   flex-wrap: nowrap;
 }
 
-/* Tooltips (Elgy) */
 .elgy-tooltip-container {
   background: linear-gradient(138deg, rgba(3, 169, 244, 1) 15%, rgba(63, 180, 233, 1) 65%);
   position: fixed;
@@ -1029,7 +996,6 @@ h1 {
   transition: all 0.6s;
 }
 
-/* Tooltip Children Styles (Unified for brevity) */
 .elgy-tooltip1, .elgy-tooltip2, .elgy-tooltip3, .elgy-tooltip4, 
 .elgy-tooltip5, .elgy-tooltip6, .elgy-tooltip7, .elgy-tooltip8 {
   position: absolute;
@@ -1046,7 +1012,6 @@ h1 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Individual Tooltip Colors & Positions on Hover */
 .elgy-tooltip1 { fill: #03a9f4; }
 .elgy-tooltip-container:hover .elgy-tooltip1 { top: 150%; opacity: 1; visibility: visible; transform: translate(-50%, -5px); display: flex; }
 .elgy-tooltip-container:hover .elgy-tooltip1:hover { background: #03a9f4; fill: #fff; }
@@ -1101,7 +1066,6 @@ h1 {
   color: #03a9f4;
 }
 
-/* Button Container (Li-Deheng) */
 .btn-conteiner {
   display: flex;
   justify-content: center;
@@ -1164,7 +1128,6 @@ h1 {
   50% { fill: var(--color-background); }
 }
 
-/* Btn (purple) */
 .Btn {
   position: relative;
   display: flex;
@@ -1210,7 +1173,6 @@ h1 {
   box-shadow: 2px 2px 0px rgb(140, 32, 212);
 }
 
-/* Gradient Btn */
 .gradient-btn {
   font-family: inherit;
   font-size: 18px;
@@ -1283,11 +1245,9 @@ h1 {
   margin-top: 1rem;
   padding: 1rem;
   background-color: black;
-  /* display: contents; อาจมีปัญหากับ Layout แนะนำให้ใช้ block หรือ flex ถ้ามีปัญหาการแสดงผล */
   display: contents; 
 }
 
-/* Custom Fade Button */
 .custom-fade-button {
   padding: 1em 2em;
   border: none;

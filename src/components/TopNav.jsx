@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaSearch, FaUserCircle } from 'react-icons/fa';
-import SidebarHome from './SidebarHome';
 import './TopNav.css';
 
 const TopNav = () => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -13,7 +11,7 @@ const TopNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ตรวจสอบ login status
+  // --- ตรวจสอบ login status ---
   useEffect(() => {
     const checkAuth = () => {
       const user = sessionStorage.getItem('user') || localStorage.getItem('user');
@@ -27,8 +25,10 @@ const TopNav = () => {
       }
     };
     checkAuth();
+
     // Listen for storage changes
     window.addEventListener('storage', checkAuth);
+    
     // Close profile menu when clicking outside
     const handleClickOutside = (e) => {
       if (!e.target.closest('.profile-dropdown-container')) {
@@ -36,14 +36,14 @@ const TopNav = () => {
       }
     };
     document.addEventListener('click', handleClickOutside);
+    
     return () => {
       window.removeEventListener('storage', checkAuth);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [location]); // Re-check when location changes
+  }, [location]); 
 
   const handleLogout = () => {
-    // Clear all auth data
     sessionStorage.clear();
     localStorage.clear();
     setIsLoggedIn(false);
@@ -62,13 +62,9 @@ const TopNav = () => {
     <>
       <nav className="topnav">
         <div className="topnav-container">
-          {/* LEFT SECTION */}
+          
+          {/* --- LEFT SECTION: Search --- */}
           <div className="nav-left">
-            {/* เรียกใช้ SidebarHome (ปุ่ม Hamburger จะแสดงตรงนี้) */}
-            <div className="sidebar-trigger-wrapper">
-              <SidebarHome open={isSidebarOpen} setOpen={setSidebarOpen} />
-            </div>
-
             <form onSubmit={handleSearchSubmit} className="search-form">
               <div className="search-input-wrapper">
                 <FaSearch className="search-icon" />
@@ -83,14 +79,26 @@ const TopNav = () => {
             </form>
           </div>
 
-          {/* CENTER SECTION */}
+          {/* --- CENTER SECTION: Main Menu --- */}
           <div className="nav-center">
             <ul className="main-menu">
-              <li><Link to="/" className={location.pathname === '/' ? 'active' : ''}>หน้าหลัก</Link></li>
+              <li>
+                <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+                  หน้าหลัก
+                </Link>
+              </li>
+              
               <li className="dropdown">
-                <span className={location.pathname.startsWith('/competition') ? 'active' : ''}>
-                  กิจกรรมการประกวด
-                </span>
+                {/* คลิกที่ตัวหนังสือเพื่อไปหน้า All Competitions */}
+                <Link to="/all-competitions" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <span className={
+                    location.pathname === '/all-competitions' || location.pathname.startsWith('/competition/') 
+                    ? 'active' 
+                    : ''
+                  }>
+                    กิจกรรมการประกวด
+                  </span>
+                </Link>
                 <div className="dropdown-content">
                   <Link to="/competition/primary">ระดับประถม</Link>
                   <Link to="/competition/secondary">ระดับมัธยม</Link>
@@ -98,12 +106,21 @@ const TopNav = () => {
                   <Link to="/competition/general">ระดับประชาชนทั่วไป</Link>
                 </div>
               </li>
-              <li><Link to="/results" className={location.pathname === '/results' ? 'active' : ''}>ประกาศผล</Link></li>
-              <li><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>เกี่ยวกับเรา</Link></li>
+
+              <li>
+                <Link to="/results" className={location.pathname === '/results' ? 'active' : ''}>
+                  ประกาศผล
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>
+                  เกี่ยวกับเรา
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* RIGHT SECTION */}
+          {/* --- RIGHT SECTION: Profile / Login --- */}
           <div className="nav-right">
             {isLoggedIn ? (
               <div className="profile-dropdown-container">
@@ -123,8 +140,14 @@ const TopNav = () => {
                       <div className="menu-item" onClick={() => { navigate('/profile'); setIsProfileMenuOpen(false); }}>
                         ดูโปรไฟล์
                       </div>
+                      <div className="menu-item" onClick={() => { navigate('/my-organizations'); setIsProfileMenuOpen(false); }}>
+                        Organizations ของฉัน
+                      </div>
                       <div className="menu-item" onClick={() => { navigate('/my-works'); setIsProfileMenuOpen(false); }}>
                         ผลงานที่ส่งประกวด
+                      </div>
+                      <div className="menu-item" onClick={() => { navigate('/judge/contests'); setIsProfileMenuOpen(false); }}>
+                        งานกรรมการ
                       </div>
                       <div className="menu-item" onClick={() => { navigate('/help'); setIsProfileMenuOpen(false); }}>
                         ช่วยเหลือ/คู่มือ
@@ -143,7 +166,8 @@ const TopNav = () => {
           </div>
         </div>
       </nav>
-      {/* ดัน Content ลงมาไม่ให้โดน Navbar ทับ (Optional) */}
+      
+      {/* Spacer เพื่อกัน Content ด้านล่างไหลขึ้นมาทับกับ Navbar */}
       <div style={{ height: '70px' }}></div> 
     </>
   );

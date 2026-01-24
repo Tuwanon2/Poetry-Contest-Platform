@@ -477,7 +477,8 @@ export default function SubmitCompetition() {
       </div>
 
       <div className="layout-container">
-        <div className="sidebar">
+        {/* แก้ไขตรงนี้: เพิ่ม style={{ borderRight: 'none' }} เพื่อลบเส้นขอบ */}
+        <div className="sidebar" style={{ borderRight: 'none' }}>
           <img 
             src={posterUrl} 
             alt="โปสเตอร์การแข่งขัน" 
@@ -677,8 +678,6 @@ export default function SubmitCompetition() {
 
                 {(() => {
                   const poemTypes = getAvailablePoemTypes();
-                  
-                
                   
                   if (poemTypes.length === 1) {
                     return (

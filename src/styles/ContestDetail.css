@@ -1,0 +1,290 @@
+/* Import ฟอนต์ Sarabun */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+/* --- Global Layout --- */
+.contest-page-wrapper {
+  background-color: #f5f7fa; /* พื้นหลังสีเทาอ่อน สบายตา */
+  min-height: 100vh;
+  font-family: 'Sarabun', sans-serif;
+  color: #333;
+}
+
+.contest-container {
+  display: flex;
+  flex-direction: row;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  min-height: 100vh;
+}
+
+/* --- Main Content (Left) --- */
+.main-content {
+  flex: 3;
+  padding: 0 0 100px 0; /* เว้นที่ข้างล่างเผื่อปุ่มลอย */
+  min-width: 0;
+  border-right: 1px solid #f0f0f0;
+}
+
+.content-padding {
+  padding: 30px;
+}
+
+/* Header Section */
+.contest-title {
+  color: #00796b; /* สีเขียวตาม CI เดิม หรือเปลี่ยนเป็น #70136C ตามชอบ */
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.contest-date-status {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 24px;
+}
+
+.status-closed {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+/* Countdown Timer */
+.timer-container {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 20px 0;
+  margin-bottom: 30px;
+  background-color: #fafafa;
+  border-radius: 8px;
+}
+
+.timer-box {
+  text-align: center;
+  flex: 1;
+  position: relative;
+}
+
+/* เส้นคั่นระหว่างเวลา */
+.timer-box:not(:last-child)::after {
+  content: ":";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-55%);
+  font-size: 24px;
+  color: #ccc;
+  font-weight: 300;
+}
+
+.timer-number {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  color: #e65100; /* สีส้ม */
+  line-height: 1;
+}
+
+.timer-label {
+  font-size: 13px;
+  color: #777;
+  margin-top: 5px;
+}
+
+.timer-expired-banner {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 20px;
+  border: 1px solid #ffcdd2;
+}
+
+/* Poster */
+.poster-wrapper {
+  width: 100%;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contest-poster {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  display: block;
+}
+
+.no-poster {
+  height: 250px;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* Sections (Details, Rules, etc.) */
+.info-section {
+  margin-bottom: 35px;
+}
+
+.section-header {
+  font-size: 20px;
+  color: #00695c;
+  margin-bottom: 15px;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0f2f1;
+}
+
+.section-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.sub-header {
+  font-size: 17px;
+  color: #00796b;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.styled-list {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.styled-list li {
+  margin-bottom: 8px;
+  color: #444;
+}
+
+/* --- Sidebar (Right) --- */
+.sidebar {
+  flex: 1;
+  min-width: 280px;
+  background-color: #fafbfc;
+  padding: 30px 20px;
+}
+
+.sidebar-card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  position: sticky;
+  top: 20px;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  color: #222;
+  font-weight: 700;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.qualification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.qualification-list li {
+  color: #00796b;
+  font-size: 15px;
+  padding: 8px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 1px dashed #eee;
+}
+
+.qualification-list li:last-child {
+  border-bottom: none;
+}
+
+/* --- Floating Button --- */
+.floating-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 0;
+  /* ไล่สีจางๆ ให้ดูเนียน */
+  background: linear-gradient(to top, rgba(255,255,255,1) 40%, rgba(255,255,255,0) 100%);
+  display: flex;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.action-btn {
+  pointer-events: auto;
+  min-width: 280px;
+  padding: 14px 40px;
+  border-radius: 50px;
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #70136C 0%, #a01c9a 100%); /* ธีมสีม่วง */
+  box-shadow: 0 6px 20px rgba(112, 19, 108, 0.4);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(112, 19, 108, 0.5);
+}
+
+.action-btn:disabled {
+  background: #bdbdbd;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Loading & Error */
+.center-message {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* --- Mobile Responsive --- */
+@media (max-width: 900px) {
+  .contest-container {
+    flex-direction: column;
+  }
+  
+  .main-content {
+    border-right: none;
+  }
+  
+  .sidebar {
+    border-top: 1px solid #eee;
+    background-color: #fff;
+  }
+  
+  .timer-number {
+    font-size: 24px;
+  }
+}

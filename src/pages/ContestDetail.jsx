@@ -26,10 +26,6 @@ const ContestDetail = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests/${id}`);
-        console.log('🔍 Contest Detail API Response:', response.data);
-        console.log('📋 Available keys:', Object.keys(response.data));
-        console.log('📅 Start date field:', response.data.start_date, response.data.StartDate);
-        console.log('📅 End date field:', response.data.end_date, response.data.EndDate);
         setContest(response.data);
         setError(null);
       } catch (err) {
@@ -58,51 +54,26 @@ const ContestDetail = () => {
   };
 
   const calculateTimeRemaining = (endDate) => {
-    if (!endDate) {
-      console.log('⚠️ No endDate provided');
-      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false };
-    }
+    if (!endDate) return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false };
     
     const now = new Date();
-    // แปลง endDate ให้เป็น Date object
-    let end = new Date(endDate);
+    const end = new Date(endDate);
     
-    // ตรวจสอบว่า Date object ถูกต้องหรือไม่
-    if (isNaN(end.getTime())) {
-      console.error('❌ Invalid date:', endDate);
-      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false };
-    }
-    
-    console.log('⏰ Calculating time:', { now: now.toISOString(), end: end.toISOString() });
+    if (isNaN(end.getTime())) return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false };
     
     const diff = end - now;
     
     if (diff <= 0) {
-      console.log('⏰ Contest expired');
       return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
     }
     
-    const result = {
+    return {
       days: Math.floor(diff / (1000 * 60 * 60 * 24)),
       hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
       minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
       seconds: Math.floor((diff % (1000 * 60)) / 1000),
       isExpired: false,
     };
-    
-    console.log('⏰ Time remaining:', result);
-    return result;
-  };
-
-  const getContestStatus = () => {
-    if (!contest) return 'loading';
-    const now = new Date();
-    const startDate = new Date(contest.start_date || contest.StartDate);
-    const endDate = new Date(contest.end_date || contest.EndDate);
-    
-    if (now < startDate) return 'upcoming';
-    if (now > endDate) return 'closed';
-    return 'open';
   };
 
   const [timeRemaining, setTimeRemaining] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: false });
@@ -110,32 +81,16 @@ const ContestDetail = () => {
   useEffect(() => {
     if (contest && (contest.end_date || contest.EndDate)) {
       const endDate = contest.end_date || contest.EndDate;
-      
-      console.log('📅 Contest data:', {
-        title: contest.title || contest.Title,
-        start_date: contest.start_date || contest.StartDate,
-        end_date: endDate,
-        full_contest: contest
-      });
-      
-      // คำนวณทันที
       const initialTime = calculateTimeRemaining(endDate);
       setTimeRemaining(initialTime);
       
-      // ตั้ง interval เพื่ออัพเดตทุกวินาที
       const interval = setInterval(() => {
         const newTime = calculateTimeRemaining(endDate);
         setTimeRemaining(newTime);
-        
-        // ถ้าหมดเวลาแล้ว ให้หยุด interval
-        if (newTime.isExpired) {
-          clearInterval(interval);
-        }
+        if (newTime.isExpired) clearInterval(interval);
       }, 1000);
       
       return () => clearInterval(interval);
-    } else {
-      console.warn('⚠️ No contest or end_date available');
     }
   }, [contest]);
 
@@ -162,9 +117,9 @@ const ContestDetail = () => {
   }
 
   const levels = contest.levels || [];
-  const levelNames = levels.map(l => l.level_name || l.name || '').filter(Boolean).join(', ') || 'ทุกระดับ';
-  
-  // จัดการ poster URL
+  // สร้างรายการระดับชั้นสำหรับการแสดงผล
+  const levelList = levels.map(l => l.level_name || l.name || '').filter(Boolean);
+
   let posterUrl = null;
   if (contest.poster_url || contest.PosterURL) {
     const posterPath = contest.poster_url || contest.PosterURL;
@@ -174,208 +129,184 @@ const ContestDetail = () => {
       posterUrl = `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
     }
   }
-  
+
   return (
     <>
       <TopNav />
-      <div style={{ width: '100vw', maxWidth: '100vw', margin: 0, background: '#fff', borderRadius: 0, boxShadow: 'none', padding: 0, display: 'flex', flexDirection: 'row', minHeight: '100vh', fontSize: '15px' }}>
-        {/* Main Content */}
-        <div style={{ flex: 2, minWidth: 0, padding: '0 0 18px 0' }}>
-          <div style={{ width: '100%', background: '#fff', borderRadius: 0, boxShadow: 'none', padding: 0 }}>
-            <div style={{ padding: '18px 18px 0 18px' }}>
-              <div style={{ color: "#00796b", fontWeight: 400, fontSize: 24, marginBottom: 10, textAlign: 'left', lineHeight: 1.2, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontWeight: 400, fontSize: 24 }}>
-                  {contest.title || contest.Title}
-                </span>
-              </div>
-              <div style={{ textAlign: 'left', fontSize: 15, color: '#222', margin: '14px 0 6px 0', fontWeight: 400 }}>
-                {timeRemaining.isExpired ? (
-                  <span style={{ color: '#d32f2f', fontWeight: 600 }}>
-                    หมดเวลารับสมัครแล้ว (ปิดรับเมื่อ {formatDate(contest.end_date || contest.EndDate)})
-                  </span>
-                ) : (
-                  <>
-                    เปิดรับผลงานถึงวันที่ {formatDate(contest.end_date || contest.EndDate)}
-                  </>
-                )}
-              </div>
-              {!timeRemaining.isExpired && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e0e0e0', borderTop: '1px solid #e0e0e0', padding: '7px 0 5px 0', marginBottom: 6 }}>
-                  {[String(timeRemaining.days).padStart(2, '0'), String(timeRemaining.hours).padStart(2, '0'), String(timeRemaining.minutes).padStart(2, '0'), String(timeRemaining.seconds).padStart(2, '0')].map((num, idx) => (
-                    <div key={idx} style={{ flex: 1, textAlign: 'center' }}>
-                      <div style={{ color: timeRemaining.days === 0 && timeRemaining.hours < 24 ? '#d32f2f' : '#d84315', fontWeight: 700, fontSize: 18, letterSpacing: 1 }}>{num}</div>
-                      <div style={{ color: '#444', fontSize: 11, marginTop: 1 }}>
-                        {['วัน', 'ชั่วโมง', 'นาที', 'วินาที'][idx]}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {timeRemaining.isExpired && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '1px solid #e0e0e0', borderTop: '1px solid #e0e0e0', padding: '12px 0', marginBottom: 6, background: '#ffebee' }}>
-                  <div style={{ color: '#d32f2f', fontWeight: 600, fontSize: 15 }}>
-                    ⏰ การประกวดนี้ปิดรับสมัครแล้ว
-                  </div>
-                </div>
-              )}
+      {/* Container หลัก จัด Layout เหมือนเว็บทั่วไป */}
+      <div style={{ width: '100vw', maxWidth: '100vw', background: '#fff', minHeight: '100vh', display: 'flex', justifyContent: 'center', backgroundColor: '#f9f9f9' }}>
+        
+        <div style={{ width: '100%', maxWidth: '1200px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '20px', padding: '20px', boxSizing: 'border-box' }}>
+          
+          {/* --- Main Content (Left Side) --- */}
+          <div style={{ flex: 3, background: '#fff', padding: '20px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            
+            {/* Header: Title */}
+            <h1 style={{ color: "#00796b", fontWeight: 500, fontSize: 28, marginBottom: 15, marginTop: 0 }}>
+              {contest.title || contest.Title}
+            </h1>
+
+            {/* Deadline Text */}
+            <div style={{ fontSize: 16, color: '#333', marginBottom: 20 }}>
+               {timeRemaining.isExpired ? (
+                  <span style={{ color: '#d32f2f' }}>ปิดรับผลงานแล้ว (สิ้นสุดเมื่อ {formatDate(contest.end_date || contest.EndDate)})</span>
+               ) : (
+                  <span>เปิดรับผลงานถึงวันที่ {formatDate(contest.end_date || contest.EndDate)}</span>
+               )}
             </div>
-            {posterUrl ? (
-              <img 
-                src={posterUrl} 
-                alt="โปสเตอร์การประกวด" 
-                style={{ width: "100%", maxHeight: 320, objectFit: "contain", borderRadius: 0, margin: 0, background: '#e0f2f1', display: 'block' }}
-                onError={(e) => { 
-                  console.log('❌ Poster failed to load:', e.target.src);
-                  e.target.style.display = 'none';
-                }}
-              />
-            ) : (
-              <div style={{ width: "100%", height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', color: '#999', fontSize: 14 }}>
-                ไม่พบรูปโปสเตอร์
+
+            {/* Countdown Timer Bar (ตามรูปที่ 1) */}
+            {!timeRemaining.isExpired && (
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-around', 
+                borderTop: '1px solid #eee', 
+                borderBottom: '1px solid #eee', 
+                padding: '15px 0', 
+                marginBottom: '30px' 
+              }}>
+                {[
+                  { val: timeRemaining.days, label: 'วัน' },
+                  { val: timeRemaining.hours, label: 'ชั่วโมง' },
+                  { val: timeRemaining.minutes, label: 'นาที' },
+                  { val: timeRemaining.seconds, label: 'วินาที' }
+                ].map((item, idx) => (
+                  <div key={idx} style={{ textAlign: 'center', flex: 1 }}>
+                    <div style={{ color: '#e65100', fontSize: '24px', fontWeight: 'bold' }}>
+                      {String(item.val).padStart(2, '0')}
+                    </div>
+                    <div style={{ color: '#666', fontSize: '14px' }}>{item.label}</div>
+                  </div>
+                ))}
               </div>
             )}
-            <div style={{ padding: '18px' }}>
-              {(contest.purpose || contest.Purpose) && (
-                <section style={{ marginBottom: 24 }}>
-                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>แนวคิด/วัตถุประสงค์</h2>
-                  <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
-                    {contest.purpose || contest.Purpose}
-                  </div>
-                </section>
-              )}
+
+            {/* Poster Section (ตามรูปที่ 1) */}
+            <div style={{ width: '100%', minHeight: '300px', background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '30px', borderRadius: '4px' }}>
+              {posterUrl ? (
+                <img 
+                  src={posterUrl} 
+                  alt="Poster" 
+                  style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain' }}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex'; // Show fallback text
+                  }}
+                />
+              ) : null}
+              {/* Fallback Text (แสดงเมื่อไม่มีรูป หรือรูปเสีย) */}
+              <div style={{ display: posterUrl ? 'none' : 'flex', color: '#9e9e9e', fontSize: '18px' }}>
+                ไม่พบรูปโปสเตอร์
+              </div>
+            </div>
+
+            {/* เนื้อหา: รายละเอียด */}
+            {(contest.description || contest.Description) && (
+              <section style={{ marginBottom: 30 }}>
+                <h2 style={{ color: "#00796b", fontSize: 18, borderBottom: '1px solid #eee', paddingBottom: 10 }}>รายละเอียด</h2>
+                <div style={{ fontSize: 15, lineHeight: 1.6, color: '#333', whiteSpace: 'pre-wrap' }}>
+                  {contest.description || contest.Description}
+                </div>
+              </section>
+            )}
+
+            {/* เนื้อหา: กติกาการประกวด */}
+            {levels.some(l => l.rules) && (
+              <section style={{ marginBottom: 30 }}>
+                <h2 style={{ color: "#00796b", fontSize: 18, borderBottom: '1px solid #eee', paddingBottom: 10 }}>กติกาการประกวด</h2>
+                {levels.map((level, idx) => (
+                  level.rules && (
+                    <div key={idx} style={{ marginBottom: 15 }}>
+                      {levels.length > 1 && <h4 style={{ margin: '10px 0', color: '#004d40' }}>{level.level_name || level.name}</h4>}
+                      <div style={{ fontSize: 15, lineHeight: 1.6, color: '#333', whiteSpace: 'pre-wrap' }}>{level.rules}</div>
+                    </div>
+                  )
+                ))}
+              </section>
+            )}
+
+            {/* เนื้อหา: รางวัล */}
+            {levels.some(l => l.prizes) && (
+              <section style={{ marginBottom: 30 }}>
+                <h2 style={{ color: "#00796b", fontSize: 18, borderBottom: '1px solid #eee', paddingBottom: 10 }}>รางวัล</h2>
+                {levels.map((level, idx) => {
+                  if (!level.prizes) return null;
+                  const prizes = typeof level.prizes === 'string' ? JSON.parse(level.prizes) : level.prizes;
+                  return (
+                    <div key={idx} style={{ marginBottom: 15 }}>
+                      {levels.length > 1 && <h4 style={{ margin: '10px 0', color: '#004d40' }}>{level.level_name || level.name}</h4>}
+                      <ul style={{ paddingLeft: 20 }}>
+                        {Array.isArray(prizes) ? (
+                          prizes.map((p, i) => <li key={i} style={{ marginBottom: 5 }}>{p}</li>)
+                        ) : (
+                          <li>{JSON.stringify(prizes)}</li>
+                        )}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </section>
+            )}
+
+          </div>
+
+          {/* --- Sidebar (Right Side - ตามรูปที่ 2) --- */}
+          <div style={{ flex: 1, minWidth: '280px' }}>
+            <div style={{ background: '#fff', padding: '20px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: '20px' }}>
               
-              {(contest.description || contest.Description) && (
-                <section style={{ marginBottom: 24 }}>
-                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>รายละเอียด</h2>
-                  <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
-                    {contest.description || contest.Description}
-                  </div>
-                </section>
-              )}
+              {/* คุณสมบัติผู้สมัคร */}
+              <h3 style={{ fontSize: 18, color: '#333', marginTop: 0, marginBottom: 15 }}>คุณสมบัติผู้สมัคร</h3>
+              <ul style={{ paddingLeft: 20, color: '#00796b', fontWeight: 500, margin: 0 }}>
+                {levelList.length > 0 ? (
+                  levelList.map((name, index) => (
+                    <li key={index} style={{ marginBottom: 8 }}>{name}</li>
+                  ))
+                ) : (
+                  <li>ไม่จำกัดคุณสมบัติ</li>
+                )}
+              </ul>
 
-              {levels.length > 0 && levels.some(l => l.rules) && (
-                <section style={{ marginBottom: 24 }}>
-                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>กติกาการประกวด</h2>
-                  {levels.map((level, idx) => (
-                    level.rules && (
-                      <div key={idx} style={{ marginBottom: 12 }}>
-                        {levels.length > 1 && (
-                          <h3 style={{ color: "#00796b", fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
-                            {level.level_name || level.name}
-                          </h3>
-                        )}
-                        <div style={{ paddingLeft: 16, color: "#333", fontSize: 13, whiteSpace: 'pre-wrap' }}>
-                          {level.rules}
-                        </div>
-                      </div>
-                    )
-                  ))}
-                </section>
-              )}
-
-              {levels.length > 0 && levels.some(l => l.prizes) && (
-                <section style={{ marginBottom: 24 }}>
-                  <h2 style={{ color: "#00695c", fontSize: 16, marginBottom: 6 }}>รางวัล</h2>
-                  {levels.map((level, idx) => {
-                    if (!level.prizes) return null;
-                    const prizes = typeof level.prizes === 'string' ? JSON.parse(level.prizes) : level.prizes;
-                    return (
-                      <div key={idx} style={{ marginBottom: 12 }}>
-                        {levels.length > 1 && (
-                          <h3 style={{ color: "#00796b", fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
-                            {level.level_name || level.name}
-                          </h3>
-                        )}
-                        <ul style={{ paddingLeft: 16, color: "#333", fontSize: 13 }}>
-                          {Array.isArray(prizes) ? (
-                            prizes.map((prize, i) => (
-                              <li key={i}>{prize}</li>
-                            ))
-                          ) : (
-                            <li>{JSON.stringify(prizes)}</li>
-                          )}
-                        </ul>
-                      </div>
-                    );
-                  })}
-                </section>
-              )}
             </div>
           </div>
-        </div>
-        {/* Sidebar */}
-        <div style={{ flex: 1, minWidth: 220, maxWidth: 280, borderLeft: '1px solid #eee', background: '#fafbfc', padding: '18px 12px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div>
-            <h2 style={{ fontSize: 15, color: '#222', fontWeight: 700, marginBottom: 8 }}>คุณสมบัติผู้สมัคร</h2>
-            <ul style={{ color: '#009688', fontSize: 12, margin: 0, paddingLeft: 12, fontWeight: 500 }}>
-              {levelNames ? (
-                <li>{levelNames}</li>
-              ) : (
-                <li>ทุกคนสามารถสมัครได้</li>
-              )}
-            </ul>
-          </div>
-        </div>
 
+        </div>
       </div>
 
-      {/* --- Sticky Footer Button (Transparent Floating) --- */}
+      {/* --- Sticky Footer Button --- */}
       <div 
         style={{
             position: 'fixed',
             bottom: 0,
             left: 0,
             width: '100%',
-            background: 'transparent', 
-            boxShadow: 'none',
-            border: 'none',
-            backdropFilter: 'none',
-            padding: isMobile ? '15px 0' : '20px 0',
-            zIndex: 1000,
+            padding: '15px 0',
+            background: 'linear-gradient(to top, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center',
-            pointerEvents: 'none' // Click-through empty space
+            pointerEvents: 'none', // Click-through background area
+            zIndex: 1000
         }}
       >
         <button
             disabled={timeRemaining.isExpired}
             style={{
-                pointerEvents: 'auto', // Button is clickable
-                padding: isMobile ? '12px 30px' : '14px 45px',
-                background: timeRemaining.isExpired ? '#ccc' : 'linear-gradient(45deg, #70136C, #8e24aa)',
+                pointerEvents: 'auto',
+                padding: '12px 50px',
+                background: timeRemaining.isExpired ? '#9e9e9e' : 'linear-gradient(45deg, #70136C, #8e24aa)',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 50,
-                fontSize: isMobile ? '16px' : '18px',
-                fontWeight: 700,
-                letterSpacing: '0.5px',
+                borderRadius: '50px',
+                fontSize: '18px',
+                fontWeight: 'bold',
                 cursor: timeRemaining.isExpired ? 'not-allowed' : 'pointer',
-                boxShadow: timeRemaining.isExpired ? 'none' : '0 6px 25px rgba(112, 19, 108, 0.4)',
-                transition: 'all 0.25s ease',
-                minWidth: isMobile ? '80%' : '260px',
-                maxWidth: '400px',
-                opacity: timeRemaining.isExpired ? 0.6 : 1,
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'transform 0.2s',
             }}
-            onMouseOver={(e) => { 
-                if (!timeRemaining.isExpired) {
-                  e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'; 
-                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(112, 19, 108, 0.5)'; 
-                }
-            }}
-            onMouseOut={(e) => { 
-                if (!timeRemaining.isExpired) {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)'; 
-                  e.currentTarget.style.boxShadow = '0 6px 25px rgba(112, 19, 108, 0.4)'; 
-                }
-            }}
+            onMouseOver={(e) => !timeRemaining.isExpired && (e.currentTarget.style.transform = 'scale(1.05)')}
+            onMouseOut={(e) => !timeRemaining.isExpired && (e.currentTarget.style.transform = 'scale(1)')}
             onClick={async () => {
-              if (timeRemaining.isExpired) {
-                alert('การประกวดนี้ปิดรับสมัครแล้ว');
-                return;
-              }
+              if (timeRemaining.isExpired) return;
               
-              // 1. เช็ค login
               const user = localStorage.getItem('user') || sessionStorage.getItem('user');
               if (!user) {
                 alert('กรุณาเข้าสู่ระบบก่อนสมัครเข้าประกวด');
@@ -383,42 +314,28 @@ const ContestDetail = () => {
                 return;
               }
               
-              // 2. เช็คว่าเคยส่งการประกวดนี้หรือยัง
               const userId = sessionStorage.getItem('user_id') || localStorage.getItem('user_id');
               if (userId) {
                 try {
                   const response = await axios.get(`${API_BASE_URL}/submissions/user/${userId}`);
                   const submissions = response.data || [];
+                  const existing = submissions.find(sub => sub.competition_id === parseInt(id));
                   
-                  // เช็คว่ามี submission ของการประกวดนี้หรือไม่
-                  const existingSubmission = submissions.find(
-                    sub => sub.competition_id === parseInt(id)
-                  );
-                  
-                  if (existingSubmission) {
-                    const confirmView = window.confirm(
-                      'คุณเคยส่งผลงานเข้าประกวดนี้แล้ว คุณต้องการดูสถานะการส่งประกวดของคุณหรือไม่?'
-                    );
-                    
-                    if (confirmView) {
+                  if (existing) {
+                    if (window.confirm('คุณส่งผลงานแล้ว ต้องการดูสถานะหรือไม่?')) {
                       navigate('/my-works');
                     }
                     return;
                   }
-                } catch (err) {
-                  console.error('Error checking submissions:', err);
-                  // ถ้า error ก็ให้ไปต่อได้
-                }
+                } catch (err) { /* ignore */ }
               }
               
-              // 3. ถ้าไม่เคยส่ง ให้ไปหน้าส่งผลงาน
               navigate(`/submit-competition/${id}`);
             }}
         >
             {timeRemaining.isExpired ? 'ปิดรับสมัครแล้ว' : 'สมัครเข้าประกวดนี้'}
         </button>
       </div>
-
     </>
   );
 };

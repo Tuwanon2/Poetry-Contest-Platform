@@ -11,13 +11,12 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ContestList from './pages/ContestList';
 import ApplicantsList from './pages/ApplicantsList';
 import CreateCompetition from './pages/CreateCompetition';
-import AllCompetitions from './pages/AllCompetitions';
-import UniversityCompetitions from './pages/UniversityCompetitions';
-import GeneralCompetitions from './pages/GeneralCompetitions';
-import PrimaryCompetitions from './pages/PrimaryCompetitions';
-import SecondaryCompetitions from './pages/SecondaryCompetitions';
+import AllCompetitions from './pages/public/AllCompetitions';
+import UniversityCompetitions from './pages/public/UniversityCompetitions';
+import GeneralCompetitions from './pages/public/GeneralCompetitions';
+import PrimaryCompetitions from './pages/public/PrimaryCompetitions';
+import SecondaryCompetitions from './pages/public/SecondaryCompetitions';
 import ContestDetail from './pages/ContestDetail';
-import CompetitionResults from './pages/CompetitionResults';
 import About from './pages/public/About';
 import SearchResults from './pages/SearchResults';
 import MyWorks from './pages/MyWorks';
@@ -43,7 +42,7 @@ function App() {
         <Route path="/judge-work-detail" element={<JudgeWorkDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/results" element={<CompetitionResults />} />
+        <Route path="/all-competitions" element={<AllCompetitions />} />
         <Route path="/about" element={<About />} />
         <Route path="/my-works" element={<MyWorks />} />
         <Route path="/submission/:submissionId" element={<SubmissionDetail />} />
