@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS submissions (
     name VARCHAR(200),
     email VARCHAR(200),
     phone VARCHAR(50),
+    level_id INTEGER REFERENCES levels(level_id) ON DELETE SET NULL,
     level_name VARCHAR(100),
     document TEXT,
     title VARCHAR(255),
@@ -167,6 +168,25 @@ CREATE TABLE IF NOT EXISTS submission_scores (
     scored_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(judge_id, submission_id)
 );
+
+-- activity_logs: บันทึกกิจกรรมต่างๆ ในระบบ
+CREATE TABLE IF NOT EXISTS activity_logs (
+    log_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
+    user_type VARCHAR(50), -- 'admin', 'organizer', 'judge', 'user', 'system'
+    user_name VARCHAR(255),
+    action TEXT NOT NULL, -- คำอธิบายการกระทำ เช่น 'สร้างการประกวด', 'ส่งผลงาน', 'ให้คะแนน'
+    entity_type VARCHAR(50), -- 'competition', 'submission', 'user', 'organization'
+    entity_id INTEGER, -- ID ของสิ่งที่ถูกกระทำ
+    ip_address VARCHAR(45),
+    details JSONB, -- ข้อมูลเพิ่มเติม
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_activity_logs_user_id ON activity_logs(user_id);
+CREATE INDEX idx_activity_logs_created_at ON activity_logs(created_at DESC);
+CREATE INDEX idx_activity_logs_user_type ON activity_logs(user_type);
+
 
 -- Trigger function to set all permissions to TRUE for creators
 CREATE OR REPLACE FUNCTION set_creator_permissions()
