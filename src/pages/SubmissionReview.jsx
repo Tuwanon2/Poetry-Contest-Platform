@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
-import SidebarHome from '../components/SidebarHome';
+
 import '../styles/SubmissionReview.css';
 
 const SubmissionReview = () => {
@@ -60,7 +60,6 @@ const SubmissionReview = () => {
     return (
       <div className="submission-review-layout">
         <TopNav />
-        <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
         <div className="submission-review-container">
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#666' }}>
             กำลังโหลดข้อมูล...
@@ -74,7 +73,6 @@ const SubmissionReview = () => {
     return (
       <div className="submission-review-layout">
         <TopNav />
-        <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
         <div className="submission-review-container">
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#e74c3c' }}>
             {error || 'ไม่พบข้อมูลผลงาน'}
@@ -87,8 +85,6 @@ const SubmissionReview = () => {
   return (
     <div className="submission-review-layout">
       <TopNav />
-      <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
-      
       <div className="submission-review-container">
         {/* Header */}
         <div className="review-header">

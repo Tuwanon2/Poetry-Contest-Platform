@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-import SidebarHome from '../../components/SidebarHome';
 import TopNav from '../../components/TopNav';
 import ContestFilters from '../../components/ContestFilters';
 import '../../components/ActivitiesList.css';
@@ -13,8 +12,6 @@ const GeneralCompetitions = () => {
   // --- State ---
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // --- Filter States ---
   const [filterStatus, setFilterStatus] = useState('all');
@@ -40,10 +37,8 @@ const GeneralCompetitions = () => {
         });
         
         setContests(generalContests);
-        setError(null);
       } catch (err) {
         console.error('❌ Error fetching contests:', err);
-        setError('ไม่สามารถโหลดข้อมูลการประกวดได้');
       } finally {
         setLoading(false);
       }
@@ -102,11 +97,8 @@ const GeneralCompetitions = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#FFFFFF' }}>
-      {/* Sidebar */}
-      <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
-
       {/* Main Content */}
-      <div style={{ flex: 1, marginLeft: sidebarOpen ? 240 : 0, transition: '0.3s' }}>
+      <div style={{ flex: 1, transition: '0.3s' }}>
         <TopNav />
 
         <div className="activities-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
@@ -135,8 +127,6 @@ const GeneralCompetitions = () => {
           {/* Grid Layout */}
           {loading ? (
             <div className="text-center mt-5" style={{fontFamily:'Kanit'}}>กำลังโหลดข้อมูล...</div>
-          ) : error ? (
-            <div className="text-center mt-5 text-danger" style={{fontFamily:'Kanit'}}>{error}</div>
           ) : (
             <div style={{ 
   display: 'grid', 

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 import axios from 'axios';
 import HomeAdminButton from '../components/HomeAdminButton';
-import SidebarHome from '../components/SidebarHome';
 import TopNav from '../components/TopNav';
 // import TopMenu from '../components/TopMenu';
 import BannerCarousel from '../components/BannerCarousel';
@@ -11,7 +10,6 @@ import ActivitiesList from '../components/ActivitiesList';
 import { useLocation } from 'react-router-dom';
 
 const Home = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -96,12 +94,9 @@ const Home = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
-
       <div
         style={{
           flex: 1,
-          marginLeft: sidebarOpen ? 240 : 0,
           minWidth: 0,
           transition: 'margin-left 0.25s cubic-bezier(.4,0,.2,1)',
         }}

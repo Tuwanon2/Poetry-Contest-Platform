@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
-import SidebarHome from '../components/SidebarHome';
+
 import '../styles/MyOrganizations.css';
 
 const MyOrganizations = () => {
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [organizations, setOrganizations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -108,11 +107,8 @@ const MyOrganizations = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
-      
       <div style={{
         flex: 1,
-        marginLeft: sidebarOpen ? 240 : 0,
         minWidth: 0,
         transition: 'margin-left 0.25s cubic-bezier(.4,0,.2,1)',
       }}>

@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
-import SidebarHome from '../../components/SidebarHome';
 import TopNav from '../../components/TopNav';
-import '../../styles/About.css';
+import '../../components/ActivitiesList.css';
 
 const About = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
     <div className="about-layout">
-      <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
-
       <div
         className="about-main"
-        style={{ marginLeft: sidebarOpen ? 240 : 0 }}
       >
         <TopNav />
 

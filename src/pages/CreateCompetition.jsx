@@ -1,7 +1,7 @@
 import TopNav from "../components/TopNav";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers } from "react-icons/fa";
+import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers, FaSearch, FaEdit, FaTrash } from "react-icons/fa";
 
 // =========================
 // Level Card Component
@@ -81,36 +81,11 @@ export default function CreateCompetition() {
     };
   }, []);
   
-  // ...existing code...
-  // ประเภทกลอน (เลือกได้หลายข้อ)
-  const poemTypeOptions = [
-    { label: "กลอนแปด", value: "กลอนแปด" },
-    { label: "กาพย์ยานี 11", value: "กาพย์ยานี 11" },
-    { label: "กาพย์ฉบัง 16", value: "กาพย์ฉบัง 16" },
-    { label: "โคลงสี่สุภาพ", value: "โคลงสี่สุภาพ" },
-    { label: "สักวา", value: "สักวา" },
-    { label: "ดอกสร้อย", value: "ดอกสร้อย" },
-    { label: "อินทรวิเชียรฉันท์", value: "อินทรวิเชียรฉันท์" },
-  ];
-  const [levelPoemTypes, setLevelPoemTypes] = useState({});
-  const [contestDescription, setContestDescription] = useState('');
-  const [contestPurpose, setContestPurpose] = useState('');
-      // Modal for adding judge
-      const [showAddJudge, setShowAddJudge] = useState(false);
-      const [judgeForm, setJudgeForm] = useState({ user_id: null, first_name: '', last_name: '', email: '', levels: [] }); // levels = array of level names
-      const [judgeError, setJudgeError] = useState('');
-      const [judgeSearchResults, setJudgeSearchResults] = useState([]);
-      const [showJudgeSearchDropdown, setShowJudgeSearchDropdown] = useState(false);
-      const [editingJudgeIndex, setEditingJudgeIndex] = useState(null);
-    // Judge creation modal state and form (removed old mockup states)
-    const [showCreateJudge, setShowCreateJudge] = useState(false);
-    const [judges, setJudges] = useState([]);
+  // State declarations
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [poster, setPoster] = useState(null);
   const [contestName, setContestName] = useState("");
   const [step, setStep] = useState(1);
-  const [selectedLevels, setSelectedLevels] = useState([]);
-  const [poster, setPoster] = useState(null);
   const [regOpen, setRegOpen] = useState("");
   const [regClose, setRegClose] = useState("");
   const [contestDescription, setContestDescription] = useState('');
@@ -487,69 +462,41 @@ export default function CreateCompetition() {
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <button className="btn-secondary" onClick={() => setStep(3)}>แก้ไขข้อมูล</button>
-                    <button className="btn-primary" onClick={() => alert("บันทึกข้อมูลเรียบร้อย (Demo)")}>ยืนยันสร้างการประกวด</button>
+                    <button className="btn-primary" onClick={async () => {
+                  try {
+                    // build payload from state
+                    const payload = {
+                      title: contestName,
+                      description: contestDescription,
+                      purpose: contestPurpose,
+                      type: selectedLevels.join(', '),
+                      start_date: '',
+                      end_date: '',
+                      status: 'open',
+                      organization_id: organizationId,
+                      registration_start: regOpen || null,
+                      registration_end: regClose || null,
+                      levels: []
+                    };
+                    // construct levels array
+                    payload.levels = selectedLevels.map(level => ({
+                      level,
+                      poem_types: levelPoemTypes[level] || [],
+                      topic: levelTopics[level] || { topicEnabled: false, topicName: '' },
+                      rules: levelDetails[level + '_rules'] || '',
+                      prizes: [levelDetails[level + '_prize1'] || '', levelDetails[level + '_prize2'] || '', levelDetails[level + '_prize3'] || ''].filter(Boolean)
+                    }));
+                    // TODO: Send payload to backend
+                    alert("บันทึกข้อมูลเรียบร้อย (Demo)");
+                  } catch (error) {
+                    console.error('Error:', error);
+                  }
+                }}>ยืนยันสร้างการประกวด</button>
                 </div>
             </div>
           )}
-
-            {/* Action Buttons */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 32, paddingTop: 24, borderTop: '2px solid #eee' }}>
-              <button
-                style={{
-                  padding: '12px 36px',
-                  background: '#fff',
-                  color: '#70136C',
-                  border: '2px solid #70136C',
-                  borderRadius: 999,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                onClick={() => setStep(3)}
-                onMouseEnter={e => e.currentTarget.style.background = '#f6e7f5'}
-                onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-              >
-                ← ย้อนกลับ
-              </button>
-              <button
-                style={{
-                  padding: '12px 48px',
-                  background: '#70136C',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 999,
-                  fontSize: '1.05rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(112,19,108,0.3)',
-                  transition: 'all 0.2s',
-                }}
-                onClick={async () => {
-                                try {
-                                  // build payload from state
-                                  const payload = {
-                                    title: contestName,
-                                    description: contestDescription,
-                                    purpose: contestPurpose,
-                                    type: selectedLevels.join(', '),
-                                    start_date: '',
-                                    end_date: '',
-                                    status: 'open',
-                                    organization_id: organizationId, // เก็บ organization_id
-                                    registration_start: regOpen || null,
-                                    registration_end: regClose || null,
-                                    max_score: maxScore,
-                                    levels: []
-                                  };
-                                  // construct levels array
-                                  payload.levels = selectedLevels.map(level => ({
-                                    level,
-                                    poem_types: levelPoemTypes[level] || [],
-                                    topic: levelTopics[level] || { topicEnabled: false, topicName: '' },
-                                    rules: levelDetails[level + '_rules'] || '',
-                                    prizes: [levelDetails[level + '_prize1'] || '', levelDetails[level + '_prize2'] || '', levelDetails[level + '_prize3'] || ''].filter(Boolean)
-                                  }));
+        </div>
+      </div>
 
       {/* ================= MODALS ================= */}
       

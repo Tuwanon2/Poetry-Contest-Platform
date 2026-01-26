@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import SidebarHome from '../components/SidebarHome';
-import TopNav from '../components/TopNav';
+// เอา import SidebarHome ออกแล้ว
+import TopNav from '../components/TopNav'; 
 
-/* 🔹 ข้อมูลการแข่งขัน */
+/* 🔹 Competition Data */
 const competitions = [
   {
     id: 1,
@@ -26,7 +26,7 @@ const competitions = [
   }
 ];
 
-/* 🔹 ข้อมูลผู้ชนะ */
+/* 🔹 Winner Data */
 const winners = [
   {
     rank: 1,
@@ -52,22 +52,25 @@ const winners = [
 ];
 
 const CompetitionResults = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('นักเรียน');
+  // ลบ state sidebarOpen ออก
   const [selectedCompetition, setSelectedCompetition] = useState(null);
 
   const selectedContest = competitions.find(c => c.id === selectedCompetition);
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#F9FAFB' }}>
-      <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
+      {/* ลบ <SidebarHome /> ออกแล้ว */}
 
-      <div style={{ flex: 1, marginLeft: sidebarOpen ? 240 : 0 }}>
+      <div style={{ 
+        flex: 1, 
+        marginLeft: 0, // ปรับเป็น 0 เพราะไม่มี Sidebar
+        transition: '0.3s' 
+      }}>
         <TopNav />
 
         <div style={{ maxWidth: 1100, margin: '30px auto', padding: '0 24px' }}>
 
-          {/* 🔽 เลือกการแข่งขัน */}
+          {/* 🔽 Select Competition */}
           <h3>เลือกการแข่งขันที่ต้องการดูผล</h3>
 
           <div style={{
@@ -85,14 +88,15 @@ const CompetitionResults = () => {
                   background: '#FFF',
                   borderRadius: 18,
                   overflow: 'hidden',
-                  boxShadow: '0 4px 15px rgba(0,0,0,.08)'
+                  boxShadow: '0 4px 15px rgba(0,0,0,.08)',
+                  border: selectedCompetition === c.id ? '2px solid #70136C' : 'none'
                 }}
               >
                 <img src={c.image} alt={c.name}
                   style={{ width: '100%', height: 160, objectFit: 'cover' }} />
                 <div style={{ padding: 16 }}>
-                  <h4>{c.name}</h4>
-                  <p style={{ fontSize: 13, color: '#666' }}>การแข่งขันสิ้นสุดแล้ว</p>
+                  <h4 style={{ margin: '0 0 8px 0' }}>{c.name}</h4>
+                  <p style={{ fontSize: 13, color: '#666', margin: 0 }}>การแข่งขันสิ้นสุดแล้ว</p>
                 </div>
               </div>
             ))}
@@ -106,52 +110,54 @@ const CompetitionResults = () => {
               borderRadius: 20,
               border: '1px dashed #DDD'
             }}>
-              กรุณาเลือกการแข่งขันเพื่อดูผล
+              กรุณาเลือกการแข่งขันด้านบนเพื่อดูผลรางวัล
             </div>
           )}
 
           {selectedContest && (
             <>
-              {/* รายละเอียดการแข่งขัน */}
-              <img src={selectedContest.image}
-                alt={selectedContest.name}
-                style={{
-                  width: '100%',
-                  height: 360,
-                  objectFit: 'cover',
-                  borderRadius: 24,
-                  marginBottom: 30
-                }} />
-
-              <div style={{ background: '#FFF', padding: 30, borderRadius: 20 }}>
-                <h1 style={{ color: '#70136C' }}>{selectedContest.name}</h1>
+              {/* Competition Details */}
+              <div style={{ background: '#FFF', padding: 30, borderRadius: 20, marginBottom: 40 }}>
+                <h1 style={{ color: '#70136C', marginTop: 0 }}>{selectedContest.name}</h1>
                 <p>{selectedContest.description}</p>
-                <p><b>ผู้จัด:</b> {selectedContest.organizer}</p>
-                <p><b>ระยะเวลา:</b> {selectedContest.date}</p>
-                <p><b>สถานที่:</b> {selectedContest.location}</p>
+                <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginTop: 20, color: '#555' }}>
+                    <span><b>ผู้จัด:</b> {selectedContest.organizer}</span>
+                    <span><b>ระยะเวลา:</b> {selectedContest.date}</span>
+                    <span><b>สถานที่:</b> {selectedContest.location}</span>
+                </div>
               </div>
 
-              {/* 📢 ประกาศผู้ชนะ */}
+              {/* 📢 Winners Announcement */}
               <div style={{
-                marginTop: 50,
                 marginBottom: 30,
                 textAlign: 'center',
                 fontSize: '1.6rem',
                 fontWeight: 800,
                 color: '#70136C'
               }}>
-                ประกาศผลผู้ชนะการแข่งขัน
+                🏆 ประกาศผลผู้ชนะการแข่งขัน
               </div>
 
               {/* Podium */}
               <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3,1fr)',
-                gap: 24
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                gap: 24,
+                flexWrap: 'wrap'
               }}>
-                <WinnerCard winner={winners[1]} />
-                <WinnerCard winner={winners[0]} main />
-                <WinnerCard winner={winners[2]} />
+                {/* 2nd Place */}
+                <div style={{ order: 1 }}>
+                     <WinnerCard winner={winners[1]} />
+                </div>
+                {/* 1st Place */}
+                <div style={{ order: 2, marginBottom: 40 }}>
+                     <WinnerCard winner={winners[0]} main />
+                </div>
+                {/* 3rd Place */}
+                <div style={{ order: 3 }}>
+                     <WinnerCard winner={winners[2]} />
+                </div>
               </div>
             </>
           )}
@@ -161,31 +167,35 @@ const CompetitionResults = () => {
   );
 };
 
-/* 🔹 การ์ดผู้ชนะ */
+/* 🔹 Winner Card Component */
 const WinnerCard = ({ winner, main }) => (
   <div style={{
     background: '#FFF',
     borderRadius: 20,
     padding: 20,
     textAlign: 'center',
+    width: main ? 280 : 240,
     boxShadow: main
       ? '0 15px 35px rgba(112,19,108,.2)'
       : '0 4px 15px rgba(0,0,0,.08)',
-    border: main ? '3px solid #FFD700' : 'none'
+    border: main ? '3px solid #FFD700' : '1px solid #EEE',
+    position: 'relative',
+    top: main ? -20 : 0
   }}>
     <img
       src={winner.image}
       alt={winner.name}
       style={{
-        width: 90,
-        height: 90,
+        width: main ? 120 : 90,
+        height: main ? 120 : 90,
         borderRadius: '50%',
         objectFit: 'cover',
-        marginBottom: 10
+        marginBottom: 15,
+        border: '4px solid #F9FAFB'
       }}
     />
-    <h3>{winner.name}</h3>
-    <div style={{ color: '#70136C', fontWeight: 600 }}>{winner.prize}</div>
+    <h3 style={{ margin: '0 0 5px 0', fontSize: main ? '1.2rem' : '1rem' }}>{winner.name}</h3>
+    <div style={{ color: '#70136C', fontWeight: 700, marginBottom: 5 }}>{winner.prize}</div>
     <div style={{ fontSize: 13, color: '#777' }}>{winner.school}</div>
   </div>
 );

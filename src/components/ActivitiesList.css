@@ -3,11 +3,32 @@
 :root {
   --primary-color: #70136c;
   --secondary-color: #a01b68;
+  --accent-color: #d4558f;
   --text-dark: #2b2b2b;
   --text-gray: #6c757d;
+  --text-light: #999;
   --bg-card: #ffffff;
+  --bg-light: #f8f9fa;
+  --border-color: #e9ecef;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-hover: 0 12px 24px rgba(112, 19, 108, 0.15);
+}
+
+* {
+  font-family: 'Kanit', sans-serif;
+}
+
+/* ===== Page Layout ===== */
+.about-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.about-main {
+  flex: 1;
+  width: 100%;
 }
 
 /* Main Container */
@@ -18,8 +39,44 @@
   padding: 0 20px;
 }
 
+.about-container {
+  max-width: 1280px;
+  margin: 4rem auto;
+  padding: 0 20px;
+}
+
+/* ===== Header Section ===== */
+.about-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, rgba(112, 19, 108, 0.05) 0%, rgba(160, 27, 104, 0.05) 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(112, 19, 108, 0.1);
+}
+
+.about-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.about-header p {
+  font-size: 1.1rem;
+  color: var(--secondary-color);
+  margin: 0;
+  font-weight: 400;
+}
+
 /* Page Header */
-.section-wrapper { margin-bottom: 35px; }
+.section-wrapper { 
+  margin-bottom: 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 .section-title.main-header { 
   font-weight: 700; 
@@ -35,6 +92,137 @@
   border-radius: 2px;
 }
 
+/* ===== Section Box ===== */
+.section-box {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.section-box:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.section-box h2 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-box h2::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  border-radius: 2px;
+}
+
+.section-content {
+  color: var(--text-gray);
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+/* Mission List */
+.mission-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mission-list li {
+  padding: 12px 0 12px 32px;
+  position: relative;
+  color: var(--text-gray);
+  line-height: 1.8;
+}
+
+.mission-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--secondary-color);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* ===== Team Grid ===== */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.team-card {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(112, 19, 108, 0.05) 0%, rgba(160, 27, 104, 0.05) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(112, 19, 108, 0.1);
+  transition: all 0.3s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--secondary-color);
+}
+
+.team-avatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
+}
+
+.team-card h4 {
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.team-card p {
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ===== Contact Box ===== */
+.contact-box {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  padding: 3rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: var(--shadow-hover);
+  margin-top: 3rem;
+}
+
+.contact-box h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.contact-box p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+  opacity: 0.95;
+}
+
 /* === Custom Card Style (Modern Look) === */
 .card-link-wrapper {
   text-decoration: none;
@@ -45,10 +233,10 @@
 
 .custom-card {
   background: var(--bg-card);
-  border-radius: 16px; /* โค้งมนมากขึ้น */
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.03); /* ขอบจางๆ แทบมองไม่เห็น */
-  box-shadow: var(--shadow-sm); /* เงานุ่มๆ */
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   height: 100%;
   display: flex;
@@ -56,7 +244,7 @@
 }
 
 .custom-card:hover {
-  transform: translateY(-6px); /* ลอยขึ้นเมื่อเอาเมาส์วาง */
+  transform: translateY(-6px);
   box-shadow: var(--shadow-hover);
 }
 
@@ -76,7 +264,7 @@
 }
 
 .custom-card:hover .card-img {
-  transform: scale(1.05); /* รูปซูมเข้าเล็กน้อยเมื่อ Hover */
+  transform: scale(1.05);
 }
 
 .no-image-placeholder {
@@ -103,12 +291,12 @@
   letter-spacing: 0.3px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   z-index: 2;
-  backdrop-filter: blur(4px); /* ถ้า Browser รองรับ พื้นหลังจะเบลอสวยๆ */
+  backdrop-filter: blur(4px);
 }
 
 /* Content Section */
 .card-content {
-  padding: 16px 18px; /* เพิ่มพื้นที่หายใจด้านข้าง */
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -131,7 +319,7 @@
 /* Data Rows */
 .card-row {
   display: flex;
-  align-items: center; /* จัดกึ่งกลางแนวตั้ง */
+  align-items: center;
   margin-bottom: 4px;
   font-size: 0.9rem;
 }
@@ -152,7 +340,7 @@
   font-weight: 400;
 }
 
-/* Divider แบบ Modern (เส้นทึบบางๆ) */
+/* Divider แบบ Modern */
 .modern-divider {
   margin: 12px 0 10px 0;
   border: none;
@@ -184,4 +372,40 @@
   font-size: 0.9rem;
   color: var(--secondary-color);
   font-weight: 600;
+}
+
+/* ===== Utility Classes ===== */
+.text-center {
+  text-align: center;
+}
+
+.mt-5 {
+  margin-top: 3rem;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .section-title.main-header {
+    font-size: 1.5rem;
+  }
+
+  .about-header h1 {
+    font-size: 2rem;
+  }
+
+  .section-box {
+    padding: 1.5rem;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-box {
+    padding: 2rem;
+  }
 }

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
-import SidebarHome from '../components/SidebarHome';
+
+// เอา import SidebarHome ออกแล้ว
 import '../styles/CreateOrganization.css';
 
 const CreateOrganization = () => {
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // ลบ state sidebarOpen ออก เพราะไม่ได้ใช้แล้ว
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -63,11 +64,12 @@ const CreateOrganization = () => {
       
       // Upload files first
       const formDataToSend = new FormData();
+      let coverImageUrl = '';
       
       if (formData.coverImage) {
         formDataToSend.append('file', formData.coverImage);
         const coverRes = await axios.post('http://localhost:8080/api/v1/upload', formDataToSend);
-        var coverImageUrl = coverRes.data?.url || coverRes.data?.file_url;
+        coverImageUrl = coverRes.data?.url || coverRes.data?.file_url;
       }
       
       const certFormData = new FormData();
@@ -84,7 +86,7 @@ const CreateOrganization = () => {
         creator_user_id: parseInt(userId)
       };
 
-      const res = await axios.post('http://localhost:8080/api/v1/organizations', orgData);
+      await axios.post('http://localhost:8080/api/v1/organizations', orgData);
       
       // Navigate back to My Organizations page
       alert('สร้าง Organization สำเร็จ! รอการอนุมัติจากผู้ดูแลระบบ');
@@ -99,11 +101,11 @@ const CreateOrganization = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <SidebarHome open={sidebarOpen} setOpen={setSidebarOpen} />
+      {/* ลบ <SidebarHome /> ออกแล้ว */}
       
       <div style={{
         flex: 1,
-        marginLeft: sidebarOpen ? 240 : 0,
+        marginLeft: 0, // ปรับเป็น 0 เพราะไม่มี Sidebar
         minWidth: 0,
         transition: 'margin-left 0.25s cubic-bezier(.4,0,.2,1)',
       }}>
