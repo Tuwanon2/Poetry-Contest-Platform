@@ -332,3 +332,4 @@ const ContestDetail = () => {
 };
 
 export default ContestDetail;
+  

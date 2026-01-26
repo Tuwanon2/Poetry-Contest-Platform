@@ -27,11 +27,11 @@ const UniversityCompetitions = () => {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
         
-        // ✅ กรองเฉพาะ "นักศึกษา / มหาวิทยาลัย / อุดมศึกษา"
+        // ✅ กรองเฉพาะ "มหาวิทยาลัย / อุดมศึกษา"
         const universityContests = (response.data || []).filter(contest => {
           const levels = contest.levels || contest.Levels || [];
           return levels.some(level => 
-            (level.level_name || level.name || '').includes('นักศึกษา') ||
+            (level.level_name || level.name || '').includes('มหาวิทยาลัย') ||
             (level.level_name || level.name || '').includes('มหาวิทยาลัย') ||
             (level.level_name || level.name || '').includes('อุดมศึกษา')
           );
@@ -111,7 +111,7 @@ const UniversityCompetitions = () => {
             marginBottom: '40px' 
           }}>
             <h2 className="section-title main-header" style={{ textAlign: 'center' }}>
-              กิจกรรมสำหรับนักศึกษา
+              การประกวดสำหรับมหาวิทยาลัย
             </h2>
             <div className="section-line thick"></div>
           </div>

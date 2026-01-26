@@ -111,7 +111,7 @@ const GeneralCompetitions = () => {
             marginBottom: '40px' 
           }}>
             <h2 className="section-title main-header" style={{ textAlign: 'center' }}>
-              กิจกรรมสำหรับประชาชนทั่วไป
+              การประกวดสำหรับประชาชนทั่วไป
             </h2>
             <div className="section-line thick"></div>
           </div>

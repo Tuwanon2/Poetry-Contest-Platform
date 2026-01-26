@@ -1,7 +1,10 @@
-import TopNav from "../components/TopNav";
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers, FaSearch, FaEdit, FaTrash } from "react-icons/fa";
+import { useLocation, useNavigate } from "react-router-dom";
+// import axios from "axios"; // เปิดใช้งานเมื่อเชื่อมต่อ API
+import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+import TopNav from "../components/TopNav";
+import InviteJudgeModal from "../components/InviteJudgeModal";
+import styles from "./CreateCompetition.module.css"; 
 
 // =========================
 // Level Card Component
@@ -10,119 +13,119 @@ function LevelSelectCard({ label, icon, selected, onClick }) {
   return (
     <div
       onClick={onClick}
-      style={{
-        flex: 1,
-        border: selected ? "2px solid #70136C" : "2px solid #e5e7eb",
-        borderRadius: 14,
-        padding: "8px 10px",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        background: selected ? "#f6e7f5" : "#fff",
-        transition: "0.2s",
-        minWidth: 0,
-        boxShadow: selected ? "0 2px 8px rgba(112,19,108,0.15)" : "none",
-      }}
+      className={`${styles.levelCard} ${selected ? styles.levelCardSelected : ''}`}
     >
-      <span style={{ fontSize: 26, color: selected ? "#70136C" : "#222" }}>
-        {icon}
-      </span>
-      <span style={{ fontSize: "1.05rem", fontWeight: 500, color: selected ? "#70136C" : "#222" }}>
-        {label}
-      </span>
+      <span className={styles.levelIcon}>{icon}</span>
+      <span className={styles.levelLabel}>{label}</span>
     </div>
   );
 }
 
 // =========================
-// Upload Poster Box
+// Upload Poster Box (Updated with Preview)
 // =========================
-const UploadBox = ({ file, onSelect }) => (
-  <div style={{ border: "2px dashed #cccccc", borderRadius: 12, padding: "40px 20px", textAlign: "center", color: "#555", background: "#fafafa" }}>
-    <h3 style={{ marginBottom: 10 }}>อัปโหลดโปสเตอร์ประกวดได้เลย</h3>
-    <p style={{ marginBottom: 20, color: "#888" }}>เลือกไฟล์รูป jpg หรือ png</p>
-    <input
-      type="file"
-      accept="image/*"
-      id="posterFile"
-      onChange={(e) => onSelect(e.target.files[0])}
-      style={{ display: "none" }}
-    />
-    <button
-      onClick={() => document.getElementById("posterFile").click()}
-      style={{ padding: "10px 24px", borderRadius: 8, background: "#70136C", color: "#fff", border: "none", cursor: "pointer" }}
-    >
-      เลือกไฟล์รูป
-    </button>
-    {file && <div style={{ marginTop: 20, fontSize: "0.95rem" }}>📄 {file.name}</div>}
-  </div>
-);
+const UploadBox = ({ file, onSelect }) => {
+  const [preview, setPreview] = useState(null);
+
+  // สร้าง URL สำหรับ Preview เมื่อไฟล์เปลี่ยน
+  useEffect(() => {
+    if (!file) {
+      setPreview(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
+
+    // Cleanup function เพื่อคืน Memory เมื่อ component ถูกทำลายหรือเปลี่ยนไฟล์
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+
+  return (
+    <div className={styles.uploadBox} style={{ position: 'relative' }}>
+      <h3 style={{ marginBottom: 10 }}>อัปโหลดโปสเตอร์ประกวด</h3>
+      <p style={{ marginBottom: 20, color: "#888" }}>เลือกไฟล์รูป jpg หรือ png</p>
+      
+      {/* Hidden Input */}
+      <input
+        type="file"
+        accept="image/*"
+        id="posterFile"
+        onChange={(e) => {
+            if (e.target.files && e.target.files[0]) {
+                onSelect(e.target.files[0]);
+            }
+        }}
+        style={{ display: "none" }}
+      />
+
+      {/* Preview Area */}
+      {preview ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10 }}>
+            <div style={{ position: 'relative', maxWidth: '300px' }}>
+                <img 
+                    src={preview} 
+                    alt="Poster Preview" 
+                    style={{ width: '100%', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} 
+                />
+                {/* Remove Button */}
+                <button
+                    onClick={() => onSelect(null)}
+                    style={{
+                        position: 'absolute', top: -10, right: -10,
+                        background: '#ff4d4f', color: 'white', border: 'none',
+                        borderRadius: '50%', width: 30, height: 30, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                    }}
+                    title="ลบรูปภาพ"
+                >
+                    <FaTimes />
+                </button>
+            </div>
+            {file && <p style={{ fontSize: "0.9rem", color: "#666", marginTop: 10 }}>{file.name}</p>}
+        </div>
+      ) : (
+        // Upload Button
+        <button
+            className={styles.uploadButton}
+            onClick={() => document.getElementById("posterFile").click()}
+        >
+            เลือกไฟล์รูป
+        </button>
+      )}
+    </div>
+  );
+};
 
 // =========================
 // MAIN PAGE: CreateCompetition
 // =========================
 export default function CreateCompetition() {
   const location = useLocation();
+  const navigate = useNavigate();
   
-  // ดึง organizationId จาก localStorage ก่อน ถ้าไม่มีค่อยดูจาก location.state
+  // Organization Logic
   const organizationIdFromStorage = localStorage.getItem('current_organization_id');
   const organizationIdFromState = location.state?.organizationId;
   const organizationId = organizationIdFromStorage 
     ? parseInt(organizationIdFromStorage) 
     : (organizationIdFromState || null);
 
-  console.log('Organization ID for competition:', organizationId); // Debug log
-
-  // Cleanup: ลบ localStorage เมื่อออกจากหน้าสร้างการประกวด
   useEffect(() => {
-    return () => {
-      localStorage.removeItem('current_organization_id');
-    };
+    // Cleanup or Initial check
   }, []);
   
-  // State declarations
-  const [selectedLevels, setSelectedLevels] = useState([]);
-  const [poster, setPoster] = useState(null);
-  const [contestName, setContestName] = useState("");
-  const [step, setStep] = useState(1);
-  const [regOpen, setRegOpen] = useState("");
-  const [regClose, setRegClose] = useState("");
-  const [contestDescription, setContestDescription] = useState('');
-  const [contestPurpose, setContestPurpose] = useState('');
-  
-  // Level Details
-  const [levelPoemTypes, setLevelPoemTypes] = useState({});
-  const [levelTopics, setLevelTopics] = useState({});
-  const [levelDetails, setLevelDetails] = useState({});
-
-  // --- States Step 3 (Judge & Assistant) ---
-  const [showRoleInfo, setShowRoleInfo] = useState(false);
-  
-  // Assistants
-  const [assistants, setAssistants] = useState([]);
-  const [showAddAssistant, setShowAddAssistant] = useState(false);
-  const [editingAssistantIndex, setEditingAssistantIndex] = useState(null);
-  const defaultAssistantPermissions = [
-    { key: 'can_view', label: 'ดูข้อมูลการประกวด', checked: true },
-    { key: 'can_edit', label: 'แก้ไขข้อมูลการประกวด', checked: true },
-    { key: 'can_manage_users', label: 'จัดการผู้เข้าแข่งขัน', checked: false },
+  // --- Constants ---
+  const poemTypeOptions = [
+    { label: "กลอนแปด", value: "กลอนแปด" },
+    { label: "กาพย์ยานี 11", value: "กาพย์ยานี 11" },
+    { label: "กาพย์ฉบัง 16", value: "กาพย์ฉบัง 16" },
+    { label: "โคลงสี่สุภาพ", value: "โคลงสี่สุภาพ" },
+    { label: "สักวา", value: "สักวา" },
+    { label: "ดอกสร้อย", value: "ดอกสร้อย" },
+    { label: "อินทรวิเชียรฉันท์", value: "อินทรวิเชียรฉันท์" },
   ];
-  const [assistantForm, setAssistantForm] = useState({ 
-    first_name: '', last_name: '', email: '', 
-    permissions: JSON.parse(JSON.stringify(defaultAssistantPermissions)) 
-  });
 
-  // Judges
-  const [judges, setJudges] = useState([]);
-  const [showAddJudge, setShowAddJudge] = useState(false);
-  const [editingJudgeIndex, setEditingJudgeIndex] = useState(null);
-  const [judgeForm, setJudgeForm] = useState({ 
-    first_name: '', last_name: '', email: '', 
-    levels: [] // Levels ที่กรรมการคนนี้ดูแล
-  });
-
-  // Data
   const ALL_LEVELS = [
     { label: "ประถม", icon: <FaChalkboardTeacher /> },
     { label: "มัธยม", icon: <FaUserGraduate /> },
@@ -130,16 +133,37 @@ export default function CreateCompetition() {
     { label: "ประชาชนทั่วไป", icon: <FaUsers /> },
   ];
 
-  const poemTypeOptions = [
-    { label: "กลอนแปด", value: "กลอนแปด" },
-    { label: "กาพย์ยานี 11", value: "กาพย์ยานี 11" },
-    { label: "กาพย์ฉบัง 16", value: "กาพย์ฉบัง 16" },
-    { label: "โคลงสี่สุภาพ", value: "โคลงสี่สุภาพ" },
-    { label: "สักวา", value: "สักวา" },
-    { label: "อินทรวิเชียรฉันท์", value: "อินทรวิเชียรฉันท์" },
+  const defaultAssistantPermissions = [
+    { key: 'can_view', label: 'ดูข้อมูลการประกวดทั้งหมด', checked: true },
+    { key: 'can_edit', label: 'แก้ไขข้อมูลการประกวด', checked: true },
+    { key: 'can_add_assistant', label: 'เพิ่มผู้ช่วยรายอื่น', checked: false },
+    { key: 'can_view_scores', label: 'ดูคะแนนกรรมการ', checked: false },
   ];
 
+  // --- States ---
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  // Step 1: General Info
+  const [contestName, setContestName] = useState("");
+  const [selectedLevels, setSelectedLevels] = useState([]);
+  const [poster, setPoster] = useState(null);
+  const [regOpen, setRegOpen] = useState("");
+  const [regClose, setRegClose] = useState("");
+  const [contestDescription, setContestDescription] = useState('');
+  const [contestPurpose, setContestPurpose] = useState('');
+
+  // Step 2: Level Details & Scoring Criteria
+  const [levelPoemTypes, setLevelPoemTypes] = useState({});
+  const [levelTopics, setLevelTopics] = useState({});
+  const [levelDetails, setLevelDetails] = useState({});
+
+  // Step 3: Judges
+  const [judges, setJudges] = useState([]);
+  const [showInviteJudgeModal, setShowInviteJudgeModal] = useState(false);
+
   // --- Handlers ---
+
   const handleSelectLevel = (level) => {
     if (selectedLevels.includes(level)) {
       setSelectedLevels(selectedLevels.filter((l) => l !== level));
@@ -148,95 +172,190 @@ export default function CreateCompetition() {
     }
   };
 
-  // Assistant Handlers
-  const handleSaveAssistant = () => {
-    if (!assistantForm.email || !assistantForm.first_name) return alert("กรุณากรอกข้อมูลให้ครบ");
-    
-    if (editingAssistantIndex !== null) {
-      const newAssistants = [...assistants];
-      newAssistants[editingAssistantIndex] = assistantForm;
-      setAssistants(newAssistants);
-    } else {
-      setAssistants([...assistants, assistantForm]);
+  // --- Criteria Handlers ---
+  const handleAddCriteria = (level) => {
+    const currentList = levelDetails[level + '_criteria'] || [];
+    const newList = [...currentList, { id: Date.now(), title: '', score: 10 }];
+    setLevelDetails({ ...levelDetails, [level + '_criteria']: newList });
+  };
+
+  const handleRemoveCriteria = (level, index) => {
+    const currentList = levelDetails[level + '_criteria'] || [];
+    const newList = currentList.filter((_, i) => i !== index);
+    setLevelDetails({ ...levelDetails, [level + '_criteria']: newList });
+  };
+
+  const handleCriteriaChange = (level, index, field, value) => {
+    const currentList = levelDetails[level + '_criteria'] || [];
+    const newList = [...currentList];
+    newList[index] = { ...newList[index], [field]: value };
+    setLevelDetails({ ...levelDetails, [level + '_criteria']: newList });
+  };
+
+  const calculateTotalScore = (level) => {
+    const criteriaList = levelDetails[level + '_criteria'] || [];
+    return criteriaList.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
+  };
+
+
+
+  // --- Validation Handler ---
+  const handleNext = () => {
+    if (step === 1) {
+        if (!contestName.trim()) return alert("กรุณากรอกชื่อการประกวด");
+        if (selectedLevels.length === 0) return alert("กรุณาเลือกระดับการแข่งขันอย่างน้อย 1 ระดับ");
+        // if (!poster) return alert("กรุณาอัปโหลดโปสเตอร์"); // ถ้าไม่บังคับคอมเมนต์บรรทัดนี้ได้
+        if (!regOpen) return alert("กรุณาระบุวันเปิดรับสมัคร");
+        if (!regClose) return alert("กรุณาระบุวันปิดรับสมัคร");
+        if (new Date(regClose) < new Date(regOpen)) return alert("วันปิดรับสมัครต้องไม่ก่อนวันเปิดรับสมัคร");
+        if (!contestDescription.trim()) return alert("กรุณากรอกรายละเอียดการประกวด");
+        if (!contestPurpose.trim()) return alert("กรุณากรอกวัตถุประสงค์");
     }
-    setShowAddAssistant(false);
-  };
 
-  const handleDeleteAssistant = (index) => {
-    setAssistants(assistants.filter((_, i) => i !== index));
-  };
-
-  // Judge Handlers
-  const handleSaveJudge = () => {
-    if (!judgeForm.email || !judgeForm.first_name) return alert("กรุณากรอกข้อมูลให้ครบ");
-    if (judgeForm.levels.length === 0) return alert("กรุณาเลือกระดับชั้นที่กรรมการดูแลอย่างน้อย 1 ระดับ");
-
-    if (editingJudgeIndex !== null) {
-      const newJudges = [...judges];
-      newJudges[editingJudgeIndex] = judgeForm;
-      setJudges(newJudges);
-    } else {
-      setJudges([...judges, judgeForm]);
+    if (step === 2) {
+        for (const level of selectedLevels) {
+            if (!levelPoemTypes[level] || levelPoemTypes[level].length === 0) {
+                return alert(`กรุณาเลือกประเภทกลอนสำหรับระดับ "${level}"`);
+            }
+            if (levelTopics[level]?.topicEnabled && !levelTopics[level]?.topicName.trim()) {
+                return alert(`กรุณาระบุชื่อหัวข้อบังคับสำหรับระดับ "${level}"`);
+            }
+            if (!levelDetails[level + '_description']?.trim()) {
+                return alert(`กรุณากรอกรายละเอียดเพิ่มเติมสำหรับระดับ "${level}"`);
+            }
+            const criteria = levelDetails[level + '_criteria'] || [];
+            if (criteria.length === 0) {
+                return alert(`กรุณาเพิ่มเกณฑ์การให้คะแนนอย่างน้อย 1 ข้อ สำหรับระดับ "${level}"`);
+            }
+            for (const c of criteria) {
+                if (!c.title.trim()) return alert(`ระดับ "${level}": กรุณากรอกชื่อเกณฑ์การให้คะแนนให้ครบ`);
+                if (Number(c.score) <= 0) return alert(`ระดับ "${level}": คะแนนเกณฑ์ต้องมากกว่า 0`);
+            }
+        }
     }
-    setShowAddJudge(false);
+
+    setStep(prev => prev + 1);
   };
 
-  const handleDeleteJudge = (index) => {
-    setJudges(judges.filter((_, i) => i !== index));
+  // --- Submit Logic (Step 4) ---
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      
+      formData.append('name', contestName);
+      formData.append('organization_id', organizationId);
+      formData.append('registration_start', regOpen);
+      formData.append('registration_end', regClose);
+      formData.append('description', contestDescription);
+      formData.append('objective', contestPurpose);
+      
+      if (poster) {
+        formData.append('poster', poster);
+      }
+
+      const competitionLevels = selectedLevels.map(lvl => ({
+        level_name: lvl,
+        poem_types: levelPoemTypes[lvl] || [],
+        topic_mode: levelTopics[lvl]?.topicEnabled ? 'fixed' : 'free',
+        topic_name: levelTopics[lvl]?.topicName || '',
+        description: levelDetails[lvl + '_description'] || '',
+        criteria: levelDetails[lvl + '_criteria'] || [],
+        total_score: calculateTotalScore(lvl),
+        prizes: levelDetails[lvl + '_prize_enabled'] ? {
+            prize_1: levelDetails[lvl + '_prize1'],
+            prize_2: levelDetails[lvl + '_prize2'],
+            prize_3: levelDetails[lvl + '_prize3'],
+        } : null
+      }));
+
+      formData.append('levels_json', JSON.stringify(competitionLevels));
+
+      console.log("Submitting Data...", Object.fromEntries(formData));
+      
+      // await axios.post('http://localhost:8080/api/v1/competitions', formData);
+      alert("สร้างการประกวดสำเร็จ!");
+      
+    } catch (error) {
+      console.error("Error creating competition:", error);
+      alert("เกิดข้อผิดพลาดในการสร้างการประกวด");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       <TopNav />
 
-      <div className="container">
-        <div className="main-card">
-          <h1 className="page-title">สร้างการประกวดใหม่</h1>
+      <div className={styles.container}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+          <button
+            onClick={() => navigate(`/organization/${organizationId}`)}
+            style={{
+              padding: '8px 16px',
+              background: 'white',
+              border: '2px solid #70136C',
+              borderRadius: 8,
+              color: '#70136C',
+              fontWeight: 600,
+              cursor: 'pointer',
+              marginBottom: 16,
+              transition: 'all 0.2s',
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.background = '#f6e7f5';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(112,19,108,0.2)';
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.background = 'white';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            ← กลับไปหน้า Organization
+          </button>
+        </div>
+        
+        <div className={styles.mainCard}>
+          <h1 className={styles.title}>สร้างการประกวดใหม่</h1>
 
           {/* Stepper */}
-          <div className="stepper-container">
-            {["รายละเอียด", "ข้อมูลระดับ", "กรรมการ/ผู้ช่วย", "ตรวจสอบ"].map((label, idx, arr) => (
-              <React.Fragment key={label}>
-                <div style={{ textAlign: "center" }}>
-                  <div
-                    className="step-circle"
-                    style={{
-                      background: idx + 1 === step ? "#70136C" : "#d1b3d1",
-                      color: "#fff",
-                    }}
-                  >
-                    {idx + 1}
+          <div className={styles.stepperContainer}>
+            {["รายละเอียด", "เกณฑ์การให้คะแนน", "ผู้ดูแล", "ตรวจสอบ"].map(
+              (label, idx, arr) => (
+                <React.Fragment key={label}>
+                  <div className={styles.stepItem}>
+                    <div className={`${styles.stepCircle} ${idx + 1 === step ? styles.stepCircleActive : ''} ${idx + 1 < step ? styles.stepCircleCompleted : ''}`}>
+                      {idx + 1}
+                    </div>
+                    <span className={styles.stepLabel}>{label}</span>
                   </div>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: idx + 1 === step ? "#70136C" : "#888" }}>{label}</span>
-                </div>
-                {idx < arr.length - 1 && (
-                  <div
-                    className="step-line"
-                    style={{
-                      background: idx + 1 <= step ? "linear-gradient(90deg, #70136C, #d1b3d1)" : "#e0e0e0",
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            ))}
+                  {idx < arr.length - 1 && (
+                    <div className={`${styles.stepLine} ${idx + 1 < step ? styles.stepLineActive : ''}`} />
+                  )}
+                </React.Fragment>
+              )
+            )}
           </div>
 
-          {/* Step 1: Details */}
+          {/* ================= STEP 1 ================= */}
           {step === 1 && (
             <>
-              <div style={{ marginBottom: 18 }}>
-                <label style={{ fontWeight: 600 }}>ชื่อการประกวด</label>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>ชื่อการประกวด <span style={{color:'red'}}>*</span></label>
                 <input
-                  className="form-input"
                   type="text"
                   value={contestName}
                   onChange={(e) => setContestName(e.target.value)}
                   placeholder="กรอกชื่อการประกวด..."
+                  className={styles.input}
                 />
               </div>
 
-              <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 10 }}>เลือกระดับการแข่งขัน</div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginBottom: 28 }}>
+              <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 10 }}>
+                เลือกระดับการแข่งขัน <span style={{color:'red'}}>*</span>
+              </div>
+              <div className={styles.levelGrid}>
                 {ALL_LEVELS.map(({ label, icon }) => (
                   <LevelSelectCard
                     key={label}
@@ -250,400 +369,339 @@ export default function CreateCompetition() {
 
               <UploadBox file={poster} onSelect={setPoster} />
 
-              <div style={{ display: 'flex', gap: 24, marginTop: 32 }}>
+              <div style={{ display: 'flex', gap: 24, marginTop: 32, marginBottom: 10 }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ fontWeight: 600 }}>วันที่เปิดรับสมัคร</label>
-                  <input className="form-input" type="date" value={regOpen} onChange={e => setRegOpen(e.target.value)} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontWeight: 600 }}>วันที่ปิดรับสมัคร</label>
-                  <input className="form-input" type="date" value={regClose} onChange={e => setRegClose(e.target.value)} min={regOpen} />
-                </div>
-              </div>
-
-              <div style={{ marginTop: 24 }}>
-                <label style={{ fontWeight: 600 }}>รายละเอียดการประกวด</label>
-                <textarea
-                  className="form-textarea"
-                  value={contestDescription}
-                  onChange={e => setContestDescription(e.target.value.slice(0, 600))}
-                  rows={5}
-                />
-                
-                <label style={{ fontWeight: 600, marginTop: 12, display: 'block' }}>วัตถุประสงค์</label>
-                <textarea
-                  className="form-textarea"
-                  value={contestPurpose}
-                  onChange={e => setContestPurpose(e.target.value.slice(0, 300))}
-                  rows={3}
-                />
-
-                <div style={{ textAlign: "center", marginTop: 28 }}>
-                  <button
-                    className="btn-primary"
-                    onClick={() => setStep(2)}
-                  >
-                    ถัดไป
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Step 2: Levels */}
-          {step === 2 && (
-            <>
-              <h2 style={{ fontWeight: 600, fontSize: 20, marginBottom: 18 }}>ข้อมูลระดับการแข่งขัน</h2>
-              {selectedLevels.map((level) => (
-                <div key={level} style={{ marginBottom: 28, border: "1px solid #eee", borderRadius: 10, padding: 18 }}>
-                  <h3 style={{ color: "#70136C", fontWeight: 600, marginBottom: 10 }}>{`ระดับ${level}`}</h3>
-                  
-                  {/* Poem Types */}
-                  <label style={{ fontWeight: 500, display: 'block', marginBottom: 8 }}>ประเภทกลอน</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-                    {poemTypeOptions.map((pt) => (
-                      <label key={pt.value} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 12px', background: '#f7f7fb', borderRadius: 8, border: '1px solid #ccc' }}>
-                        <input
-                          type="checkbox"
-                          checked={(levelPoemTypes[level] || []).includes(pt.value)}
-                          onChange={() => {
-                            const current = levelPoemTypes[level] || [];
-                            const newArr = current.includes(pt.value) ? current.filter(v => v !== pt.value) : [...current, pt.value];
-                            setLevelPoemTypes({ ...levelPoemTypes, [level]: newArr });
-                          }}
-                        />
-                        {pt.label}
-                      </label>
-                    ))}
-                  </div>
-
-                  {/* Topics & Rules - Simplified for brevity based on previous context */}
-                  <label style={{ fontWeight: 500 }}>กติกา</label>
-                  <textarea
-                    className="form-textarea"
-                    placeholder="ระบุกติกา..."
-                    value={levelDetails[`${level}_rules`] || ''}
-                    onChange={e => setLevelDetails({...levelDetails, [`${level}_rules`]: e.target.value})}
+                  <label className={styles.label}>วันที่เปิดรับสมัคร <span style={{color:'red'}}>*</span></label>
+                  <input
+                    type="date"
+                    value={regOpen}
+                    onChange={e => setRegOpen(e.target.value)}
+                    className={styles.input}
                   />
                 </div>
-              ))}
+                <div style={{ flex: 1 }}>
+                  <label className={styles.label}>วันที่ปิดรับสมัคร <span style={{color:'red'}}>*</span></label>
+                  <input
+                    type="date"
+                    value={regClose}
+                    onChange={e => setRegClose(e.target.value)}
+                    min={regOpen}
+                    className={styles.input}
+                  />
+                </div>
+              </div>
+              
+              <div className={styles.formGroup}>
+                  <label className={styles.label}>รายละเอียด (ภาพรวม) <span style={{color:'red'}}>*</span></label>
+                  <textarea
+                    value={contestDescription}
+                    onChange={e => setContestDescription(e.target.value)}
+                    className={styles.textarea}
+                    rows={4}
+                  />
+              </div>
+               <div className={styles.formGroup}>
+                  <label className={styles.label}>วัตถุประสงค์ <span style={{color:'red'}}>*</span></label>
+                  <textarea
+                    value={contestPurpose}
+                    onChange={e => setContestPurpose(e.target.value)}
+                    className={styles.textarea}
+                    rows={3}
+                  />
+              </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 32 }}>
-                <button className="btn-secondary" onClick={() => setStep(1)}>ย้อนกลับ</button>
-                <button className="btn-primary" onClick={() => setStep(3)}>ถัดไป</button>
+              <div className={styles.buttonContainer}>
+                <button className={styles.btnPrimary} onClick={handleNext}>
+                  ถัดไป
+                </button>
               </div>
             </>
           )}
 
-          {/* Step 3: Judges & Assistants */}
+          {/* ================= STEP 2: SCORING & RULES ================= */}
+          {step === 2 && (
+            <>
+              <h2 style={{ marginBottom: 20 }}>ข้อมูลระดับและเกณฑ์การให้คะแนน</h2>
+              {selectedLevels.length === 0 && <p style={{color:'red'}}>กรุณาเลือกระดับในขั้นตอนที่ 1 ก่อน</p>}
+              
+              {selectedLevels.map((level) => {
+                const topicEnabled = levelTopics[level]?.topicEnabled || false;
+                const topicName = levelTopics[level]?.topicName || "";
+                const selectedPoemTypes = levelPoemTypes[level] || [];
+                const criteriaList = levelDetails[level + '_criteria'] || [];
+                const totalScore = calculateTotalScore(level);
+                const levelDesc = levelDetails[level + '_description'] || '';
+
+                return (
+                  <div key={level} className={styles.levelDetailBox}>
+                    <h3 className={styles.levelTitle}>ระดับ: {level}</h3>
+                    
+                    {/* Poem Types */}
+                    <div style={{ marginBottom: 16 }}>
+                      <label className={styles.label}>ประเภทกลอน <span style={{color:'red'}}>*</span></label>
+                      <div className={styles.poemTypeContainer}>
+                        {poemTypeOptions.map((pt) => (
+                          <label key={pt.value} className={styles.poemTypeLabel}>
+                            <input
+                              type="checkbox"
+                              checked={selectedPoemTypes.includes(pt.value)}
+                              onChange={() => {
+                                const current = selectedPoemTypes;
+                                const newArr = current.includes(pt.value)
+                                  ? current.filter(v => v !== pt.value)
+                                  : [...current, pt.value];
+                                setLevelPoemTypes({ ...levelPoemTypes, [level]: newArr });
+                              }}
+                              style={{ marginRight: 5 }}
+                            />
+                            {pt.label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Topic */}
+                    <div className={styles.topicToggleContainer}>
+                        <button
+                          type="button"
+                          className={`${styles.toggleBtnLeft} ${!topicEnabled ? styles.toggleActive : ''}`}
+                          onClick={() => setLevelTopics({ ...levelTopics, [level]: { ...levelTopics[level], topicEnabled: false } })}
+                        >หัวข้ออิสระ</button>
+                        <button
+                          type="button"
+                          className={`${styles.toggleBtnRight} ${topicEnabled ? styles.toggleActive : ''}`}
+                          onClick={() => setLevelTopics({ ...levelTopics, [level]: { ...levelTopics[level], topicEnabled: true } })}
+                        >หัวข้อบังคับ</button>
+                        
+                        {topicEnabled && (
+                          <input 
+                            type="text" 
+                            placeholder="ระบุชื่อหัวข้อ (จำเป็น)" 
+                            value={topicName}
+                            onChange={(e) => setLevelTopics({ ...levelTopics, [level]: { ...levelTopics[level], topicEnabled: true, topicName: e.target.value } })}
+                            className={styles.input}
+                            style={{marginLeft: 10, flex: 1, borderColor: (!topicName ? 'red' : '#ddd')}}
+                          />
+                        )}
+                    </div>
+
+                    {/* Description */}
+                    <div style={{ marginTop: 20 }}>
+                        <label className={styles.label}>รายละเอียดเพิ่มเติมสำหรับระดับ {level} <span style={{color:'red'}}>*</span></label>
+                        <textarea
+                            className={styles.textarea}
+                            rows={3}
+                            placeholder={`ระบุรายละเอียด กติกา หรือเงื่อนไขเฉพาะสำหรับระดับ ${level}...`}
+                            value={levelDesc}
+                            onChange={(e) => setLevelDetails({ ...levelDetails, [level + '_description']: e.target.value })}
+                        />
+                    </div>
+
+                    {/* Criteria */}
+                    <div style={{ marginTop: 25, background: '#f8f9fa', padding: 15, borderRadius: 8, border: '1px solid #eee' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <label className={styles.label} style={{marginBottom: 0}}>
+                                 เกณฑ์การให้คะแนนและกติกา <span style={{color:'red'}}>*</span>
+                            </label>
+                            <div style={{ fontWeight: 'bold', color: '#70136C' }}>
+                                คะแนนรวม: {totalScore} คะแนน
+                            </div>
+                        </div>
+
+                        {criteriaList.length === 0 && (
+                             <div style={{ textAlign: 'center', color: '#ff4d4f', padding: '10px 0', fontStyle: 'italic' }}>
+                                 * กรุณาเพิ่มเกณฑ์การให้คะแนนอย่างน้อย 1 ข้อ
+                             </div>
+                        )}
+
+                        {criteriaList.map((item, index) => (
+                            <div key={index} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'center' }}>
+                                <div style={{ 
+                                    width: 24, height: 24, background: '#70136C', color: 'white', 
+                                    borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 12 
+                                }}>
+                                    {index + 1}
+                                </div>
+                                
+                                <input 
+                                    type="text"
+                                    className={styles.input}
+                                    style={{ margin: 0, flex: 1 }}
+                                    placeholder="ระบุเกณฑ์"
+                                    value={item.title}
+                                    onChange={(e) => handleCriteriaChange(level, index, 'title', e.target.value)}
+                                />
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                    <span style={{ fontSize: '0.9em', color: '#666' }}>เต็ม</span>
+                                    <input 
+                                        type="number"
+                                        className={styles.input}
+                                        style={{ margin: 0, width: 70, textAlign: 'center' }}
+                                        value={item.score}
+                                        onChange={(e) => handleCriteriaChange(level, index, 'score', e.target.value)}
+                                    />
+                                    <span style={{ fontSize: '0.9em', color: '#666' }}>คะแนน</span>
+                                </div>
+
+                                <button 
+                                    type="button"
+                                    onClick={() => handleRemoveCriteria(level, index)}
+                                    style={{ background: 'none', border: 'none', color: '#ff4d4f', cursor: 'pointer', padding: 5 }}
+                                >
+                                    <FaTrash />
+                                </button>
+                            </div>
+                        ))}
+
+                        <button 
+                            type="button" 
+                            onClick={() => handleAddCriteria(level)}
+                            style={{ 
+                                background: 'white', border: '1px dashed #70136C', color: '#70136C', 
+                                width: '100%', padding: '8px', borderRadius: 6, cursor: 'pointer',
+                                display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5,
+                                marginTop: 10
+                            }}
+                        >
+                            <FaPlus size={12} /> เพิ่มเกณฑ์คะแนน
+                        </button>
+                    </div>
+
+                  </div>
+                );
+              })}
+
+              <div className={styles.navButtonContainer}>
+                <button className={styles.btnSecondary} onClick={() => setStep(1)}>ย้อนกลับ</button>
+                <button className={styles.btnPrimary} onClick={handleNext}>ถัดไป</button>
+              </div>
+            </>
+          )}
+
+          {/* ================= STEP 3: JUDGES ================= */}
           {step === 3 && (
             <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <h2 style={{ fontWeight: 700, fontSize: 22, color: '#70136C' }}>จัดการกรรมการและผู้ช่วย</h2>
-                <button onClick={() => setShowRoleInfo(true)} style={{ background: 'none', border: 'none', color: '#70136C', cursor: 'pointer', textDecoration: 'underline' }}>
-                   ดูสิทธิ์การใช้งาน
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h2>เชิญกรรมการ</h2>
+                <button 
+                    className={styles.btnSecondary}
+                    onClick={() => setShowInviteJudgeModal(true)}
+                >
+                    ➕ เชิญกรรมการ
                 </button>
               </div>
 
-              {/* Assistants Section */}
-              <div style={{ marginBottom: 32 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 600 }}>ผู้ช่วยจัดการประกวด</h3>
-                    <button className="btn-outline" onClick={() => {
-                        setEditingAssistantIndex(null);
-                        setAssistantForm({ first_name: '', last_name: '', email: '', permissions: JSON.parse(JSON.stringify(defaultAssistantPermissions)) });
-                        setShowAddAssistant(true);
-                    }}>
-                        + เพิ่มผู้ช่วย
-                    </button>
-                </div>
-                
-                <div style={{ background: '#fafbfc', borderRadius: 8, border: '1px solid #eee', overflow: 'hidden' }}>
-                    <table className="custom-table">
-                        <thead>
-                            <tr>
-                                <th>ชื่อ-นามสกุล</th>
-                                <th>อีเมล</th>
-                                <th>สิทธิ์</th>
-                                <th>จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {assistants.length === 0 ? (
-                                <tr><td colSpan={4} style={{ textAlign: 'center', color: '#999' }}>ยังไม่มีผู้ช่วย</td></tr>
-                            ) : assistants.map((a, idx) => (
-                                <tr key={idx}>
-                                    <td>{a.first_name} {a.last_name}</td>
-                                    <td>{a.email}</td>
-                                    <td>{a.permissions.filter(p => p.checked).length} สิทธิ์</td>
-                                    <td>
-                                        <button className="action-btn-sm" onClick={() => {
-                                            setEditingAssistantIndex(idx);
-                                            setAssistantForm({...a});
-                                            setShowAddAssistant(true);
-                                        }}><FaEdit /></button>
-                                        <button className="delete-btn-sm" onClick={() => handleDeleteAssistant(idx)}><FaTrash /></button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+              {/* Judges List Table */}
+              <div className={styles.tableContainer}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr className={styles.tableHeader}>
+                      <th>ชื่อ-นามสกุล</th>
+                      <th>อีเมล</th>
+                      <th>ระดับที่รับผิดชอบ</th>
+                      <th>จัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {judges.length === 0 ? (
+                      <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, color: '#999' }}>ยังไม่มีกรรมการ (กดถัดไปได้)</td></tr>
+                    ) : (
+                      judges.map((j, idx) => (
+                        <tr key={idx}>
+                          <td>{j.first_name} {j.last_name}</td>
+                          <td>{j.email}</td>
+                          <td>{j.levels ? j.levels.join(', ') : '-'}</td>
+                          <td>
+                            <button onClick={() => setJudges(judges.filter((_, i) => i !== idx))} style={{ border:'none', background:'transparent', color:'red', cursor:'pointer' }}>
+                                <FaTrash />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
-
-              {/* Judges Section */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 600 }}>กรรมการตัดสิน</h3>
-                    <button className="btn-outline" onClick={() => {
-                         setEditingJudgeIndex(null);
-                         setJudgeForm({ first_name: '', last_name: '', email: '', levels: [] });
-                         setShowAddJudge(true);
-                    }}>
-                        + เพิ่มกรรมการ
-                    </button>
-                </div>
-                
-                <div style={{ background: '#fafbfc', borderRadius: 8, border: '1px solid #eee', overflow: 'hidden' }}>
-                    <table className="custom-table">
-                        <thead>
-                            <tr>
-                                <th>ชื่อ-นามสกุล</th>
-                                <th>อีเมล</th>
-                                <th>ระดับชั้นที่ตัดสิน</th>
-                                <th>จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {judges.length === 0 ? (
-                                <tr><td colSpan={4} style={{ textAlign: 'center', color: '#999' }}>ยังไม่มีกรรมการ</td></tr>
-                            ) : judges.map((j, idx) => (
-                                <tr key={idx}>
-                                    <td>{j.first_name} {j.last_name}</td>
-                                    <td>{j.email}</td>
-                                    <td>
-                                        {j.levels.map(l => (
-                                            <span key={l} style={{ display: 'inline-block', background: '#e0e0e0', padding: '2px 8px', borderRadius: 4, fontSize: 12, marginRight: 4 }}>
-                                                {l}
-                                            </span>
-                                        ))}
-                                    </td>
-                                    <td>
-                                        <button className="action-btn-sm" onClick={() => {
-                                            setEditingJudgeIndex(idx);
-                                            setJudgeForm({...j});
-                                            setShowAddJudge(true);
-                                        }}><FaEdit /></button>
-                                        <button className="delete-btn-sm" onClick={() => handleDeleteJudge(idx)}><FaTrash /></button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 32 }}>
-                <button className="btn-secondary" onClick={() => setStep(2)}>ย้อนกลับ</button>
-                <button className="btn-primary" onClick={() => setStep(4)}>ถัดไป</button>
+              
+              <div className={styles.navButtonContainer} style={{ marginTop: 40 }}>
+                <button className={styles.btnSecondary} onClick={() => setStep(2)}>ย้อนกลับ</button>
+                <button className={styles.btnPrimary} onClick={() => setStep(4)}>ถัดไป</button>
               </div>
             </>
           )}
 
-          {/* Step 4: Review */}
+          {/* ================= STEP 4: REVIEW ================= */}
           {step === 4 && (
-            <div style={{ textAlign: 'center' }}>
-                <h2 style={{ color: '#70136C', marginBottom: 20 }}>ตรวจสอบความถูกต้อง</h2>
-                <div style={{ textAlign: 'left', background: '#f9f9f9', padding: 20, borderRadius: 12, border: '1px solid #eee', marginBottom: 30 }}>
+            <>
+                <h2 style={{ textAlign: 'center', marginBottom: 30 }}>ตรวจสอบข้อมูลก่อนสร้าง</h2>
+                
+                <div className={styles.reviewBox}>
+                    <h3>📌 ข้อมูลทั่วไป</h3>
                     <p><strong>ชื่อการประกวด:</strong> {contestName}</p>
-                    <p><strong>ระดับการแข่งขัน:</strong> {selectedLevels.join(', ')}</p>
-                    <p><strong>ผู้ช่วย:</strong> {assistants.length} คน</p>
-                    <p><strong>กรรมการ:</strong> {judges.length} ท่าน</p>
+                    <p><strong>รับสมัคร:</strong> {regOpen || '-'} ถึง {regClose || '-'}</p>
+                    <p><strong>ระดับที่เลือก:</strong> {selectedLevels.join(', ')}</p>
+                    {poster && <div style={{marginTop:10}}><strong>โปสเตอร์:</strong> {poster.name} (พร้อมอัปโหลด)</div>}
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <button className="btn-secondary" onClick={() => setStep(3)}>แก้ไขข้อมูล</button>
-                    <button className="btn-primary" onClick={async () => {
-                  try {
-                    // build payload from state
-                    const payload = {
-                      title: contestName,
-                      description: contestDescription,
-                      purpose: contestPurpose,
-                      type: selectedLevels.join(', '),
-                      start_date: '',
-                      end_date: '',
-                      status: 'open',
-                      organization_id: organizationId,
-                      registration_start: regOpen || null,
-                      registration_end: regClose || null,
-                      levels: []
-                    };
-                    // construct levels array
-                    payload.levels = selectedLevels.map(level => ({
-                      level,
-                      poem_types: levelPoemTypes[level] || [],
-                      topic: levelTopics[level] || { topicEnabled: false, topicName: '' },
-                      rules: levelDetails[level + '_rules'] || '',
-                      prizes: [levelDetails[level + '_prize1'] || '', levelDetails[level + '_prize2'] || '', levelDetails[level + '_prize3'] || ''].filter(Boolean)
-                    }));
-                    // TODO: Send payload to backend
-                    alert("บันทึกข้อมูลเรียบร้อย (Demo)");
-                  } catch (error) {
-                    console.error('Error:', error);
-                  }
-                }}>ยืนยันสร้างการประกวด</button>
+
+                <div className={styles.reviewBox}>
+                    <h3>🏆 รายละเอียดและเกณฑ์คะแนน</h3>
+                    {selectedLevels.map(lvl => (
+                        <div key={lvl} style={{marginBottom: 15, paddingLeft: 10, borderLeft: '3px solid #70136C'}}>
+                            <div style={{fontWeight: 'bold', fontSize: '1.1em'}}>{lvl}</div>
+                            <div style={{fontSize: '0.9em', color: '#555', marginBottom: 5}}>
+                                <div>ประเภท: {(levelPoemTypes[lvl] || []).join(', ') || '-'}</div>
+                                <div>หัวข้อ: {levelTopics[lvl]?.topicEnabled ? levelTopics[lvl].topicName : 'อิสระ'}</div>
+                            </div>
+                            
+                            {levelDetails[lvl + '_description'] && (
+                                <div style={{ margin: '8px 0', fontSize: '0.9rem', color: '#333' }}>
+                                    <strong>รายละเอียด:</strong> <br/>
+                                    <span style={{whiteSpace:'pre-wrap'}}>{levelDetails[lvl + '_description']}</span>
+                                </div>
+                            )}
+                            
+                            <div style={{ background: '#f5f5f5', padding: 8, borderRadius: 6, fontSize: '0.9em' }}>
+                                <strong>เกณฑ์การให้คะแนน (รวม {calculateTotalScore(lvl)} คะแนน):</strong>
+                                <ul style={{ margin: '5px 0 0 20px', padding: 0 }}>
+                                    {(levelDetails[lvl + '_criteria'] || []).map((c, i) => (
+                                        <li key={i}>{c.title || '(ไม่มีชื่อ)'} : <b>{c.score}</b> คะแนน</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-            </div>
+
+                <div className={styles.navButtonContainer}>
+                    <button className={styles.btnSecondary} onClick={() => setStep(3)}>แก้ไข</button>
+                    <button 
+                        className={styles.btnPrimary} 
+                        onClick={handleSubmit}
+                        disabled={loading}
+                    >
+                        {loading ? 'กำลังบันทึก...' : 'ยืนยันและสร้างการประกวด'}
+                    </button>
+                </div>
+            </>
           )}
+
         </div>
       </div>
 
-      {/* ================= MODALS ================= */}
-      
-      {/* Role Info Modal */}
-      {showRoleInfo && (
-        <div className="modal-overlay" onClick={() => setShowRoleInfo(false)}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <h3 className="modal-title">สิทธิ์ของแต่ละบทบาท</h3>
-                <div style={{ marginBottom: 20 }}>
-                    <strong style={{ color: '#70136C' }}>ผู้ช่วยจัดการประกวด</strong>
-                    <ul style={{ paddingLeft: 20, marginTop: 5 }}>
-                        <li>สามารถแก้ไขข้อมูลการประกวดได้</li>
-                        <li>จัดการผู้สมัครและส่งออกข้อมูลได้</li>
-                    </ul>
-                </div>
-                <div>
-                    <strong style={{ color: '#70136C' }}>กรรมการ</strong>
-                    <ul style={{ paddingLeft: 20, marginTop: 5 }}>
-                        <li>เข้าดูผลงานในระดับที่ได้รับมอบหมาย</li>
-                        <li>ให้คะแนนผลงาน</li>
-                        <li>ไม่สามารถแก้ไขข้อมูลการประกวด</li>
-                    </ul>
-                </div>
-                <div style={{ textAlign: 'right', marginTop: 20 }}>
-                    <button className="btn-primary" onClick={() => setShowRoleInfo(false)}>ปิด</button>
-                </div>
-            </div>
-        </div>
-      )}
+      {/* Invite Judge Modal */}
+      <InviteJudgeModal
+        isOpen={showInviteJudgeModal}
+        onClose={() => setShowInviteJudgeModal(false)}
+        competitionId={null}
+        levels={selectedLevels}
+        onSuccess={(newJudge) => {
+          // Add the invited judge to the judges list
+          setJudges([...judges, newJudge]);
+          setShowInviteJudgeModal(false);
+        }}
+      />
 
-      {/* Add Assistant Modal */}
-      {showAddAssistant && (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <h3 className="modal-title">{editingAssistantIndex !== null ? 'แก้ไขผู้ช่วย' : 'เพิ่มผู้ช่วย'}</h3>
-                
-                <div style={{ display: 'flex', gap: 10 }}>
-                    <input 
-                        className="form-input" 
-                        placeholder="ค้นหาจาก Email..." 
-                        value={assistantForm.email}
-                        onChange={e => setAssistantForm({...assistantForm, email: e.target.value})}
-                    />
-                    <button className="btn-secondary" style={{ padding: '0 16px' }}><FaSearch /></button>
-                </div>
-                
-                <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                    <input 
-                        className="form-input" 
-                        placeholder="ชื่อ" 
-                        value={assistantForm.first_name}
-                        onChange={e => setAssistantForm({...assistantForm, first_name: e.target.value})}
-                    />
-                    <input 
-                        className="form-input" 
-                        placeholder="นามสกุล" 
-                        value={assistantForm.last_name}
-                        onChange={e => setAssistantForm({...assistantForm, last_name: e.target.value})}
-                    />
-                </div>
-
-                <div style={{ marginTop: 16 }}>
-                    <label style={{ fontWeight: 600 }}>กำหนดสิทธิ์</label>
-                    <div className="checkbox-grid">
-                        {assistantForm.permissions.map((perm, idx) => (
-                            <label key={perm.key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <input 
-                                    type="checkbox" 
-                                    checked={perm.checked}
-                                    onChange={(e) => {
-                                        const newPerms = [...assistantForm.permissions];
-                                        newPerms[idx].checked = e.target.checked;
-                                        setAssistantForm({...assistantForm, permissions: newPerms});
-                                    }}
-                                />
-                                {perm.label}
-                            </label>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="modal-actions">
-                    <button className="btn-secondary" onClick={() => setShowAddAssistant(false)}>ยกเลิก</button>
-                    <button className="btn-primary" onClick={handleSaveAssistant}>บันทึก</button>
-                </div>
-            </div>
-        </div>
-      )}
-
-      {/* Add Judge Modal */}
-      {showAddJudge && (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <h3 className="modal-title">{editingJudgeIndex !== null ? 'แก้ไขกรรมการ' : 'เพิ่มกรรมการ'}</h3>
-                
-                <input 
-                    className="form-input" 
-                    placeholder="อีเมลกรรมการ" 
-                    value={judgeForm.email}
-                    onChange={e => setJudgeForm({...judgeForm, email: e.target.value})}
-                />
-                
-                <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                    <input 
-                        className="form-input" 
-                        placeholder="ชื่อ" 
-                        value={judgeForm.first_name}
-                        onChange={e => setJudgeForm({...judgeForm, first_name: e.target.value})}
-                    />
-                    <input 
-                        className="form-input" 
-                        placeholder="นามสกุล" 
-                        value={judgeForm.last_name}
-                        onChange={e => setJudgeForm({...judgeForm, last_name: e.target.value})}
-                    />
-                </div>
-
-                <div style={{ marginTop: 16 }}>
-                    <label style={{ fontWeight: 600 }}>ระดับชั้นที่รับผิดชอบ</label>
-                    <div className="checkbox-grid">
-                        {selectedLevels.map((lvl) => (
-                            <label key={lvl} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <input 
-                                    type="checkbox" 
-                                    checked={judgeForm.levels.includes(lvl)}
-                                    onChange={(e) => {
-                                        const current = judgeForm.levels;
-                                        const newLevels = e.target.checked 
-                                            ? [...current, lvl] 
-                                            : current.filter(l => l !== lvl);
-                                        setJudgeForm({...judgeForm, levels: newLevels});
-                                    }}
-                                />
-                                {lvl}
-                            </label>
-                        ))}
-                    </div>
-                    {selectedLevels.length === 0 && <p style={{ color: 'red', fontSize: 13 }}>กรุณาเลือกระดับการแข่งขันใน Step 1 ก่อน</p>}
-                </div>
-
-                <div className="modal-actions">
-                    <button className="btn-secondary" onClick={() => setShowAddJudge(false)}>ยกเลิก</button>
-                    <button className="btn-primary" onClick={handleSaveJudge}>บันทึก</button>
-                </div>
-            </div>
-        </div>
-      )}
     </>
   );
 }

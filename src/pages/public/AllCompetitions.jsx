@@ -103,7 +103,7 @@ const AllCompetitions = () => {
             justifyContent: 'center', 
             marginBottom: '40px' 
           }}>
-            <h2 className="section-title main-header" style={{ textAlign: 'center' }}>กิจกรรมการแข่งขันทั้งหมด</h2>
+            <h2 className="section-title main-header" style={{ textAlign: 'center' }}>การประกวดทั้งหมด</h2>
             <div className="section-line thick"></div>
           </div>
 

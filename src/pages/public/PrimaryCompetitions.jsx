@@ -110,7 +110,7 @@ const PrimaryCompetitions = () => {
             marginBottom: '40px' 
           }}>
             <h2 className="section-title main-header" style={{ textAlign: 'center' }}>
-              กิจกรรมสำหรับระดับประถม
+              การประกวดสำหรับระดับประถม
             </h2>
             <div className="section-line thick"></div>
           </div>

@@ -57,7 +57,7 @@ const ActivitiesList = ({ filterCategory }) => {
 
   const filterByLevel = (allContests) => {
     if (!filterCategory) return allContests;
-    const normalizedCategory = filterCategory === 'นิสิต' ? 'นักศึกษา' : filterCategory;
+    const normalizedCategory = filterCategory === 'นิสิต' ? 'มหาวิทยาลัย' : filterCategory;
     return allContests.filter(contest => {
       const levels = contest.levels || contest.Levels || [];
       if (levels.length > 0) {
@@ -75,7 +75,7 @@ const ActivitiesList = ({ filterCategory }) => {
     const badge = getStatusBadge(contest);
     const posterUrl = getPosterUrl(contest);
     const levels = (contest.levels || contest.Levels || [])
-      .map(l => (l.level_name || l.name || '').replace('มหาวิทยาลัย', 'นักศึกษา'))
+      .map(l => (l.level_name || l.name || ''))
       .join(', ') || 'ไม่ระบุ';
     
     const dateRange = formatDate(contest.end_date || contest.EndDate);
@@ -162,14 +162,14 @@ const ActivitiesList = ({ filterCategory }) => {
     <Container className="activities-container">
       {allFilteredContests.length === 0 ? (
          <div className="text-center py-5">
-            <p style={{ color: '#999', fontSize: '1.2rem' }}>ไม่พบกิจกรรมในหมวดหมู่นี้</p>
+            <p style={{ color: '#999', fontSize: '1.2rem' }}>ไม่พบการประกวดในหมวดหมู่นี้</p>
          </div>
       ) : (
         <>
           {recommendedContests.length > 0 && (
             <div className="mb-5">
               <div className="section-wrapper">
-                <h2 className="section-title main-header">กิจกรรมแนะนำ</h2>
+                <h2 className="section-title main-header">การประกวดแนะนำ</h2>
                 <div className="section-line thick"></div>
               </div>
               <Row xs={1} md={2} lg={4} className="g-4"> 
@@ -185,7 +185,7 @@ const ActivitiesList = ({ filterCategory }) => {
           {generalContests.length > 0 && (
             <div className="mt-5">
               <div className="section-wrapper">
-                <h2 className="section-title main-header">กิจกรรมทั้งหมด</h2>
+                <h2 className="section-title main-header">การประกวดทั้งหมด</h2>
                 <div className="section-line thick"></div>
               </div>
               <Row xs={1} md={2} lg={4} className="g-4">

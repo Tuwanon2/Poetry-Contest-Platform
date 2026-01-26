@@ -96,13 +96,13 @@ const TopNav = () => {
                     ? 'active' 
                     : ''
                   }>
-                    กิจกรรมการประกวด
+                    การประกวด
                   </span>
                 </Link>
                 <div className="dropdown-content">
                   <Link to="/competition/primary">ระดับประถม</Link>
                   <Link to="/competition/secondary">ระดับมัธยม</Link>
-                  <Link to="/competition/university">ระดับนักศึกษา</Link>
+                  <Link to="/competition/university">ระดับมหาวิทยาลัย</Link>
                   <Link to="/competition/general">ระดับประชาชนทั่วไป</Link>
                 </div>
               </li>

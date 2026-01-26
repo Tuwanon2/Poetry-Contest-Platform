@@ -1,0 +1,341 @@
+/* CreateCompetition.module.css */
+
+.container {
+  max-width: 900px;
+  margin: 28px auto 40px auto;
+  padding: 0 20px;
+}
+
+.mainCard {
+  background: #fff;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(60, 60, 60, 0.10);
+  padding: 18px 36px 48px 36px;
+}
+
+.title {
+  margin-bottom: 28px;
+  font-size: 2.1rem;
+  font-weight: 700;
+}
+
+/* Stepper */
+.stepperContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.stepItem {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stepCircle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #d1b3d1;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stepCircleActive {
+  background: #70136C;
+}
+
+.stepLabel {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stepLine {
+  flex: 1;
+  height: 2px;
+  background: #e0e0e0;
+  margin: 0 8px;
+  border-radius: 2px;
+}
+
+.stepLineActive {
+  background: linear-gradient(90deg, #e0e0e0 60%, #70136C 100%);
+}
+
+/* Form Elements */
+.formGroup {
+  margin-bottom: 18px;
+}
+
+.label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.input, .textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  background: #fafbfc;
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.charCount {
+  font-size: 13px;
+  color: #888;
+  margin-top: 6px;
+  text-align: right;
+}
+
+/* Level Card */
+.levelGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.levelCard {
+  flex: 1;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #fff;
+  transition: 0.2s;
+  min-width: 0;
+}
+
+.levelCardSelected {
+  border-color: #70136C;
+  background: #f6e7f5;
+  box-shadow: 0 2px 8px rgba(112, 19, 108, 0.15);
+}
+
+.levelIcon {
+  font-size: 26px;
+  color: #222;
+  text-align: center;
+}
+
+.levelCardSelected .levelIcon,
+.levelCardSelected .levelLabel {
+  color: #70136C;
+}
+
+.levelLabel {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #222;
+  text-align: center;
+}
+
+/* Upload Box */
+.uploadBox {
+  border: 2px dashed #cccccc;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #555;
+  background: #fafafa;
+}
+
+.uploadButton {
+  padding: 10px 24px;
+  border-radius: 8px;
+  background: #70136C;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+/* Buttons */
+.btnPrimary {
+  padding: 10px 32px;
+  background: #70136C;
+  color: #fff;
+  border: 2px solid #70136C;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(112, 19, 108, 0.1);
+}
+
+.btnPrimary:hover {
+  background: #5a0f56;
+  box-shadow: 0 4px 16px rgba(112, 19, 108, 0.3);
+}
+
+.btnSecondary {
+  padding: 8px 16px;
+  background: #fff;
+  color: #70136C;
+  border: 2px solid #70136C;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btnSecondary:hover {
+  background: #f6e7f5;
+  box-shadow: 0 2px 8px rgba(112, 19, 108, 0.2);
+}
+
+.btnOutline {
+  background: #fff;
+  color: #70136C;
+  border: 2px solid #70136C;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.buttonContainer {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.navButtonContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+}
+
+/* Level Details Section */
+.levelDetailBox {
+  margin-bottom: 28px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.levelTitle {
+  color: #70136C;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.poemTypeContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.poemTypeLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 400;
+  font-size: 15px;
+  background: #f7f7fb;
+  border-radius: 8px;
+  padding: 4px 12px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.poemTypeLabelSelected {
+  border: 2px solid #70136C;
+}
+
+/* Topic Toggle */
+.topicToggleContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.toggleBtnLeft {
+  border-radius: 999px 0 0 999px;
+  padding: 4px 18px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 15px;
+  margin-right: 0;
+  border: none;
+}
+
+.toggleBtnRight {
+  border-radius: 0 999px 999px 0;
+  padding: 4px 18px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 15px;
+  margin-left: -1px;
+  border: none;
+}
+
+.toggleActive {
+  background: #70136C;
+  color: #fff;
+  outline: 2px solid #70136C;
+  z-index: 1;
+}
+
+.toggleInactive {
+  background: #eee;
+  color: #70136C;
+  outline: none;
+}
+
+/* Table */
+.tableContainer {
+  background: #fafbfc;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  padding: 12px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.tableHeader {
+  background: #f6e7f5;
+  color: #70136C;
+}
+
+.table th, .table td {
+  padding: 8px 6px;
+}
+
+/* Info Box */
+.infoBox {
+  background: #f6e7f5;
+  border-radius: 8px;
+  padding: 10px 18px;
+  margin-bottom: 18px;
+  color: #70136C;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

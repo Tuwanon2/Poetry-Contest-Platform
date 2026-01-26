@@ -196,11 +196,16 @@ const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess })
             }}
           >
             <option value="">-- เลือกระดับ --</option>
-            {levels && levels.map((level, idx) => (
-              <option key={idx} value={level.level_id}>
-                {level.level_name}
-              </option>
-            ))}
+            {levels && levels.map((level, idx) => {
+              // Support both object format (from API) and string format (from CreateCompetition)
+              const levelValue = typeof level === 'object' ? level.level_id : level;
+              const levelName = typeof level === 'object' ? level.level_name : level;
+              return (
+                <option key={idx} value={levelValue}>
+                  {levelName}
+                </option>
+              );
+            })}
           </select>
         </div>
 
