@@ -73,6 +73,12 @@ func Register(v1 *gin.RouterGroup, kh *handlers.KlonHandlers) {
     v1.POST("/submissions/:id/score", kh.ScoreSubmission)
     v1.POST("/submissions/:id/comment", kh.CommentSubmission)
     v1.GET("/judge/contests/:id/summary", kh.JudgeContestSummary)
+    
+    // New Judge Scoring Routes
+    v1.GET("/judge/competitions/:competition_id/levels", kh.GetJudgeLevels)
+    v1.GET("/judge/competitions/:competition_id/levels/:level_id/submissions", kh.GetJudgeSubmissionsList)
+    v1.GET("/judge/submission-detail/:id", kh.GetSubmissionForScoring)
+    v1.POST("/judge/submission-score/:id", kh.SubmitScore)
 
     // Organizations routes
     v1.GET("/organizations/user/:userId", kh.GetUserOrganizations)
@@ -94,7 +100,50 @@ func Register(v1 *gin.RouterGroup, kh *handlers.KlonHandlers) {
     v1.POST("/contests/:id/judges", kh.InviteJudge)
     v1.DELETE("/contests/judges/:judgeId", kh.RemoveCompetitionJudge)
 
-    // Admin routes
+    // ============ Admin Routes ============
+    
+    // Organizations (existing)
     v1.GET("/admin/organizations/pending", kh.GetPendingOrganizations)
     v1.PUT("/admin/organizations/:id/status", kh.UpdateOrganizationStatus)
+    
+    // Dashboard
+    v1.GET("/admin/dashboard/stats", kh.GetDashboardStats)
+    
+    // Users Management
+    v1.GET("/admin/users", kh.GetAllUsers)
+    v1.PUT("/admin/users/:id/role", kh.UpdateUserRole)
+    v1.PUT("/admin/users/:id/status", kh.UpdateUserStatus)
+    v1.POST("/admin/users/:id/reset-password", kh.ResetUserPassword) // TODO: implement
+    
+    // Competitions Management  
+    v1.GET("/admin/competitions", kh.GetAllCompetitionsAdmin)
+    v1.DELETE("/admin/competitions/:id", kh.DeleteCompetition)
+    v1.PUT("/admin/competitions/:id/status", kh.UpdateCompetitionStatus)
+    
+    // Submissions Management
+    v1.GET("/admin/submissions", kh.GetAllSubmissionsAdmin)
+    v1.PUT("/admin/submissions/:id/status", kh.UpdateSubmissionStatus) // TODO: implement
+    v1.DELETE("/admin/submissions/:id", kh.DeleteSubmission)
+    v1.POST("/admin/submissions/:id/set-award", kh.SetSubmissionAward) // TODO: implement
+    
+    // Judges Management
+    v1.GET("/admin/judges", kh.GetAllJudges) // TODO: implement
+    v1.DELETE("/admin/judge-assignment/:id", kh.RemoveJudgeAssignment) // TODO: implement
+    
+    // Results & Announcement
+    v1.GET("/admin/competitions/:id/results", kh.GetCompetitionResults) // TODO: implement
+    v1.POST("/admin/competitions/:id/announce-results", kh.AnnounceResults) // TODO: implement
+    v1.GET("/admin/competitions/:id/export-results", kh.ExportResults) // TODO: implement
+    
+    // Reports & Analytics
+    v1.GET("/admin/competitions/:id/report", kh.GetCompetitionReport) // TODO: implement
+    v1.GET("/admin/competitions/:id/report-export", kh.ExportReport) // TODO: implement
+    
+    // Logs & Audit Trail
+    v1.GET("/admin/logs", kh.GetLogs) // TODO: implement
+    
+    // Settings
+    v1.GET("/admin/settings", kh.GetSettings) // TODO: implement
+    v1.PUT("/admin/settings", kh.UpdateSettings) // TODO: implement
+    v1.POST("/admin/backup", kh.BackupDatabase) // TODO: implement
 }

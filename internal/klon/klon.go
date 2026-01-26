@@ -2,6 +2,7 @@ package klon
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"time"
 )
@@ -169,9 +170,19 @@ type KlonDatabase interface {
 	InviteCompetitionJudge(ctx context.Context, competitionID, userID, levelID, invitedBy int) error
 	RemoveCompetitionJudge(ctx context.Context, judgeID int) error
 
+	// Submission Scoring (Judge scoring system)
+	GetJudgeLevelsForCompetition(ctx context.Context, userID, competitionID int) ([]map[string]interface{}, error)
+	GetJudgeSubmissions(ctx context.Context, userID, competitionID, levelID int) ([]map[string]interface{}, error)
+	GetSubmissionDetail(ctx context.Context, submissionID int) (map[string]interface{}, error)
+	SaveSubmissionScore(ctx context.Context, judgeID, submissionID int, score float64, comment string) error
+	GetSubmissionScore(ctx context.Context, judgeID, submissionID int) (map[string]interface{}, error)
+
 	// Admin - Organizations
 	GetPendingOrganizations() ([]PendingOrganization, error)
 	UpdateOrganizationStatus(organizationID int, status string) error
+	
+	// Database access
+	GetDB() *sql.DB
 }
 
 // Invitation represents an invitation sent to a user to be a judge

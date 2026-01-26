@@ -150,3 +150,111 @@ func (h *KlonHandlers) JudgeContestSummary(c *gin.Context) {
     if err != nil { c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}); return }
     c.JSON(http.StatusOK, out)
 }
+
+// ========== New Submission Scoring Handlers ==========
+
+// GetJudgeLevels - Get all levels assigned to a judge for a competition
+func (h *KlonHandlers) GetJudgeLevels(c *gin.Context) {
+    competitionID, err := strconv.Atoi(c.Param("competition_id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid competition_id"})
+        return
+    }
+    
+    userID, err := strconv.Atoi(c.Query("user_id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "user_id required"})
+        return
+    }
+    
+    levels, err := h.db.GetJudgeLevelsForCompetition(c.Request.Context(), userID, competitionID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, levels)
+}
+
+// GetJudgeSubmissionsList - Get all submissions for a judge to score
+func (h *KlonHandlers) GetJudgeSubmissionsList(c *gin.Context) {
+    competitionID, err := strconv.Atoi(c.Param("competition_id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid competition_id"})
+        return
+    }
+    
+    levelID, err := strconv.Atoi(c.Param("level_id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid level_id"})
+        return
+    }
+    
+    userID, err := strconv.Atoi(c.Query("user_id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "user_id required"})
+        return
+    }
+    
+    submissions, err := h.db.GetJudgeSubmissions(c.Request.Context(), userID, competitionID, levelID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, submissions)
+}
+
+// GetSubmissionForScoring - Get full details of a submission for scoring
+func (h *KlonHandlers) GetSubmissionForScoring(c *gin.Context) {
+    submissionID, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid submission_id"})
+        return
+    }
+    
+    submission, err := h.db.GetSubmissionDetail(c.Request.Context(), submissionID)
+    if err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "submission not found"})
+        return
+    }
+    
+    // Get judge's existing score if any
+    judgeID, err := strconv.Atoi(c.Query("judge_id"))
+    if err == nil && judgeID > 0 {
+        score, _ := h.db.GetSubmissionScore(c.Request.Context(), judgeID, submissionID)
+        if score != nil {
+            submission["existing_score"] = score
+        }
+    }
+    
+    c.JSON(http.StatusOK, submission)
+}
+
+// SubmitScore - Submit or update a score for a submission
+func (h *KlonHandlers) SubmitScore(c *gin.Context) {
+    submissionID, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid submission_id"})
+        return
+    }
+    
+    var req struct {
+        JudgeID int     `json:"judge_id" binding:"required"`
+        Score   float64 `json:"score" binding:"required,min=0,max=10"`
+        Comment string  `json:"comment"`
+    }
+    
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    err = h.db.SaveSubmissionScore(c.Request.Context(), req.JudgeID, submissionID, req.Score, req.Comment)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{"message": "score saved successfully"})
+}

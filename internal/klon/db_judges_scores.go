@@ -222,3 +222,221 @@ func (p *PostgresKlonDB) ListJudges(ctx context.Context, competitionID int) ([]J
 func (p *PostgresKlonDB) ListScores(ctx context.Context, workID int) ([]Score, error) {
     return []Score{}, nil
 }
+
+// ========== Submission Scoring Functions ==========
+
+// GetJudgeSubmissions - Get all submissions for a judge in a specific competition and level
+func (p *PostgresKlonDB) GetJudgeSubmissions(ctx context.Context, userID, competitionID, levelID int) ([]map[string]interface{}, error) {
+    query := `
+        SELECT 
+            s.submission_id,
+            s.title,
+            s.content,
+            s.submitted_at,
+            s.status,
+            u.full_name as author_name,
+            u.email as author_email,
+            ss.score,
+            ss.comment,
+            ss.scored_at,
+            CASE WHEN ss.submission_score_id IS NOT NULL THEN true ELSE false END as is_scored
+        FROM submissions s
+        INNER JOIN users u ON s.user_id = u.user_id
+        LEFT JOIN submission_scores ss ON s.submission_id = ss.submission_id 
+            AND ss.judge_id = (SELECT judge_id FROM judges WHERE user_id = $1 AND competition_id = $2 AND level_id = $3 LIMIT 1)
+        WHERE s.competition_id = $2 AND s.level_id = $3
+        ORDER BY s.submitted_at ASC
+    `
+    
+    rows, err := p.db.QueryContext(ctx, query, userID, competitionID, levelID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+    
+    results := make([]map[string]interface{}, 0)
+    for rows.Next() {
+        var (
+            submissionID int
+            title, content, authorName, authorEmail, status string
+            submittedAt time.Time
+            score sql.NullFloat64
+            comment sql.NullString
+            scoredAt sql.NullTime
+            isScored bool
+        )
+        
+        err := rows.Scan(&submissionID, &title, &content, &submittedAt, &status, 
+            &authorName, &authorEmail, &score, &comment, &scoredAt, &isScored)
+        if err != nil {
+            return nil, err
+        }
+        
+        result := map[string]interface{}{
+            "submission_id": submissionID,
+            "title": title,
+            "content": content,
+            "submitted_at": submittedAt,
+            "status": status,
+            "author_name": authorName,
+            "author_email": authorEmail,
+            "is_scored": isScored,
+        }
+        
+        if score.Valid {
+            result["score"] = score.Float64
+        }
+        if comment.Valid {
+            result["comment"] = comment.String
+        }
+        if scoredAt.Valid {
+            result["scored_at"] = scoredAt.Time
+        }
+        
+        results = append(results, result)
+    }
+    
+    return results, nil
+}
+
+// GetSubmissionDetail - Get full details of a submission
+func (p *PostgresKlonDB) GetSubmissionDetail(ctx context.Context, submissionID int) (map[string]interface{}, error) {
+    query := `
+        SELECT 
+            s.submission_id,
+            s.title,
+            s.content,
+            s.submitted_at,
+            s.status,
+            s.competition_id,
+            s.level_id,
+            s.user_id,
+            u.full_name as author_name,
+            u.email as author_email,
+            c.title as competition_title,
+            l.name as level_name
+        FROM submissions s
+        INNER JOIN users u ON s.user_id = u.user_id
+        INNER JOIN competitions c ON s.competition_id = c.competition_id
+        INNER JOIN levels l ON s.level_id = l.level_id
+        WHERE s.submission_id = $1
+    `
+    
+    var (
+        competitionID, levelID, userID int
+        title, content, status, authorName, authorEmail, competitionTitle, levelName string
+        submittedAt time.Time
+    )
+    
+    err := p.db.QueryRowContext(ctx, query, submissionID).Scan(
+        &submissionID, &title, &content, &submittedAt, &status, &competitionID, &levelID, &userID,
+        &authorName, &authorEmail, &competitionTitle, &levelName,
+    )
+    
+    if err != nil {
+        return nil, err
+    }
+    
+    return map[string]interface{}{
+        "submission_id": submissionID,
+        "title": title,
+        "content": content,
+        "submitted_at": submittedAt,
+        "status": status,
+        "competition_id": competitionID,
+        "level_id": levelID,
+        "user_id": userID,
+        "author_name": authorName,
+        "author_email": authorEmail,
+        "competition_title": competitionTitle,
+        "level_name": levelName,
+    }, nil
+}
+
+// SaveSubmissionScore - Save or update a score for a submission
+func (p *PostgresKlonDB) SaveSubmissionScore(ctx context.Context, judgeID, submissionID int, score float64, comment string) error {
+    query := `
+        INSERT INTO submission_scores (judge_id, submission_id, score, comment, scored_at)
+        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
+        ON CONFLICT (judge_id, submission_id) 
+        DO UPDATE SET 
+            score = EXCLUDED.score,
+            comment = EXCLUDED.comment,
+            scored_at = CURRENT_TIMESTAMP
+    `
+    
+    _, err := p.db.ExecContext(ctx, query, judgeID, submissionID, score, comment)
+    return err
+}
+
+// GetSubmissionScore - Get a judge's score for a specific submission
+func (p *PostgresKlonDB) GetSubmissionScore(ctx context.Context, judgeID, submissionID int) (map[string]interface{}, error) {
+    query := `
+        SELECT score, comment, scored_at
+        FROM submission_scores
+        WHERE judge_id = $1 AND submission_id = $2
+    `
+    
+    var (
+        score float64
+        comment sql.NullString
+        scoredAt time.Time
+    )
+    
+    err := p.db.QueryRowContext(ctx, query, judgeID, submissionID).Scan(&score, &comment, &scoredAt)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, nil // ยังไม่ได้ให้คะแนน
+        }
+        return nil, err
+    }
+    
+    result := map[string]interface{}{
+        "score": score,
+        "scored_at": scoredAt,
+    }
+    
+    if comment.Valid {
+        result["comment"] = comment.String
+    }
+    
+    return result, nil
+}
+
+// GetJudgeLevelsForCompetition - Get all levels assigned to a judge for a specific competition
+func (p *PostgresKlonDB) GetJudgeLevelsForCompetition(ctx context.Context, userID, competitionID int) ([]map[string]interface{}, error) {
+    query := `
+        SELECT 
+            j.level_id,
+            l.name as level_name,
+            j.judge_id
+        FROM judges j
+        INNER JOIN levels l ON j.level_id = l.level_id
+        WHERE j.user_id = $1 AND j.competition_id = $2 AND j.status = 'accepted'
+        ORDER BY j.level_id
+    `
+    
+    rows, err := p.db.QueryContext(ctx, query, userID, competitionID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+    
+    results := make([]map[string]interface{}, 0)
+    for rows.Next() {
+        var levelID, judgeID int
+        var levelName string
+        
+        if err := rows.Scan(&levelID, &levelName, &judgeID); err != nil {
+            return nil, err
+        }
+        
+        results = append(results, map[string]interface{}{
+            "level_id": levelID,
+            "level_name": levelName,
+            "judge_id": judgeID,
+        })
+    }
+    
+    return results, nil
+}

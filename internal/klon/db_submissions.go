@@ -10,14 +10,22 @@ func (p *PostgresKlonDB) CreateSubmission(ctx context.Context, competitionID int
     var submissionID int
     var submittedAt sql.NullTime
     
+    // First, get level_id from level_name
+    var levelID sql.NullInt64
+    levelQuery := `SELECT level_id FROM levels WHERE name = $1`
+    err := p.db.QueryRowContext(ctx, levelQuery, levelName).Scan(&levelID)
+    if err != nil && err != sql.ErrNoRows {
+        return nil, err
+    }
+    
     query := `
         INSERT INTO submissions 
-        (competition_id, user_id, name, email, phone, level_name, title, poem_type, content, document, submitted_at) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP) 
+        (competition_id, user_id, name, email, phone, level_id, level_name, title, poem_type, content, document, submitted_at) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP) 
         RETURNING submission_id, submitted_at
     `
     
-    err := p.db.QueryRowContext(
+    err = p.db.QueryRowContext(
         ctx, 
         query,
         competitionID,
@@ -25,6 +33,7 @@ func (p *PostgresKlonDB) CreateSubmission(ctx context.Context, competitionID int
         name,
         email,
         phone,
+        levelID,
         levelName,
         title,
         poemType,
@@ -43,6 +52,7 @@ func (p *PostgresKlonDB) CreateSubmission(ctx context.Context, competitionID int
         "name": name,
         "email": email,
         "phone": phone,
+        "level_id": levelID,
         "level_name": levelName,
         "title": title,
         "poem_type": poemType,

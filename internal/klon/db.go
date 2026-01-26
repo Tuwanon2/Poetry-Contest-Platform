@@ -42,3 +42,7 @@ func (p *PostgresKlonDB) Ping() error {
     }
     return p.db.Ping()
 }
+// GetDB returns the underlying *sql.DB for direct queries
+func (p *PostgresKlonDB) GetDB() *sql.DB {
+    return p.db
+}
