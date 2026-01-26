@@ -164,7 +164,7 @@ const JudgeContests = () => {
             ) : (
               <div className="invitations-list">
                 {invitations.map((inv) => (
-                  <div key={inv.id} className="invitation-card">
+                  <div key={inv.judge_id} className="invitation-card">
                     <div className="card-header">
                       <h3 className="contest-title">{inv.title || 'การประกวด'}</h3>
                       <span className="status-badge pending">รอตอบรับ</span>
@@ -182,13 +182,13 @@ const JudgeContests = () => {
                     <div className="card-footer">
                       <button 
                         className="accept-btn"
-                        onClick={() => handleAcceptInvitation(inv.id)}
+                        onClick={() => handleAcceptInvitation(inv.judge_id)}
                       >
                         ✓ ตอบรับ
                       </button>
                       <button 
                         className="reject-btn"
-                        onClick={() => handleRejectInvitation(inv.id)}
+                        onClick={() => handleRejectInvitation(inv.judge_id)}
                       >
                         ✕ ปฏิเสธ
                       </button>
@@ -215,7 +215,7 @@ const JudgeContests = () => {
                   <div 
                     key={contest.id} 
                     className="contest-card"
-                    onClick={() => navigate(`/judge-scoring/${contest.id}`)}
+                    onClick={() => navigate(`/my-work/${contest.id}`)}
                   >
                     <div className="card-header">
                       <h3 className="contest-title">{contest.title}</h3>

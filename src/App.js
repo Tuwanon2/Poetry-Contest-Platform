@@ -2,7 +2,6 @@ import CompetitionsOverview from './pages/CompetitionsOverview';
 import SubmitCompetition from './pages/SubmitCompetition';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import JudgeScoring from './pages/JudgeScoring';
 import JudgeWorkDetail from './pages/JudgeWorkDetail';
 import JudgeContests from './pages/JudgeContests';
 import Login from './pages/auth/Login';
@@ -23,6 +22,8 @@ import CompetitionResults from './pages/CompetitionResults';
 import About from './pages/public/About';
 import SearchResults from './pages/SearchResults';
 import MyWorks from './pages/MyWorks';
+import MyWork from './pages/MyWork';
+import ScoreSubmission from './pages/ScoreSubmission';
 import SubmissionDetail from './pages/SubmissionDetail';
 import MyOrganizations from './pages/MyOrganizations';
 import CreateOrganization from './pages/CreateOrganization';
@@ -50,7 +51,6 @@ function App() {
         <Route path="/competition/university" element={<UniversityCompetitions />} />
         <Route path="/competition/general" element={<GeneralCompetitions />} />
         <Route path="/competitions-overview" element={<CompetitionsOverview />} />
-        <Route path="/judge-scoring" element={<JudgeScoring />} />
         <Route path="/judge-work-detail" element={<JudgeWorkDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -58,6 +58,8 @@ function App() {
         <Route path="/results" element={<CompetitionResults />} />
         <Route path="/about" element={<About />} />
         <Route path="/my-works" element={<MyWorks />} />
+        <Route path="/my-work/:competitionId" element={<MyWork />} />
+        <Route path="/score-submission/:submissionId" element={<ScoreSubmission />} />
         <Route path="/submission/:submissionId" element={<SubmissionDetail />} />
         <Route path="/all-competitions" element={<AllCompetitions />} />
         <Route path="/competition/primary" element={<PrimaryCompetitions />} />
@@ -72,7 +74,6 @@ function App() {
         <Route path="/competition/:competitionId/edit" element={<EditCompetition />} />
         <Route path="/competition/:competitionId/submission/:submissionId" element={<SubmissionReview />} />
         <Route path="/judge/contests" element={<JudgeContests />} />
-        <Route path="/judge-scoring/:competitionId" element={<JudgeScoring />} />
       </Routes>
     </Router>
   );

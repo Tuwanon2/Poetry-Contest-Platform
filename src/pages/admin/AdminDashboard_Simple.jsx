@@ -9,8 +9,21 @@ export default function AdminDashboard() {
   const [approvedOrganizations, setApprovedOrganizations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [approveTab, setApproveTab] = useState('pending'); // 'pending' หรือ 'approved'
+  const [dashboardStats, setDashboardStats] = useState({
+    totalUsers: 0,
+    totalCompetitions: 0,
+    totalOrganizations: 0,
+    usersByRole: {
+      judges: 0,
+      organizers: 0,
+      assistants: 0
+    }
+  });
 
   useEffect(() => {
+    if (activeSection === 'overview') {
+      fetchDashboardStats();
+    }
     if (activeSection === 'approve-organizer') {
       if (approveTab === 'pending') {
         fetchPendingOrganizations();
@@ -19,6 +32,15 @@ export default function AdminDashboard() {
       }
     }
   }, [activeSection, approveTab]);
+
+  const fetchDashboardStats = async () => {
+    try {
+      const res = await axios.get('http://localhost:8080/api/v1/admin/dashboard/stats');
+      setDashboardStats(res.data || {});
+    } catch (err) {
+      console.error('Error fetching dashboard stats:', err);
+    }
+  };
 
   const fetchPendingOrganizations = async () => {
     try {
@@ -169,11 +191,11 @@ export default function AdminDashboard() {
                 marginBottom: '30px'
               }}>
                 {[
-                  { title: 'ผู้เข้าแข่งขัน', value: '1,240', emoji: '👥', color: '#70136C' },
-                  { title: 'รายการประกวด', value: '8', emoji: '🏆', color: '#e67e22' },
-                  { title: 'กรรมการ', value: '24', emoji: '⚖️', color: '#27ae60' },
-                  { title: 'ผู้จัดการประกวด', value: '5', emoji: '💼', color: '#2980b9' },
-                  { title: 'ผู้ช่วยจัดการประกวด', value: '12', emoji: '✅', color: '#8e44ad' }
+                  { title: 'ผู้ใช้ในระบบ', value: dashboardStats.totalUsers || 0, emoji: '👥', color: '#70136C' },
+                  { title: 'รายการประกวด', value: dashboardStats.totalCompetitions || 0, emoji: '🏆', color: '#e67e22' },
+                  { title: 'กรรมการ', value: dashboardStats.usersByRole?.judges || 0, emoji: '⚖️', color: '#27ae60' },
+                  { title: 'องค์กร', value: dashboardStats.totalOrganizations || 0, emoji: '💼', color: '#2980b9' },
+                  { title: 'ผู้ช่วยจัดการประกวด', value: dashboardStats.usersByRole?.assistants || 0, emoji: '✅', color: '#8e44ad' }
                 ].map((stat, i) => (
                   <div key={i} style={{ 
                     background: 'white', 
