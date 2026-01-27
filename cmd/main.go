@@ -56,7 +56,8 @@ func main() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	// Serve static files from uploads directory (in DB_poem folder)
+	// Serve static files from uploads directory
+	// Serve static files from absolute uploads directory for robustness
 	r.Static("/uploads", "/DB_poem/uploads")
 
 	// Public register route (should be accessible without auth middleware)

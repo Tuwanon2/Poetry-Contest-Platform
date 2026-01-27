@@ -3,6 +3,7 @@ package klon
 import (
     "context"
     "database/sql"
+    "encoding/json"
     "errors"
     "time"
     "fmt"
@@ -236,7 +237,8 @@ func (p *PostgresKlonDB) GetJudgeSubmissions(ctx context.Context, userID, compet
             s.status,
             u.full_name as author_name,
             u.email as author_email,
-            ss.score,
+            ss.scores,
+            ss.total_score,
             ss.comment,
             ss.scored_at,
             CASE WHEN ss.submission_score_id IS NOT NULL THEN true ELSE false END as is_scored
@@ -260,14 +262,15 @@ func (p *PostgresKlonDB) GetJudgeSubmissions(ctx context.Context, userID, compet
             submissionID int
             title, content, authorName, authorEmail, status string
             submittedAt time.Time
-            score sql.NullFloat64
+            scoresBytes []byte
+            totalScore sql.NullFloat64
             comment sql.NullString
             scoredAt sql.NullTime
             isScored bool
         )
         
         err := rows.Scan(&submissionID, &title, &content, &submittedAt, &status, 
-            &authorName, &authorEmail, &score, &comment, &scoredAt, &isScored)
+            &authorName, &authorEmail, &scoresBytes, &totalScore, &comment, &scoredAt, &isScored)
         if err != nil {
             return nil, err
         }
@@ -283,8 +286,16 @@ func (p *PostgresKlonDB) GetJudgeSubmissions(ctx context.Context, userID, compet
             "is_scored": isScored,
         }
         
-        if score.Valid {
-            result["score"] = score.Float64
+        // Parse scores JSONB
+        if len(scoresBytes) > 0 {
+            var scores interface{}
+            if err := json.Unmarshal(scoresBytes, &scores); err == nil {
+                result["scores"] = scores
+            }
+        }
+        
+        if totalScore.Valid {
+            result["total_score"] = totalScore.Float64
         }
         if comment.Valid {
             result["comment"] = comment.String
@@ -356,11 +367,11 @@ func (p *PostgresKlonDB) GetSubmissionDetail(ctx context.Context, submissionID i
 // SaveSubmissionScore - Save or update a score for a submission
 func (p *PostgresKlonDB) SaveSubmissionScore(ctx context.Context, judgeID, submissionID int, score float64, comment string) error {
     query := `
-        INSERT INTO submission_scores (judge_id, submission_id, score, comment, scored_at)
+        INSERT INTO submission_scores (judge_id, submission_id, total_score, comment, scored_at)
         VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
         ON CONFLICT (judge_id, submission_id) 
         DO UPDATE SET 
-            score = EXCLUDED.score,
+            total_score = EXCLUDED.total_score,
             comment = EXCLUDED.comment,
             scored_at = CURRENT_TIMESTAMP
     `
@@ -369,21 +380,44 @@ func (p *PostgresKlonDB) SaveSubmissionScore(ctx context.Context, judgeID, submi
     return err
 }
 
+// SaveSubmissionScoreWithCriteria - Save or update scores with criteria for a submission
+func (p *PostgresKlonDB) SaveSubmissionScoreWithCriteria(ctx context.Context, judgeID, submissionID int, scores interface{}, totalScore float64, comment string) error {
+    scoresJSON, err := json.Marshal(scores)
+    if err != nil {
+        return err
+    }
+    
+    query := `
+        INSERT INTO submission_scores (judge_id, submission_id, scores, total_score, comment, scored_at)
+        VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
+        ON CONFLICT (judge_id, submission_id) 
+        DO UPDATE SET 
+            scores = EXCLUDED.scores,
+            total_score = EXCLUDED.total_score,
+            comment = EXCLUDED.comment,
+            scored_at = CURRENT_TIMESTAMP
+    `
+    
+    _, err = p.db.ExecContext(ctx, query, judgeID, submissionID, scoresJSON, totalScore, comment)
+    return err
+}
+
 // GetSubmissionScore - Get a judge's score for a specific submission
 func (p *PostgresKlonDB) GetSubmissionScore(ctx context.Context, judgeID, submissionID int) (map[string]interface{}, error) {
     query := `
-        SELECT score, comment, scored_at
+        SELECT scores, total_score, comment, scored_at
         FROM submission_scores
         WHERE judge_id = $1 AND submission_id = $2
     `
     
     var (
-        score float64
+        scoresBytes []byte
+        totalScore sql.NullFloat64
         comment sql.NullString
         scoredAt time.Time
     )
     
-    err := p.db.QueryRowContext(ctx, query, judgeID, submissionID).Scan(&score, &comment, &scoredAt)
+    err := p.db.QueryRowContext(ctx, query, judgeID, submissionID).Scan(&scoresBytes, &totalScore, &comment, &scoredAt)
     if err != nil {
         if err == sql.ErrNoRows {
             return nil, nil // ยังไม่ได้ให้คะแนน
@@ -392,8 +426,19 @@ func (p *PostgresKlonDB) GetSubmissionScore(ctx context.Context, judgeID, submis
     }
     
     result := map[string]interface{}{
-        "score": score,
         "scored_at": scoredAt,
+    }
+    
+    // Parse scores JSONB
+    if len(scoresBytes) > 0 {
+        var scores interface{}
+        if err := json.Unmarshal(scoresBytes, &scores); err == nil {
+            result["scores"] = scores
+        }
+    }
+    
+    if totalScore.Valid {
+        result["total_score"] = totalScore.Float64
     }
     
     if comment.Valid {

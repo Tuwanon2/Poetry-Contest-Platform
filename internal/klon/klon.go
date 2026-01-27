@@ -175,6 +175,7 @@ type KlonDatabase interface {
 	GetJudgeSubmissions(ctx context.Context, userID, competitionID, levelID int) ([]map[string]interface{}, error)
 	GetSubmissionDetail(ctx context.Context, submissionID int) (map[string]interface{}, error)
 	SaveSubmissionScore(ctx context.Context, judgeID, submissionID int, score float64, comment string) error
+	SaveSubmissionScoreWithCriteria(ctx context.Context, judgeID, submissionID int, scores interface{}, totalScore float64, comment string) error
 	GetSubmissionScore(ctx context.Context, judgeID, submissionID int) (map[string]interface{}, error)
 
 	// Admin - Organizations

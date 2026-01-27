@@ -132,7 +132,7 @@ func (p *PostgresKlonDB) SearchContests(ctx context.Context, q string) ([]Compet
 
 // fetchLevelsForCompetition returns a slice of level objects (with poem_types and prizes)
 func (p *PostgresKlonDB) fetchLevelsForCompetition(ctx context.Context, competitionID int) ([]map[string]interface{}, error) {
-    rows, err := p.db.QueryContext(ctx, `SELECT cl.competition_level_id, cl.level_id, l.name as level_name, cl.rules, cl.prizes, cl.topic_enabled, cl.topic_name, cl.poem_type_id FROM competition_levels cl LEFT JOIN levels l ON cl.level_id = l.level_id WHERE cl.competition_id=$1 ORDER BY cl.competition_level_id`, competitionID)
+    rows, err := p.db.QueryContext(ctx, `SELECT cl.competition_level_id, cl.level_id, l.name as level_name, cl.rules, cl.prizes, cl.topic_enabled, cl.topic_name, cl.poem_type_id, cl.scoring_criteria FROM competition_levels cl LEFT JOIN levels l ON cl.level_id = l.level_id WHERE cl.competition_id=$1 ORDER BY cl.competition_level_id`, competitionID)
     if err != nil { return nil, err }
     defer rows.Close()
     var out []map[string]interface{}
@@ -145,7 +145,8 @@ func (p *PostgresKlonDB) fetchLevelsForCompetition(ctx context.Context, competit
         var topicEnabled bool
         var topicName sql.NullString
         var poemTypeID sql.NullInt64
-        if err := rows.Scan(&competitionLevelID, &levelID, &levelName, &rules, &prizesBytes, &topicEnabled, &topicName, &poemTypeID); err != nil { continue }
+        var scoringCriteriaBytes []byte
+        if err := rows.Scan(&competitionLevelID, &levelID, &levelName, &rules, &prizesBytes, &topicEnabled, &topicName, &poemTypeID, &scoringCriteriaBytes); err != nil { continue }
         lvl := map[string]interface{}{"competition_level_id": competitionLevelID, "level_id": levelID, "level_name": levelName}
         if rules.Valid { lvl["rules"] = rules.String }
         lvl["topic_enabled"] = topicEnabled
@@ -163,6 +164,14 @@ func (p *PostgresKlonDB) fetchLevelsForCompetition(ctx context.Context, competit
             var pr interface{}
             if err := json.Unmarshal(prizesBytes, &pr); err == nil {
                 lvl["prizes"] = pr
+            }
+        }
+
+        // scoring_criteria JSONB
+        if len(scoringCriteriaBytes) > 0 {
+            var sc interface{}
+            if err := json.Unmarshal(scoringCriteriaBytes, &sc); err == nil {
+                lvl["scoring_criteria"] = sc
             }
         }
 
@@ -391,11 +400,17 @@ func (p *PostgresKlonDB) CreateCompetition(ctx context.Context, comp Competition
                     if b, err := json.Marshal(prs); err == nil { prizesBytes = b }
                 }
 
+                // scoring_criteria: accept array (JSON)
+                var scoringCriteriaBytes []byte
+                if sc, ok := lp["scoring_criteria"]; ok {
+                    if b, err := json.Marshal(sc); err == nil { scoringCriteriaBytes = b }
+                }
+
                 // insert level row with level_id
                 if poemTypeID != nil {
-                    _, _ = p.db.ExecContext(ctx, `INSERT INTO competition_levels (competition_id, level_id, poem_type_id, rules, prizes, topic_enabled, topic_name) VALUES ($1,$2,$3,$4,$5,$6,$7)`, comp.ID, levelID, poemTypeID, rules, prizesBytes, topicEnabled, topicName)
+                    _, _ = p.db.ExecContext(ctx, `INSERT INTO competition_levels (competition_id, level_id, poem_type_id, rules, prizes, topic_enabled, topic_name, scoring_criteria) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`, comp.ID, levelID, poemTypeID, rules, prizesBytes, topicEnabled, topicName, scoringCriteriaBytes)
                 } else {
-                    _, _ = p.db.ExecContext(ctx, `INSERT INTO competition_levels (competition_id, level_id, rules, prizes, topic_enabled, topic_name) VALUES ($1,$2,$3,$4,$5,$6)`, comp.ID, levelID, rules, prizesBytes, topicEnabled, topicName)
+                    _, _ = p.db.ExecContext(ctx, `INSERT INTO competition_levels (competition_id, level_id, rules, prizes, topic_enabled, topic_name, scoring_criteria) VALUES ($1,$2,$3,$4,$5,$6,$7)`, comp.ID, levelID, rules, prizesBytes, topicEnabled, topicName, scoringCriteriaBytes)
                 }
             }
         }

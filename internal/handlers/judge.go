@@ -240,9 +240,11 @@ func (h *KlonHandlers) SubmitScore(c *gin.Context) {
     }
     
     var req struct {
-        JudgeID int     `json:"judge_id" binding:"required"`
-        Score   float64 `json:"score" binding:"required,min=0,max=10"`
-        Comment string  `json:"comment"`
+        JudgeID    int                      `json:"judge_id" binding:"required"`
+        Score      float64                  `json:"score"`
+        Scores     []map[string]interface{} `json:"scores"`
+        TotalScore float64                  `json:"total_score"`
+        Comment    string                   `json:"comment"`
     }
     
     if err := c.ShouldBindJSON(&req); err != nil {
@@ -250,7 +252,14 @@ func (h *KlonHandlers) SubmitScore(c *gin.Context) {
         return
     }
     
-    err = h.db.SaveSubmissionScore(c.Request.Context(), req.JudgeID, submissionID, req.Score, req.Comment)
+    // If scores array is provided, use criteria-based scoring
+    if len(req.Scores) > 0 {
+        err = h.db.SaveSubmissionScoreWithCriteria(c.Request.Context(), req.JudgeID, submissionID, req.Scores, req.TotalScore, req.Comment)
+    } else {
+        // Fallback to simple scoring for backward compatibility
+        err = h.db.SaveSubmissionScore(c.Request.Context(), req.JudgeID, submissionID, req.Score, req.Comment)
+    }
+    
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return

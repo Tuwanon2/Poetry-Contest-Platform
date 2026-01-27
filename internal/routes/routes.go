@@ -22,11 +22,12 @@ func Register(v1 *gin.RouterGroup, kh *handlers.KlonHandlers) {
     // Competitions (alias routes for frontend compatibility)
     v1.GET("/competitions", kh.ListContests)
     v1.GET("/competitions/:id", kh.GetContest)
-    v1.POST("/competitions", kh.CreateContest)
+    v1.POST("/competitions", kh.CreateCompetitionWithFormData) // Use FormData handler
     v1.PUT("/competitions/:id", kh.UpdateContest)
     v1.DELETE("/competitions/:id", kh.DeleteContest)
     v1.GET("/competitions/:id/submissions", kh.ListSubmissions)
     v1.GET("/competitions/:id/levels", kh.GetCompetitionLevels)
+    v1.PUT("/competition-levels/:id/criteria", kh.UpdateCompetitionLevelCriteria)
 
     // Auth
     v1.POST("/auth/login", kh.Login)
