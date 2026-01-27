@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-// import axios from "axios"; // เปิดใช้งานเมื่อเชื่อมต่อ API
+import axios from "axios";
 import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import TopNav from "../components/TopNav";
 import InviteJudgeModal from "../components/InviteJudgeModal";
@@ -148,6 +148,8 @@ export default function CreateCompetition() {
   const [contestName, setContestName] = useState("");
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [poster, setPoster] = useState(null);
+  const [posterURL, setPosterURL] = useState(""); // url string (จาก backend)
+  const [posterUploading, setPosterUploading] = useState(false);
   const [regOpen, setRegOpen] = useState("");
   const [regClose, setRegClose] = useState("");
   const [contestDescription, setContestDescription] = useState('');
@@ -241,44 +243,50 @@ export default function CreateCompetition() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      if (poster && !posterURL) {
+        alert('กรุณารออัปโหลดโปสเตอร์ให้เสร็จก่อน');
+        setLoading(false);
+        return;
+      }
       const formData = new FormData();
-      
       formData.append('name', contestName);
       formData.append('organization_id', organizationId);
       formData.append('registration_start', regOpen);
       formData.append('registration_end', regClose);
       formData.append('description', contestDescription);
       formData.append('objective', contestPurpose);
-      
-      if (poster) {
-        formData.append('poster', poster);
-      }
-
-      const competitionLevels = selectedLevels.map(lvl => ({
-        level_name: lvl,
-        poem_types: levelPoemTypes[lvl] || [],
-        topic_mode: levelTopics[lvl]?.topicEnabled ? 'fixed' : 'free',
-        topic_name: levelTopics[lvl]?.topicName || '',
-        description: levelDetails[lvl + '_description'] || '',
-        criteria: levelDetails[lvl + '_criteria'] || [],
-        total_score: calculateTotalScore(lvl),
-        prizes: levelDetails[lvl + '_prize_enabled'] ? {
+      // ส่ง poster_url (URL string ที่ได้จาก /api/v1/upload) แทนการแนบไฟล์
+      if (posterURL) formData.append('poster_url', posterURL);
+      formData.append('levels_json', JSON.stringify(selectedLevels.map(lvl => {
+        const criteria = levelDetails[lvl + '_criteria'] || [];
+        return {
+          level_name: lvl,
+          poem_types: levelPoemTypes[lvl] || [],
+          topic_mode: levelTopics[lvl]?.topicEnabled ? 'fixed' : 'free',
+          topic_name: levelTopics[lvl]?.topicName || '',
+          description: levelDetails[lvl + '_description'] || '',
+          criteria: criteria,
+          scoring_criteria: criteria.map(c => ({ name: c.title, max_score: Number(c.score) })),
+          total_score: calculateTotalScore(lvl),
+          prizes: levelDetails[lvl + '_prize_enabled'] ? {
             prize_1: levelDetails[lvl + '_prize1'],
             prize_2: levelDetails[lvl + '_prize2'],
             prize_3: levelDetails[lvl + '_prize3'],
-        } : null
-      }));
-
-      formData.append('levels_json', JSON.stringify(competitionLevels));
-
-      console.log("Submitting Data...", Object.fromEntries(formData));
-      
-      // await axios.post('http://localhost:8080/api/v1/competitions', formData);
+          } : null
+        };
+      })));
+      if (judges.length > 0) {
+        formData.append('judges_json', JSON.stringify(judges));
+      }
+      await axios.post('http://localhost:8080/api/v1/competitions', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       alert("สร้างการประกวดสำเร็จ!");
-      
+      navigate(`/organization/${organizationId}`);
     } catch (error) {
       console.error("Error creating competition:", error);
-      alert("เกิดข้อผิดพลาดในการสร้างการประกวด");
+      const errorMsg = error.response?.data?.message || error.message || "เกิดข้อผิดพลาดในการสร้างการประกวด";
+      alert(`เกิดข้อผิดพลาด: ${errorMsg}`);
     } finally {
       setLoading(false);
     }
@@ -367,7 +375,27 @@ export default function CreateCompetition() {
                 ))}
               </div>
 
-              <UploadBox file={poster} onSelect={setPoster} />
+              <UploadBox file={poster} onSelect={async file => {
+                setPoster(file);
+                setPosterURL("");
+                if (file) {
+                  setPosterUploading(true);
+                  try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const res = await axios.post('http://localhost:8080/api/v1/upload', formData);
+                    setPosterURL(res.data?.url || res.data?.file_url || "");
+                  } catch (err) {
+                    alert('อัปโหลดโปสเตอร์ล้มเหลว');
+                  } finally {
+                    setPosterUploading(false);
+                  }
+                }
+              }} />
+
+              {posterUploading && <div style={{marginTop:10, color:'#ff9800'}}>กำลังอัปโหลดโปสเตอร์...</div>}
+              {posterURL && <div style={{marginTop:10}}><strong>โปสเตอร์:</strong> <a href={posterURL} target="_blank" rel="noopener noreferrer">ดูโปสเตอร์</a></div>}
+              {poster && !posterURL && !posterUploading && <div style={{marginTop:10, color:'#ff4d4f'}}><strong>โปสเตอร์:</strong> {poster.name} (ยังไม่อัปโหลด)</div>}
 
               <div style={{ display: 'flex', gap: 24, marginTop: 32, marginBottom: 10 }}>
                 <div style={{ flex: 1 }}>
@@ -583,12 +611,12 @@ export default function CreateCompetition() {
           {step === 3 && (
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <h2>เชิญกรรมการ</h2>
+                <h2>เตรียมเชิญกรรมการ</h2>
                 <button 
                     className={styles.btnSecondary}
                     onClick={() => setShowInviteJudgeModal(true)}
                 >
-                    ➕ เชิญกรรมการ
+                    ➕ เพิ่มกรรมการ
                 </button>
               </div>
 
@@ -605,11 +633,11 @@ export default function CreateCompetition() {
                   </thead>
                   <tbody>
                     {judges.length === 0 ? (
-                      <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, color: '#999' }}>ยังไม่มีกรรมการ (กดถัดไปได้)</td></tr>
+                      <tr><td colSpan={4} style={{ textAlign: 'center', padding: 20, color: '#999' }}>ยังไม่มีกรรมการ (สามารถข้ามได้)</td></tr>
                     ) : (
                       judges.map((j, idx) => (
                         <tr key={idx}>
-                          <td>{j.first_name} {j.last_name}</td>
+                          <td>{j.full_name || `${j.first_name || ''} ${j.last_name || ''}`}</td>
                           <td>{j.email}</td>
                           <td>{j.levels ? j.levels.join(', ') : '-'}</td>
                           <td>
@@ -641,8 +669,21 @@ export default function CreateCompetition() {
                     <p><strong>ชื่อการประกวด:</strong> {contestName}</p>
                     <p><strong>รับสมัคร:</strong> {regOpen || '-'} ถึง {regClose || '-'}</p>
                     <p><strong>ระดับที่เลือก:</strong> {selectedLevels.join(', ')}</p>
-                    {poster && <div style={{marginTop:10}}><strong>โปสเตอร์:</strong> {poster.name} (พร้อมอัปโหลด)</div>}
+                    {posterURL && <div style={{marginTop:10}}><strong>โปสเตอร์:</strong> <a href={posterURL} target="_blank" rel="noopener noreferrer">ดูโปสเตอร์</a></div>}
+                    {poster && !posterURL && !posterUploading && <div style={{marginTop:10, color:'#ff4d4f'}}><strong>โปสเตอร์:</strong> {poster.name} (ยังไม่อัปโหลด)</div>}
                 </div>
+
+                {judges.length > 0 && (
+                  <div className={styles.reviewBox}>
+                      <h3>👨‍⚖️ กรรมการที่จะเชิญ ({judges.length} คน)</h3>
+                      {judges.map((j, idx) => (
+                        <div key={idx} style={{ marginBottom: 8, paddingLeft: 10, borderLeft: '2px solid #70136C' }}>
+                          <div><strong>{j.full_name || `${j.first_name || ''} ${j.last_name || ''}`}</strong> ({j.email})</div>
+                          <div style={{ fontSize: '0.9em', color: '#666' }}>ระดับ: {j.levels.join(', ')}</div>
+                        </div>
+                      ))}
+                  </div>
+                )}
 
                 <div className={styles.reviewBox}>
                     <h3>🏆 รายละเอียดและเกณฑ์คะแนน</h3>
@@ -689,14 +730,20 @@ export default function CreateCompetition() {
         </div>
       </div>
 
-      {/* Invite Judge Modal */}
+      {/* Invite Judge Modal - Prepare Mode */}
       <InviteJudgeModal
         isOpen={showInviteJudgeModal}
         onClose={() => setShowInviteJudgeModal(false)}
-        competitionId={null}
+        competitionId={null} // null = prepare mode, ยังไม่สร้างการประกวด
         levels={selectedLevels}
+        prepareMode={true} // บอกว่าอยู่ในโหมดเตรียมข้อมูล
         onSuccess={(newJudge) => {
-          // Add the invited judge to the judges list
+          // Check duplicate
+          if (judges.some(j => j.email === newJudge.email)) {
+            alert('กรรมการคนนี้ถูกเพิ่มแล้ว');
+            return;
+          }
+          // เพิ่มกรรมการเข้าไปใน list
           setJudges([...judges, newJudge]);
           setShowInviteJudgeModal(false);
         }}

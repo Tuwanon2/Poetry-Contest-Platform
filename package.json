@@ -31,6 +31,7 @@
     "slick-carousel": "^1.8.1",
     "web-vitals": "^2.1.4"
   },
+  "proxy": "http://localhost:8080",
   "scripts": {
     "start": "cross-env PORT=4000 react-scripts start",
     "build": "react-scripts build",

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess }) => {
+const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess, prepareMode = false }) => {
   const [searchEmail, setSearchEmail] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedLevel, setSelectedLevel] = useState('');
+  const [selectedLevels, setSelectedLevels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
 
@@ -43,28 +43,51 @@ const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess })
       return;
     }
 
-    if (!selectedLevel) {
-      alert('กรุณาเลือกระดับที่ต้องการให้ตรวจสอบ');
+    if (selectedLevels.length === 0) {
+      alert('กรุณาเลือกระดับอย่างน้อย 1 ระดับ');
       return;
     }
 
+    // ถ้าอยู่ในโหมด prepare (ยังไม่มีการประกวด) ให้ return ข้อมูลกลับไป
+    if (prepareMode || !competitionId) {
+      const judgeData = {
+        user_id: selectedUser.id,
+        email: selectedUser.email,
+        full_name: selectedUser.full_name || selectedUser.username,
+        levels: selectedLevels,
+      };
+      
+      // Reset form
+      setSearchEmail('');
+      setSelectedUser(null);
+      setSelectedLevels([]);
+      setSearchResults([]);
+      
+      if (onSuccess) onSuccess(judgeData);
+      return;
+    }
+
+    // ถ้ามี competitionId ให้เชิญจริง (API call)
     setLoading(true);
     try {
       const currentUserId = parseInt(localStorage.getItem('user_id') || sessionStorage.getItem('user_id'));
       
-      const payload = {
-        user_id: selectedUser.id,
-        level_id: parseInt(selectedLevel),
-        invited_by: currentUserId
-      };
-
-      await axios.post(`http://localhost:8080/api/v1/contests/${competitionId}/judges`, payload);
+      // เชิญกรรมการแต่ละระดับ
+      for (const levelValue of selectedLevels) {
+        const payload = {
+          user_id: selectedUser.id,
+          level_id: parseInt(levelValue),
+          invited_by: currentUserId
+        };
+        await axios.post(`http://localhost:8080/api/v1/contests/${competitionId}/judges`, payload);
+      }
+      
       alert('เชิญกรรมการสำเร็จ!');
       
       // Reset form
       setSearchEmail('');
       setSelectedUser(null);
-      setSelectedLevel('');
+      setSelectedLevels([]);
       setSearchResults([]);
       
       if (onSuccess) onSuccess();
@@ -178,35 +201,59 @@ const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess })
           )}
         </div>
 
-        {/* Level Selection */}
+        {/* Level Selection - Multiple Checkboxes */}
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>
-            เลือกระดับที่ต้องการให้ตรวจสอบ
+          <label style={{ display: 'block', marginBottom: '12px', fontWeight: '600', color: '#333' }}>
+            เลือกระดับที่ต้องการให้ตรวจสอบ (เลือกได้หลายระดับ)
           </label>
-          <select
-            value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              fontSize: '15px',
-              border: '1px solid #d0d0d0',
-              borderRadius: '8px',
-              boxSizing: 'border-box',
-            }}
-          >
-            <option value="">-- เลือกระดับ --</option>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(2, 1fr)', 
+            gap: '12px',
+            padding: '12px',
+            background: '#f8f9fa',
+            borderRadius: '8px',
+          }}>
             {levels && levels.map((level, idx) => {
-              // Support both object format (from API) and string format (from CreateCompetition)
               const levelValue = typeof level === 'object' ? level.level_id : level;
               const levelName = typeof level === 'object' ? level.level_name : level;
+              const isChecked = selectedLevels.includes(levelValue);
+              
               return (
-                <option key={idx} value={levelValue}>
-                  {levelName}
-                </option>
+                <label key={idx} style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  background: isChecked ? '#e8f5e9' : 'white',
+                  border: isChecked ? '2px solid #27ae60' : '1px solid #d0d0d0',
+                  borderRadius: '6px',
+                  transition: 'all 0.2s',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedLevels([...selectedLevels, levelValue]);
+                      } else {
+                        setSelectedLevels(selectedLevels.filter(l => l !== levelValue));
+                      }
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <span style={{ 
+                    fontSize: '15px', 
+                    fontWeight: isChecked ? '600' : '400',
+                    color: isChecked ? '#27ae60' : '#333',
+                  }}>
+                    {levelName}
+                  </span>
+                </label>
               );
             })}
-          </select>
+          </div>
         </div>
 
         {/* Actions */}
@@ -230,20 +277,20 @@ const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess })
           </button>
           <button
             onClick={handleInvite}
-            disabled={loading || !selectedUser || !selectedLevel}
+            disabled={loading || !selectedUser || selectedLevels.length === 0}
             style={{
               padding: '12px 24px',
-              background: (!selectedUser || !selectedLevel) ? '#ccc' : '#70136C',
+              background: (!selectedUser || selectedLevels.length === 0) ? '#ccc' : '#70136C',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
               fontSize: '15px',
               fontWeight: '600',
-              cursor: (!selectedUser || !selectedLevel || loading) ? 'not-allowed' : 'pointer',
+              cursor: (!selectedUser || selectedLevels.length === 0 || loading) ? 'not-allowed' : 'pointer',
               opacity: loading ? 0.6 : 1,
             }}
           >
-            {loading ? 'กำลังเชิญ...' : 'เชิญกรรมการ'}
+            {loading ? 'กำลังเชิญ...' : (prepareMode ? 'เพิ่มกรรมการ' : 'เชิญกรรมการ')}
           </button>
         </div>
       </div>

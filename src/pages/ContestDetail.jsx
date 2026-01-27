@@ -303,7 +303,7 @@ const ContestDetail = () => {
             disabled={timeRemaining.isExpired}
             onClick={() => {
                 if(timeRemaining.isExpired) return;
-                const user = localStorage.getItem('user');
+                const user = localStorage.getItem('user') || sessionStorage.getItem('user');
                 if(!user) { alert('กรุณาเข้าสู่ระบบ'); navigate('/login'); return; }
                 navigate(`/submit-competition/${id}`);
             }}

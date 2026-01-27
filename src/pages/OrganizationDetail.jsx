@@ -538,8 +538,21 @@ const OrganizationDetail = () => {
                   }}>
                     {competitions.map((comp) => {
                       const compId = comp.competition_id || comp.id;
-                      const imageUrl = comp.image_url || comp.poster_url;
-                      
+                      let imageUrl = comp.image_url || comp.poster_url;
+                      if (imageUrl && !imageUrl.startsWith('http')) {
+                        if (imageUrl.startsWith('/DB_poem/uploads')) {
+                          imageUrl = `http://localhost:8080${imageUrl}`;
+                        }
+                        // If it starts with /uploads, use as-is (served by backend static route)
+                        // If it starts with something else, fallback to original logic
+                        else if (imageUrl.startsWith('/uploads')) {
+                          imageUrl = `http://localhost:8080${imageUrl}`;
+                        }
+                        // else, fallback (for legacy or unexpected cases)
+                        else {
+                          imageUrl = `http://localhost:8080/${imageUrl}`;
+                        }
+                      }
                       return (
                         <div 
                           key={compId}

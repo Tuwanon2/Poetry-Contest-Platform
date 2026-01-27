@@ -75,6 +75,7 @@ const EditCompetition = () => {
     }
     
     try {
+      // 1. อัพเดตข้อมูลการประกวดหลัก
       const payload = {
         title,
         description,
@@ -83,11 +84,29 @@ const EditCompetition = () => {
         poster_url: posterURL,
         registration_start: registrationStart,
         registration_end: registrationEnd,
-        max_score: maxScore,
-        levels
+        max_score: maxScore
       };
 
       await axios.put(`http://localhost:8080/api/v1/competitions/${competitionId}`, payload);
+      
+      // 2. อัพเดต scoring_criteria สำหรับแต่ละ level
+      const updatePromises = levels
+        .filter(level => level.competition_level_id) // มีเฉพาะ level ที่มี id แล้ว
+        .map(level => {
+          if (level.scoring_criteria && Array.isArray(level.scoring_criteria)) {
+            return axios.put(
+              `http://localhost:8080/api/v1/competition-levels/${level.competition_level_id}/criteria`,
+              { scoring_criteria: level.scoring_criteria }
+            ).catch(err => {
+              console.error(`Failed to update criteria for level ${level.competition_level_id}:`, err);
+              return null; // ไม่ให้ทั้งหมดล้มเหลว
+            });
+          }
+          return Promise.resolve();
+        });
+      
+      await Promise.all(updatePromises);
+      
       alert("อัปเดตการประกวดสำเร็จ!");
       navigate(`/competition/${competitionId}/manage`);
     } catch (err) {
@@ -103,7 +122,8 @@ const EditCompetition = () => {
       rules: "",
       prizes: [],
       topic_enabled: false,
-      topic_name: ""
+      topic_name: "",
+      scoring_criteria: []
     }]);
   };
   
@@ -117,6 +137,27 @@ const EditCompetition = () => {
   const handleLevelChange = (index, field, value) => {
     const newLevels = [...levels];
     newLevels[index] = { ...newLevels[index], [field]: value };
+    setLevels(newLevels);
+  };
+  
+  const handleAddCriteria = (levelIndex) => {
+    const newLevels = [...levels];
+    if (!newLevels[levelIndex].scoring_criteria) {
+      newLevels[levelIndex].scoring_criteria = [];
+    }
+    newLevels[levelIndex].scoring_criteria.push({ name: '', max_score: 10 });
+    setLevels(newLevels);
+  };
+  
+  const handleRemoveCriteria = (levelIndex, criteriaIndex) => {
+    const newLevels = [...levels];
+    newLevels[levelIndex].scoring_criteria = newLevels[levelIndex].scoring_criteria.filter((_, i) => i !== criteriaIndex);
+    setLevels(newLevels);
+  };
+  
+  const handleCriteriaChange = (levelIndex, criteriaIndex, field, value) => {
+    const newLevels = [...levels];
+    newLevels[levelIndex].scoring_criteria[criteriaIndex][field] = value;
     setLevels(newLevels);
   };
   
@@ -447,6 +488,125 @@ const EditCompetition = () => {
                               />
                             </div>
                           )}
+                          
+                          {/* Scoring Criteria Section */}
+                          <div className="form-group" style={{ marginTop: '16px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                              <label className="form-label" style={{ margin: 0, color: '#70136C' }}>
+                                เกณฑ์การให้คะแนน <span style={{ color: '#e74c3c' }}>*</span>
+                              </label>
+                              <span style={{ fontSize: '14px', color: '#70136C', fontWeight: 600 }}>
+                                คะแนนรวม: {(level.scoring_criteria || []).reduce((sum, c) => sum + (c.max_score || 0), 0)} คะแนน
+                              </span>
+                            </div>
+                            
+                            {(level.scoring_criteria || []).length > 0 ? (
+                              <div style={{ display: 'grid', gap: '8px', marginBottom: '8px' }}>
+                                {level.scoring_criteria.map((criteria, cidx) => (
+                                  <div key={cidx} style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '8px',
+                                    padding: '8px',
+                                    background: '#f8f9fa',
+                                    borderRadius: '6px',
+                                    border: '1px solid #e0e0e0'
+                                  }}>
+                                    <div style={{ 
+                                      background: '#70136C', 
+                                      color: 'white', 
+                                      width: '28px', 
+                                      height: '28px', 
+                                      borderRadius: '50%', 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      justifyContent: 'center',
+                                      fontWeight: 600,
+                                      fontSize: '13px',
+                                      flexShrink: 0
+                                    }}>
+                                      {cidx + 1}
+                                    </div>
+                                    
+                                    <input
+                                      type="text"
+                                      value={criteria.name}
+                                      onChange={(e) => handleCriteriaChange(idx, cidx, 'name', e.target.value)}
+                                      placeholder="ชื่อเกณฑ์"
+                                      style={{
+                                        flex: 1,
+                                        padding: '6px 10px',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        fontSize: '14px'
+                                      }}
+                                    />
+                                    
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                      <input
+                                        type="number"
+                                        value={criteria.max_score}
+                                        onChange={(e) => handleCriteriaChange(idx, cidx, 'max_score', parseInt(e.target.value) || 0)}
+                                        style={{
+                                          width: '70px',
+                                          padding: '6px 8px',
+                                          border: '1px solid #ddd',
+                                          borderRadius: '4px',
+                                          fontSize: '14px',
+                                          textAlign: 'center'
+                                        }}
+                                      />
+                                      <span style={{ fontSize: '13px', color: '#666', minWidth: '45px' }}>คะแนน</span>
+                                    </div>
+                                    
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveCriteria(idx, cidx)}
+                                      style={{
+                                        background: '#e74c3c',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        width: '28px',
+                                        height: '28px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '16px',
+                                        flexShrink: 0
+                                      }}
+                                      title="ลบเกณฑ์"
+                                    >
+                                      🗑️
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
+                            
+                            <button
+                              type="button"
+                              onClick={() => handleAddCriteria(idx)}
+                              style={{
+                                width: '100%',
+                                padding: '10px',
+                                background: 'white',
+                                border: '2px dashed #70136C',
+                                borderRadius: '6px',
+                                color: '#70136C',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px'
+                              }}
+                            >
+                              + เพิ่มเกณฑ์การให้คะแนน
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}

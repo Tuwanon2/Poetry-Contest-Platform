@@ -36,6 +36,18 @@ export default function SubmitCompetition() {
   const defaultType = "กลอนแปด";
   const defaultPattern = POEM_PATTERNS[defaultType];
 
+  // Mockup poem for default
+  const mockupPoem = [
+    "แสงอรุณอุ่นฟ้าพาใจฝัน",
+    "ปลุกชีวันให้ตื่นจากคืนเหงา",
+    "เสียงลมแผ่วแว่วผ่านลานบ้านเรา",
+    "ดั่งบอกเล่าความหวังยังคงมี",
+    "แม้เส้นทางขวากหนามตามขวางกั้น",
+    "อย่าหวั่นไหวให้ใจนั้นหมองศรี",
+    "ก้าวด้วยศรัทธาพาฝันสู่วันดี",
+    "เพียรวันนี้พรุ่งนี้ย่อมงดงาม"
+  ];
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -44,9 +56,7 @@ export default function SubmitCompetition() {
     level: "",
     title: "",
     poemType: defaultType,
-    poemLines: Array(
-      defaultPattern.linesPerStanza * defaultPattern.initialStanzas
-    ).fill(""),
+    poemLines: mockupPoem,
     file: null,
   });
 
