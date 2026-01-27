@@ -101,7 +101,8 @@ CREATE TABLE IF NOT EXISTS competition_levels (
     rules TEXT,
     prizes JSONB,
     topic_enabled BOOLEAN DEFAULT FALSE,
-    topic_name VARCHAR(255)
+    topic_name VARCHAR(255),
+    scoring_criteria JSONB -- Array of {name: string, max_score: number}
 );
 
 -- (We store poem type id directly on competition_levels and prizes as JSONB there)
@@ -163,7 +164,8 @@ CREATE TABLE IF NOT EXISTS submission_scores (
     submission_score_id SERIAL PRIMARY KEY,
     submission_id INTEGER REFERENCES submissions(submission_id) ON DELETE CASCADE,
     judge_id INTEGER REFERENCES judges(judge_id) ON DELETE CASCADE,
-    score NUMERIC(5,2) NOT NULL,
+    scores JSONB, -- Array of {criteria_name: string, score: number}
+    total_score NUMERIC(5,2), -- Sum of all criteria scores
     comment TEXT,
     scored_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(judge_id, submission_id)
