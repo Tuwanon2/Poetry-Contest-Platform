@@ -28,7 +28,7 @@
 }
 
 body {
-  background-color: #000000;
+  background-color: #fef9ff !important;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
