@@ -28,7 +28,7 @@
 }
 
 body {
-  background-color: #000000;
+  background-color: #fef9ff !important;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -44,7 +44,7 @@ h1 {
 }
 
 .menu-dropdown-hover:hover + .menu-dropdown-content,
-.menu-dropdown-content:hover {
+.menu-dropdown-content:hover { 
   display: block !important;
 }
 

@@ -144,12 +144,11 @@ const ContestDetail = () => {
                     
                     {/* Title */}
                     <h1 style={{ 
-                        fontSize: '28px', 
-                        fontWeight: 'bold', 
-                        color: '#000', 
-                        marginBottom: '25px', 
-                        marginTop: 0,
-                        textAlign: 'left'
+                      fontSize: '28px', 
+                      color: '#000', 
+                      marginBottom: '25px', 
+                      marginTop: 0,
+                      textAlign: 'left'
                     }}>
                         {contest.title || contest.Title}
                     </h1>
@@ -285,7 +284,7 @@ const ContestDetail = () => {
       </div>
 
       {/* === TRANSPARENT FOOTER === */}
-      <div style={{
+        <div style={{
           position: 'fixed',
           bottom: 0,
           left: 0,
@@ -298,34 +297,35 @@ const ContestDetail = () => {
           background: 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%)',
           backdropFilter: 'none',
           pointerEvents: 'none'
-      }}>
+        }}>
           <button
-            disabled={timeRemaining.isExpired}
-            onClick={() => {
-                if(timeRemaining.isExpired) return;
-                const user = localStorage.getItem('user') || sessionStorage.getItem('user');
-                if(!user) { alert('กรุณาเข้าสู่ระบบ'); navigate('/login'); return; }
-                navigate(`/submit-competition/${id}`);
-            }}
-            style={{
-                pointerEvents: 'auto',
-                background: timeRemaining.isExpired ? '#BDBDBD' : 'linear-gradient(90deg, #70136c 0%, #90188c 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '12px 60px',
-                borderRadius: '50px',
-                fontSize: '18px',
-                fontWeight: 'bold',
-                cursor: timeRemaining.isExpired ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 20px rgba(112, 19, 108, 0.4)', 
-                transition: 'transform 0.2s',
-            }}
-            onMouseOver={(e) => !timeRemaining.isExpired && (e.currentTarget.style.transform = 'scale(1.05)')}
-            onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          disabled={timeRemaining.isExpired}
+          onClick={() => {
+            if(timeRemaining.isExpired) return;
+            const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+            if(!user) { alert('กรุณาเข้าสู่ระบบ'); navigate('/login'); return; }
+            navigate(`/submit-competition/${id}`);
+          }}
+          style={{
+            pointerEvents: 'auto',
+            background: timeRemaining.isExpired ? '#BDBDBD' : 'linear-gradient(90deg, #70136c 0%, #90188c 100%)',
+            color: 'white',
+            border: 'none',
+            padding: '12px 60px',
+            borderRadius: '50px',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            cursor: timeRemaining.isExpired ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 20px rgba(112, 19, 108, 0.4)', 
+            transition: 'transform 0.2s',
+            marginBottom: '48px', // เพิ่มระยะห่างจากขอบล่างเพื่อไม่ให้ปุ่มกิน footer
+          }}
+          onMouseOver={(e) => !timeRemaining.isExpired && (e.currentTarget.style.transform = 'scale(1.05)')}
+          onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           >
-              {timeRemaining.isExpired ? 'ปิดรับสมัครแล้ว' : 'สมัครเข้าประกวดนี้'}
+            {timeRemaining.isExpired ? 'ปิดรับสมัครแล้ว' : 'สมัครเข้าประกวดนี้'}
           </button>
-      </div>
+        </div>
 
     </>
   );
