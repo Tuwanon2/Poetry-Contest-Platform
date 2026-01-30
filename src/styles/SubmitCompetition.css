@@ -1,3 +1,24 @@
+.view-cert-btn {
+  padding: 6px 18px;
+  border-radius: 7px;
+  background: #fff;
+  color: #70136C;
+  border: 1.5px solid #e3d6f3;
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  box-shadow: 0 1px 4px rgba(112,19,108,0.06);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.view-cert-btn:hover {
+  background: #f3e6f7;
+  color: #4b0c47;
+  border-color: #70136C;
+}
 /* SubmitCompetition.css */
 
 /* --- Layout Main --- */
@@ -563,25 +584,55 @@
 }
 
 /* --- Step 3: Confirmation --- */
-.confirm-box {
-  margin-bottom: 24px;
-  font-size: 1rem;
-  color: #333;
+
+/* Minimal confirmation step */
+.minimal-confirm-box {
+  margin-bottom: 22px;
+  font-size: 1.08rem;
+  color: #222;
   width: 100%;
-  background: #fafbfc;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #e8e0e8;
-}
-.confirm-row { 
-  margin-bottom: 14px;
+  background: #f8f6fa;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px 0 #e0d7ee;
+  padding: 32px 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1.5px solid #e3d6f3;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 18px;
 }
-.confirm-icon { 
-  font-size: 1.2em; 
+.minimal-confirm-title {
+  font-size: 1.25rem;
+  font-weight: 700;
   color: #70136C;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.minimal-confirm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.minimal-confirm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed #e0e0e0;
+  font-size: 1.05rem;
+}
+.minimal-label {
+  color: #888;
+  font-weight: 500;
+  min-width: 120px;
+  font-size: 1.01rem;
+}
+.minimal-confirm-section {
+  margin-top: 8px;
 }
 
 .confirm-poem-display {

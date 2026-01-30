@@ -60,6 +60,55 @@ export default function SubmitCompetition() {
     file: null,
   });
 
+  // Autofill user info from localStorage/sessionStorage
+  useEffect(() => {
+    let userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        let firstName = '';
+        let lastName = '';
+        // 1. Try full_name
+        if (user.full_name) {
+          const nameParts = user.full_name.trim().split(' ');
+          if (nameParts.length === 1) {
+            firstName = nameParts[0];
+            lastName = '';
+          } else if (nameParts.length > 1) {
+            firstName = nameParts[0];
+            lastName = nameParts.slice(1).join(' ');
+          }
+        }
+        // 2. Fallback to firstName/lastName
+        if ((!firstName || !lastName) && (user.firstName || user.firstname)) {
+          firstName = user.firstName || user.firstname;
+        }
+        if ((!firstName || !lastName) && (user.lastName || user.lastname)) {
+          lastName = user.lastName || user.lastname;
+        }
+        // 3. Fallback to name
+        if ((!firstName || !lastName) && user.name) {
+          const nameParts = user.name.trim().split(' ');
+          if (nameParts.length === 1) {
+            firstName = nameParts[0];
+            lastName = '';
+          } else if (nameParts.length > 1) {
+            firstName = nameParts[0];
+            lastName = nameParts.slice(1).join(' ');
+          }
+        }
+        setForm(prev => ({
+          ...prev,
+          firstName,
+          lastName,
+          email: user.email || '',
+        }));
+      } catch (err) {
+        // ignore
+      }
+    }
+  }, []);
+
   const [step, setStep] = useState(0);
 
   // Fetch contest data
@@ -502,14 +551,6 @@ export default function SubmitCompetition() {
           <div className="contest-title">
             {contest.title || contest.Title}
           </div>
-          {contest.description && (
-            <div className="rules-box">
-              <div className="rules-title">รายละเอียด</div>
-              <div style={{ padding: '10px', fontSize: '13px', color: '#333', whiteSpace: 'pre-wrap' }}>
-                {contest.description}
-              </div>
-            </div>
-          )}
           {contest.levels && contest.levels.length > 0 && contest.levels.some(l => l.rules) && (
             <div className="rules-box">
               <div className="rules-title">กติกาสำคัญ</div>
@@ -570,8 +611,9 @@ export default function SubmitCompetition() {
                         name="firstName"
                         type="text"
                         value={form.firstName}
-                        onChange={handleChange}
                         className="input-field"
+                        readOnly
+                        style={{ background: '#f5f5f5', color: '#888' }}
                       />
                     </div>
                     <div className="form-col">
@@ -580,8 +622,9 @@ export default function SubmitCompetition() {
                         name="lastName"
                         type="text"
                         value={form.lastName}
-                        onChange={handleChange}
                         className="input-field"
+                        readOnly
+                        style={{ background: '#f5f5f5', color: '#888' }}
                       />
                     </div>
                   </div>
@@ -593,8 +636,9 @@ export default function SubmitCompetition() {
                     name="email"
                     type="email"
                     value={form.email}
-                    onChange={handleChange}
                     className="input-field"
+                    readOnly
+                    style={{ background: '#f5f5f5', color: '#888' }}
                   />
                 </div>
 
@@ -748,23 +792,41 @@ export default function SubmitCompetition() {
 
             {step === 2 && (
               <>
-                <div className="confirm-box">
-                  <div className="confirm-row"><b>ชื่อ:</b> {form.firstName} {form.lastName}</div>
-                  <div className="confirm-row"><span className="confirm-icon">📧</span><b>อีเมล:</b> {form.email}</div>
-                  <div className="confirm-row"><span className="confirm-icon">📞</span><b>เบอร์โทรศัพท์:</b> {form.phone}</div>
-                  <div className="confirm-row"><span className="confirm-icon">🎓</span><b>ระดับ:</b> {form.level}</div>
-                  <div className="confirm-row"><b>ประเภทกลอน:</b> {form.poemType}</div>
-                  <div className="confirm-row"><b>หัวข้อกลอน:</b> {form.title}</div>
-                  <div style={{ marginBottom: 14 }}><b>เนื้อหากลอน:</b>
-                    <div className="poem-box" style={{ padding: '20px' }}>
+                <div className="confirm-box minimal-confirm-box">
+                  <div className="minimal-confirm-title">ตรวจสอบข้อมูลก่อนยืนยัน</div>
+                  <div className="minimal-confirm-list">
+                    <div className="minimal-confirm-row"><span className="minimal-label">ชื่อ-นามสกุล</span><span>{form.firstName} {form.lastName}</span></div>
+                    <div className="minimal-confirm-row"><span className="minimal-label">อีเมล</span><span>{form.email}</span></div>
+                    <div className="minimal-confirm-row"><span className="minimal-label">เบอร์โทรศัพท์</span><span>{form.phone}</span></div>
+                    <div className="minimal-confirm-row"><span className="minimal-label">ระดับ</span><span>{form.level}</span></div>
+                    <div className="minimal-confirm-row"><span className="minimal-label">ประเภทกลอน</span><span>{form.poemType}</span></div>
+                    <div className="minimal-confirm-row"><span className="minimal-label">หัวข้อกลอน</span><span>{form.title}</span></div>
+                    {form.level && form.level !== "ประชาชนทั่วไป" && (
+                      <div className="minimal-confirm-row">
+                        <span className="minimal-label">ไฟล์รับรอง</span>
+                        <span>
+                          {form.file ? (
+                            <button
+                              type="button"
+                              className="view-cert-btn"
+                              onClick={() => {
+                                const url = URL.createObjectURL(form.file);
+                                window.open(url, '_blank');
+                              }}
+                            >ดูไฟล์รับรอง</button>
+                          ) : (
+                            <span style={{color:'red'}}>ยังไม่ได้อัปโหลด</span>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="minimal-confirm-section">
+                    <div className="minimal-label" style={{marginBottom:8}}>เนื้อหากลอน</div>
+                    <div className="poem-box" style={{ padding: '20px', background: '#fafbfc', border: '1.5px solid #e0e0e0', borderRadius: 8 }}>
                       {renderConfirmPoem()}
                     </div>
                   </div>
-                  
-                  {form.level && form.level !== "ประชาชนทั่วไป" && (
-                    <div style={{ marginBottom: 10 }}><b>ไฟล์รับรอง:</b> {form.file ? form.file.name : <span style={{color:'red'}}>ยังไม่ได้อัปโหลด</span>}</div>
-                  )}
-                  
                 </div>
               </>
             )}

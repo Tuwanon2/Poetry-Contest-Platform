@@ -44,7 +44,7 @@ h1 {
 }
 
 .menu-dropdown-hover:hover + .menu-dropdown-content,
-.menu-dropdown-content:hover {
+.menu-dropdown-content:hover { 
   display: block !important;
 }
 

@@ -8,6 +8,7 @@ const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 const ActivitiesList = ({ filterCategory }) => {
   const [contests, setContests] = useState([]);
+  const [orgs, setOrgs] = useState({}); // org_id: orgData
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -16,8 +17,22 @@ const ActivitiesList = ({ filterCategory }) => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
-        setContests(response.data || []);
+        const contestsData = response.data || [];
+        setContests(contestsData);
         setError(null);
+
+        // Fetch all unique org ids
+        const orgIds = Array.from(new Set(contestsData.map(c => c.organization_id).filter(Boolean)));
+        const orgsMap = {};
+        await Promise.all(orgIds.map(async (orgId) => {
+          try {
+            const res = await axios.get(`${API_BASE_URL}/organizations/${orgId}`);
+            orgsMap[orgId] = res.data;
+          } catch {
+            orgsMap[orgId] = null;
+          }
+        }));
+        setOrgs(orgsMap);
       } catch (err) {
         console.error('Error fetching contests:', err);
         setError('ไม่สามารถโหลดข้อมูลการประกวดได้');
@@ -77,10 +92,8 @@ const ActivitiesList = ({ filterCategory }) => {
     const levels = (contest.levels || contest.Levels || [])
       .map(l => (l.level_name || l.name || ''))
       .join(', ') || 'ไม่ระบุ';
-    
     const dateRange = formatDate(contest.end_date || contest.EndDate);
-    const poetryType = contest.poetry_type || contest.PoetryType || '-';
-    const topicType = contest.topic_type || contest.TopicType || '-';
+    const org = contest.organization_id ? orgs[contest.organization_id] : null;
 
     return (
       <Link 
@@ -104,24 +117,18 @@ const ActivitiesList = ({ filterCategory }) => {
             <h3 className="card-title" title={contest.title || contest.Title}>
                 {contest.title || contest.Title}
             </h3>
-            
+            {/* ORGANIZATION NAME */}
+            {org && (
+              <div className="card-row" style={{ marginBottom: 4 }}>
+                <span className="label-gray">จัดโดย</span>
+                <span className="value-text" style={{ color: '#009688', fontWeight: 600 }}> : {org.name || org.organization_name || '-'}</span>
+              </div>
+            )}
             <div className="card-row">
               <span className="label-purple">ระดับ</span>
               <span className="value-text">: {levels}</span>
             </div>
-
-            <div className="card-row">
-              <span className="label-purple">ประเภท</span>
-              <span className="value-text">: {poetryType}</span>
-            </div>
-
-            <div className="card-row">
-              <span className="label-purple">หัวข้อ</span>
-              <span className="value-text">: {topicType}</span>
-            </div>
-            
             <div className="modern-divider"></div>
-            
             <div className="card-footer-row">
               {/* SVG Icon นาฬิกา */}
               <svg className="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

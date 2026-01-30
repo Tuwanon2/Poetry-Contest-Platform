@@ -5,9 +5,13 @@ import TopNav from '../components/TopNav';
 import SidebarNav from '../components/SidebarNav';
 import { SidebarNavContext } from '../components/SidebarNavContext';
 import InviteJudgeModal from '../components/InviteJudgeModal';
+import InviteJudgeModalManagement from '../components/InviteJudgeModalManagement';
 import '../styles/CompetitionManagement.css';
 
 const CompetitionManagement = () => {
+    const [judges, setJudges] = useState([]);
+    const [isJudgesModalOpen, setIsJudgesModalOpen] = useState(false);
+    const [removingJudgeId, setRemovingJudgeId] = useState(null);
   const { competitionId } = useParams();
   const navigate = useNavigate();
   const [sidebarPage, setSidebarPage] = useState('overview');
@@ -34,7 +38,29 @@ const CompetitionManagement = () => {
   useEffect(() => {
     fetchCompetitionDetails();
     fetchSubmissions();
+    fetchJudges();
   }, [competitionId]);
+
+  const fetchJudges = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/v1/contests/${competitionId}/judges`);
+      setJudges(res.data || []);
+    } catch (err) {
+      setJudges([]);
+    }
+  };
+  const handleRemoveJudge = async (judgeId) => {
+    if (!window.confirm('ยืนยันการลบกรรมการคนนี้?')) return;
+    setRemovingJudgeId(judgeId);
+    try {
+      await axios.delete(`http://localhost:8080/api/v1/contests/judges/${judgeId}`);
+      setJudges(judges.filter(j => j.id !== judgeId));
+    } catch (err) {
+      alert('ลบกรรมการไม่สำเร็จ');
+    } finally {
+      setRemovingJudgeId(null);
+    }
+  };
 
   const fetchCompetitionDetails = async () => {
     try {
@@ -177,319 +203,135 @@ const CompetitionManagement = () => {
     <SidebarNavContext.Provider value={{ sidebarPage, setSidebarPage }}>
       <div style={{ display: "flex", minHeight: "100vh", background: "#f8f9fb" }}>
         <SidebarNav current={sidebarPage} onNavigate={handleSidebarNavigate} />
-        
         <div style={{ flex: 1, marginLeft: 220 }}>
           <TopNav />
-      
-      <div className="comp-mgmt-container">
-        {/* Header */}
-        <div className="comp-mgmt-header">
-          <div className="header-left">
-            <button className="back-btn" onClick={() => navigate(-1)}>
-              ← กลับ
-            </button>
-            <div className="header-info">
-              <h1 className="comp-title">{competition.title}</h1>
-              <div className="comp-status">{getStatusBadge(competition.status)}</div>
-            </div>
-          </div>
-          <div className="header-right">
-            <button 
-              className="invite-judge-btn"
-              onClick={() => setIsInviteJudgeModalOpen(true)}
-              style={{
-                padding: '12px 24px',
-                background: 'linear-gradient(135deg, #70136C 0%, #9b1c96 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <span>👨‍⚖️</span>
-              เชิญกรรมการ
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="tab-content">
-            <div className="overview-tab">
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <div className="stat-icon">📝</div>
-                  <div className="stat-value">{submissions.length}</div>
-                  <div className="stat-label">ผลงานที่ส่งเข้าประกวด</div>
+          <div className="comp-mgmt-container">
+            {/* Custom Header Layout */}
+            <div className="comp-mgmt-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 0, paddingBottom: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  
+                  <button className="back-btn" onClick={() => navigate(-1)} style={{ marginLeft: 0 }}>
+                    ← กลับ
+                  </button>
                 </div>
-                
-                <div className="stat-card">
-                  <div className="stat-icon">📅</div>
-                  <div className="stat-label" style={{ order: -1, marginBottom: '8px', fontSize: '14px' }}>วันปิดรับสมัคร</div>
-                  <div className="stat-value">
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flex: 1 }}>
+                  <h1 className="comp-title" style={{ fontSize: 28, fontWeight: 700, color: '#70136C', margin: 0, textAlign: 'right' }}>{competition.title}</h1>
+                  <div className="comp-status" style={{ marginTop: 4 }}>{getStatusBadge(competition.status)}</div>
+                </div>
+              </div>
+              {/* Stats Cards Row */}
+              <div className="stats-grid" style={{ marginTop: 32, marginBottom: 0, gap: 32 }}>
+                <div className="stat-card" style={{
+                  background: 'linear-gradient(135deg, #f8e1fa 0%, #f3e6f7 100%)',
+                  border: '2px solid #e1bee7',
+                  boxShadow: '0 4px 16px rgba(112,19,108,0.07)',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  minWidth: 220, minHeight: 120
+                }}>
+                  <div className="stat-icon" style={{ fontSize: 40, marginBottom: 8 }}>📝</div>
+                  <div className="stat-value" style={{ fontSize: 36, fontWeight: 700, color: '#70136C', marginBottom: 4 }}>{submissions.length}</div>
+                  <div className="stat-label" style={{ fontSize: 16, color: '#70136C', fontWeight: 600 }}>ผลงานที่ส่งเข้าประกวด</div>
+                </div>
+                <div className="stat-card" style={{
+                  background: 'linear-gradient(135deg, #e1f5fe 0%, #e3f2fd 100%)',
+                  border: '2px solid #b3e5fc',
+                  boxShadow: '0 4px 16px rgba(19,112,108,0.07)',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  minWidth: 220, minHeight: 120
+                }}>
+                  <div className="stat-icon" style={{ fontSize: 40, marginBottom: 8 }}>📅</div>
+                  <div className="stat-label" style={{ fontSize: 15, color: '#1976d2', fontWeight: 600, marginBottom: 2 }}>วันปิดรับสมัคร</div>
+                  <div className="stat-value" style={{ fontSize: 32, fontWeight: 700, color: '#1976d2', marginBottom: 2 }}>
                     {new Date(competition.end_date).getDate()}
                   </div>
-                  <div className="stat-label">
+                  <div className="stat-label" style={{ fontSize: 15, color: '#1976d2' }}>
                     {new Date(competition.end_date).toLocaleDateString('th-TH', { month: 'short', year: 'numeric' })}
                   </div>
                 </div>
+                {/* Judges Stat Card */}
+                <div className="stat-card clickable" style={{
+                  background: 'linear-gradient(135deg, #e8f5e9 0%, #e0f7fa 100%)',
+                  border: '2px solid #b2dfdb',
+                  boxShadow: '0 4px 16px rgba(19,108,112,0.07)',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  minWidth: 220, minHeight: 120, cursor: 'pointer'
+                }} onClick={() => setIsJudgesModalOpen(true)}>
+                  <div className="stat-icon" style={{ fontSize: 40, marginBottom: 8 }}>👨‍⚖️</div>
+                  <div className="stat-value" style={{ fontSize: 36, fontWeight: 700, color: '#009688', marginBottom: 4 }}>{judges.length}</div>
+                  <div className="stat-label" style={{ fontSize: 16, color: '#009688', fontWeight: 600 }}>กรรมการ</div>
+                  <div style={{ fontSize: 13, color: '#009688', marginTop: 4, textDecoration: 'underline' }}>ดูทั้งหมด</div>
+                </div>
               </div>
-
-              <div className="info-section">
-                <h3>รายละเอียดการประกวด</h3>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <span className="info-label">หมวดหมู่:</span>
-                    <span className="info-value">{competition.category_name}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="info-label">กลุ่มเป้าหมาย:</span>
-                    <span className="info-value">{competition.target_group}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="info-label">วันเริ่มต้น:</span>
-                    <span className="info-value">
-                      {new Date(competition.start_date).toLocaleDateString('th-TH')}
-                    </span>
-                  </div>
-                  <div className="info-item">
-                    <span className="info-label">วันสิ้นสุด:</span>
-                    <span className="info-value">
-                      {new Date(competition.end_date).toLocaleDateString('th-TH')}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="description-box">
-                  <h4>คำอธิบาย</h4>
-                  <p>{competition.description}</p>
-                </div>
-
-                {/* Levels and Scoring Criteria */}
-                {competitionLevels.length > 0 && (
-                  <div style={{ marginTop: '24px' }}>
-                    <h4 style={{ marginBottom: '16px', color: '#70136C' }}>ระดับการแข่งขันและเกณฑ์การให้คะแนน</h4>
-                    {competitionLevels.map((level, idx) => {
-                      const isEditing = editingLevelId === level.competition_level_id;
-                      const baseCriteria = level.scoring_criteria || [];
-                      const criteriaToShow = isEditing ? editingCriteria : (Array.isArray(baseCriteria) ? baseCriteria : []);
-                      
-                      return (
-                        <div key={idx} style={{ 
-                          background: '#f8f9fa', 
-                          padding: '16px', 
-                          borderRadius: '8px', 
-                          marginBottom: '12px',
-                          border: '1px solid #e0e0e0'
-                        }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                            <h5 style={{ margin: 0, color: '#70136C', fontSize: '16px' }}>
-                              ระดับ: {level.level_name || level.name}
-                            </h5>
-                            
-                            {!isEditing ? (
-                              <button
-                                onClick={() => handleEditLevel(level)}
-                                style={{
-                                  padding: '6px 16px',
-                                  background: '#70136C',
-                                  color: 'white',
-                                  border: 'none',
-                                  borderRadius: '6px',
-                                  cursor: 'pointer',
-                                  fontSize: '14px',
-                                  fontWeight: 600
-                                }}
-                              >
-                                ✏️ แก้ไข
-                              </button>
-                            ) : (
-                              <div style={{ display: 'flex', gap: '8px' }}>
-                                <button
-                                  onClick={() => handleSaveCriteria(level.competition_level_id)}
-                                  style={{
-                                    padding: '6px 16px',
-                                    background: '#27ae60',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: 600
-                                  }}
-                                >
-                                  ✓ บันทึก
-                                </button>
-                                <button
-                                  onClick={handleCancelEdit}
-                                  style={{
-                                    padding: '6px 16px',
-                                    background: '#95a5a6',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: 600
-                                  }}
-                                >
-                                  ✕ ยกเลิก
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {criteriaToShow.length > 0 ? (
-                            <div>
-                              <p style={{ fontWeight: 600, marginBottom: '8px', fontSize: '14px' }}>เกณฑ์การให้คะแนน:</p>
-                              <div style={{ display: 'grid', gap: '8px' }}>
-                                {criteriaToShow.map((criteria, cidx) => (
-                                  <div key={cidx} style={{ 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '8px 12px',
-                                    background: 'white',
-                                    borderRadius: '4px',
-                                    fontSize: '14px',
-                                    gap: '8px'
-                                  }}>
-                                    {isEditing ? (
-                                      <>
-                                        <span style={{ fontWeight: 600, color: '#70136C', minWidth: '24px' }}>
-                                          {cidx + 1}.
-                                        </span>
-                                        <input
-                                          type="text"
-                                          value={criteria.name}
-                                          onChange={(e) => handleCriteriaChange(cidx, 'name', e.target.value)}
-                                          placeholder="ชื่อเกณฑ์"
-                                          style={{
-                                            flex: 1,
-                                            padding: '6px 10px',
-                                            border: '1px solid #ddd',
-                                            borderRadius: '4px',
-                                            fontSize: '14px'
-                                          }}
-                                        />
-                                        <input
-                                          type="number"
-                                          value={criteria.max_score}
-                                          onChange={(e) => handleCriteriaChange(cidx, 'max_score', parseInt(e.target.value) || 0)}
-                                          style={{
-                                            width: '80px',
-                                            padding: '6px 10px',
-                                            border: '1px solid #ddd',
-                                            borderRadius: '4px',
-                                            fontSize: '14px',
-                                            textAlign: 'center'
-                                          }}
-                                        />
-                                        <span style={{ fontSize: '14px', color: '#666' }}>คะแนน</span>
-                                        <button
-                                          onClick={() => handleRemoveCriteria(cidx)}
-                                          style={{
-                                            padding: '4px 8px',
-                                            background: '#e74c3c',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer',
-                                            fontSize: '12px'
-                                          }}
-                                        >
-                                          ✕
-                                        </button>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <span>{cidx + 1}. {criteria.name}</span>
-                                        <span style={{ fontWeight: 600, color: '#70136C' }}>
-                                          {criteria.max_score} คะแนน
-                                        </span>
-                                      </>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                              
-                              {isEditing && (
-                                <button
-                                  onClick={handleAddCriteria}
-                                  style={{
-                                    marginTop: '8px',
-                                    padding: '8px 16px',
-                                    background: 'white',
-                                    border: '1px dashed #70136C',
-                                    borderRadius: '6px',
-                                    color: '#70136C',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: 600,
-                                    width: '100%'
-                                  }}
-                                >
-                                  ➕ เพิ่มเกณฑ์
-                                </button>
-                              )}
-                              
-                              <div style={{ 
-                                marginTop: '8px', 
-                                textAlign: 'right', 
-                                fontWeight: 'bold',
-                                fontSize: '15px',
-                                color: '#70136C'
-                              }}>
-                                คะแนนรวม: {criteriaToShow.reduce((sum, c) => sum + (c.max_score || 0), 0)} คะแนน
-                              </div>
-                            </div>
-                          ) : (
-                            <p style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>
-                              ยังไม่มีการกำหนดเกณฑ์การให้คะแนน
-                              {isEditing && (
-                                <button
-                                  onClick={handleAddCriteria}
-                                  style={{
-                                    marginLeft: '12px',
-                                    padding: '6px 12px',
-                                    background: '#70136C',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '13px'
-                                  }}
-                                >
-                                  ➕ เพิ่มเกณฑ์
-                                </button>
-                              )}
-                            </p>
-                          )}
+                  {/* Judges Modal */}
+                  {isJudgesModalOpen && (
+                    <div style={{
+                      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 2000,
+                      background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                      <div style={{
+                        background: 'white',
+                        borderRadius: 20,
+                        padding: 48,
+                        minWidth: 600,
+                        maxWidth: 800,
+                        maxHeight: '85vh',
+                        overflowY: 'auto',
+                        boxShadow: '0 12px 48px rgba(0,0,0,0.18)'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                          <h2 style={{ margin: 0, color: '#009688', fontWeight: 700, fontSize: 28 }}>กรรมการในการประกวด</h2>
+                          <button onClick={() => setIsJudgesModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: 32, color: '#888', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        <div style={{ marginBottom: 24 }}>
+                          <button
+                            onClick={() => { setIsInviteJudgeModalOpen(true); setIsJudgesModalOpen(false); }}
+                            style={{
+                              padding: '12px 28px', background: 'linear-gradient(135deg, #70136C 0%, #9b1c96 100%)', color: 'white',
+                              border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 17, cursor: 'pointer', marginBottom: 8
+                            }}
+                          >+ เพิ่มกรรมการ</button>
+                        </div>
+                        {judges.length === 0 ? (
+                          <div style={{ color: '#888', textAlign: 'center', margin: '48px 0', fontSize: 20 }}>ยังไม่มีกรรมการ</div>
+                        ) : (
+                          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                            {judges.map(judge => (
+                              <li key={judge.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid #eee' }}>
+                                <div>
+                                  <span style={{ fontWeight: 600, color: '#333', fontSize: 18 }}>{judge.full_name || judge.username || judge.email}</span>
+                                  <span style={{ color: '#888', fontSize: 15, marginLeft: 12 }}>{judge.email}</span>
+                                </div>
+                                <button
+                                  onClick={() => handleRemoveJudge(judge.id)}
+                                  disabled={removingJudgeId === judge.id}
+                                  style={{ background: '#e74c3c', color: 'white', border: 'none', borderRadius: 8, padding: '8px 20px', fontWeight: 600, fontSize: 16, cursor: removingJudgeId === judge.id ? 'not-allowed' : 'pointer', opacity: removingJudgeId === judge.id ? 0.6 : 1 }}
+                                >{removingJudgeId === judge.id ? 'กำลังลบ...' : 'ลบ'}</button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  )}
+            </div>
+            {/* Content */}
+            <div className="tab-content">
+              <div className="overview-tab">
+                {/* ...existing code for info-section, etc. (if any) ... */}
               </div>
             </div>
+          </div>
         </div>
       </div>
-        </div>
-      </div>
-
       {/* Invite Judge Modal */}
-      <InviteJudgeModal
+      <InviteJudgeModalManagement
         isOpen={isInviteJudgeModalOpen}
         onClose={() => setIsInviteJudgeModalOpen(false)}
         competitionId={competitionId}
-        levels={competitionLevels.map(l => l.level_name || l.name)}
+        levels={competitionLevels}
         onSuccess={() => {
-          // Optional: refresh judges list if needed
-          console.log('Judge invited successfully');
+          // รีเฟรชข้อมูลกรรมการหรืออะไรก็ตามที่ต้องการ
         }}
       />
     </SidebarNavContext.Provider>
