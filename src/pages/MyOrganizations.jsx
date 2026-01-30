@@ -10,6 +10,7 @@ const MyOrganizations = () => {
   const [organizations, setOrganizations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [orgRoles, setOrgRoles] = useState({}); // { orgId: role }
 
   useEffect(() => {
     const username = localStorage.getItem('username') || sessionStorage.getItem('username');
@@ -27,11 +28,25 @@ const MyOrganizations = () => {
     try {
       setLoading(true);
       const userId = localStorage.getItem('user_id') || sessionStorage.getItem('user_id');
-      
       const res = await axios.get(`http://localhost:8080/api/v1/organizations/user/${userId}`);
-      console.log('Organizations data:', res.data); // Debug log
-      
       setOrganizations(res.data || []);
+
+      // Fetch roles for each org
+      const rolesObj = {};
+      await Promise.all(
+        (res.data || []).map(async (org) => {
+          try {
+            const membersRes = await axios.get(`http://localhost:8080/api/v1/organizations/${org.organization_id}/members`);
+            const me = (membersRes.data || []).find(m => String(m.user_id) === String(userId));
+            if (me && me.role) {
+              rolesObj[org.organization_id] = me.role;
+            }
+          } catch (e) {
+            // ignore error for this org
+          }
+        })
+      );
+      setOrgRoles(rolesObj);
     } catch (err) {
       console.error('Error fetching organizations:', err);
       setError('ไม่สามารถโหลดข้อมูล Organizations ได้');
@@ -114,19 +129,27 @@ const MyOrganizations = () => {
       }}>
         <TopNav />
 
-        <div className="my-orgs-container">
-          <div className="my-orgs-header">
-            <div className="header-left">
-              <button className="back-btn" onClick={() => navigate('/')}>
-                ← กลับ
-              </button>
-              <h1>Organizations ของฉัน</h1>
-            </div>
-            <button 
-              className="create-org-btn"
+       
+
+        <div className="my-orgs-container" style={{ maxWidth: 900, margin: '40px auto', padding: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            <h2 style={{ color: '#fff', fontWeight: 600, fontSize: 24, margin: 0 }}>Organizations</h2>
+            <button
+              style={{
+                background: 'none',
+                border: '1px solid #4F95DA',
+                color: '#fff',
+                fontWeight: 500,
+                fontSize: 15,
+                borderRadius: 6,
+                padding: '6px 16px',
+                cursor: 'pointer',
+                backgroundColor: '#70136C',
+                transition: 'background 0.2s',
+              }}
               onClick={() => navigate('/create-organization')}
             >
-              + สร้าง Organization
+              สร้าง organization ใหม่
             </button>
           </div>
 
@@ -145,9 +168,9 @@ const MyOrganizations = () => {
 
           {!loading && !error && organizations.length === 0 && (
             <div className="empty-state">
-              <div className="empty-icon">🏢</div>
-              <h2>ยังไม่มี Organization</h2>
-              <p>คุณยังไม่ได้เป็นสมาชิกของ Organization ใดๆ</p>
+              
+              <h2>คุณยังไม่ได้เป็นสมาชิกของ Organization ใดๆ</h2>
+             
               <button 
                 className="create-org-btn-large"
                 onClick={() => navigate('/create-organization')}
@@ -170,7 +193,6 @@ const MyOrganizations = () => {
                     paddingBottom: '12px',
                     borderBottom: '2px solid #FF9800'
                   }}>
-                    <span style={{ fontSize: '24px' }}>📬</span>
                     <h2 style={{ margin: 0, color: '#FF9800', fontSize: '20px' }}>
                       คำเชิญที่รอการตอบรับ
                     </h2>
@@ -188,88 +210,97 @@ const MyOrganizations = () => {
                   
                   <div className="orgs-grid">
                     {organizations.filter(org => org.member_status === 'pending').map((org) => (
-                      <div 
-                        key={org.organization_id} 
-                        className="org-card"
-                        style={{ 
-                          borderLeft: '4px solid #FF9800',
-                          cursor: 'default'
+                      <div
+                        key={org.organization_id}
+                        style={{
+                          background: '#FF9800',
+                          borderRadius: 10,
+                          boxShadow: '0 1px 4px 0 rgba(0,0,0,0.12)',
+                          border: '1px solid #e6a23c',
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '0 24px',
+                          minHeight: 64,
+                          marginBottom: 16,
+                          width: '100%',
+                          boxSizing: 'border-box',
                         }}
                       >
-                        <div className="org-cover">
+                        {/* Logo/cover */}
+                        <div style={{ width: 40, height: 40, minWidth: 40, minHeight: 40, borderRadius: 6, overflow: 'hidden', marginRight: 16, background: '#fff3e0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           {org.cover_image ? (
-                            <img src={org.cover_image} alt={org.name} />
+                            <img src={org.cover_image} alt={org.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           ) : (
-                            <div className="org-cover-placeholder">
-                              <span>🏢</span>
-                            </div>
+                            <span style={{ fontSize: 22, color: '#b26a00' }}>🏢</span>
                           )}
                         </div>
-                        
-                        <div className="org-content">
-                          <h3>{org.name}</h3>
-                          <p className="org-description">
-                            {org.description || 'ไม่มีคำอธิบาย'}
-                          </p>
-                          
-                          <div style={{ 
-                            marginTop: '16px', 
-                            padding: '12px', 
-                            background: '#FFF8E1', 
-                            borderRadius: '8px',
-                            fontSize: '14px',
-                            color: '#F57C00',
-                            marginBottom: '12px'
-                          }}>
-                            📩 คุณได้รับเชิญให้เป็นสมาชิกใน Organization นี้
-                          </div>
-
-                          {/* แสดงปุ่มตอบรับ/ปฏิเสธสำหรับ pending invitations */}
-                          <div style={{ 
-                            display: 'flex', 
-                            gap: '8px',
-                            marginTop: '12px'
-                          }}>
-                            <button
-                              onClick={() => handleAcceptInvitation(org.member_id)}
-                              style={{
-                                flex: 1,
-                                padding: '10px',
-                                background: '#4CAF50',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'background 0.2s'
-                              }}
-                              onMouseEnter={(e) => e.target.style.background = '#45a049'}
-                              onMouseLeave={(e) => e.target.style.background = '#4CAF50'}
-                            >
-                              ✅ ยอมรับ
-                            </button>
-
-                            <button
-                              onClick={() => handleRejectInvitation(org.member_id)}
-                              style={{
-                                flex: 1,
-                                padding: '10px',
-                                background: '#F44336',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'background 0.2s'
-                              }}
-                              onMouseEnter={(e) => e.target.style.background = '#e53935'}
-                              onMouseLeave={(e) => e.target.style.background = '#F44336'}
-                            >
-                              ❌ ปฏิเสธ
-                            </button>
-                          </div>
+                        {/* Main info */}
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <span
+                            style={{
+                              color: '#ffffff',
+                              fontWeight: 600,
+                              fontSize: 17,
+                              textAlign: 'left',
+                              wordBreak: 'break-word',
+                              // maxWidth: 220, // ถ้าอยากให้กว้างสุดเท่า card ก็ลบ maxWidth ออก
+                              transition: 'color 0.2s',
+                              // ลบ overflow, textOverflow, whiteSpace
+                            }}
+                          >
+                            {org.name}
+                          </span>
+                          <span style={{
+                            background: '#fff',
+                            color: '#FF9800',
+                            borderRadius: 12,
+                            fontSize: 13,
+                            fontWeight: 600,
+                            padding: '2px 12px',
+                            marginLeft: 6,
+                            border: '2px solid #ffe0b2',
+                            boxShadow: '0 1px 4px 0 rgba(255,152,0,0.06)',
+                            display: 'inline-block',
+                          }}>รอการตอบรับ</span>
+                        </div>
+                        {/* Accept/Reject buttons on the right */}
+                        <div style={{ display: 'flex', gap: 8, marginLeft: 16 }}>
+                          <button
+                            onClick={() => handleAcceptInvitation(org.member_id)}
+                            style={{
+                              padding: '6px 12px',
+                              background: '#fff',
+                              color: '#43a047',
+                              border: '2px solid #43a047',
+                              borderRadius: 8,
+                              fontSize: 15,
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              transition: 'background 0.2s, color 0.2s',
+                            }}
+                            onMouseEnter={e => { e.target.style.background = '#43a047'; e.target.style.color = '#fff'; }}
+                            onMouseLeave={e => { e.target.style.background = '#fff'; e.target.style.color = '#43a047'; }}
+                          >
+                            ยอมรับ
+                          </button>
+                          <button
+                            onClick={() => handleRejectInvitation(org.member_id)}
+                            style={{
+                              padding: '6px 12px',
+                              background: '#fff',
+                              color: '#e53935',
+                              border: '2px solid #e53935',
+                              borderRadius: 8,
+                              fontSize: 15,
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              transition: 'background 0.2s, color 0.2s',
+                            }}
+                            onMouseEnter={e => { e.target.style.background = '#e53935'; e.target.style.color = '#fff'; }}
+                            onMouseLeave={e => { e.target.style.background = '#fff'; e.target.style.color = '#e53935'; }}
+                          >
+                            ปฏิเสธ
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -277,7 +308,7 @@ const MyOrganizations = () => {
                 </div>
               )}
 
-              {/* Organizations ที่อนุมัติแล้ว (status = accepted) */}
+              {/* Organizations ที่อนุมัติแล้ว (status = approved) */}
               {organizations.filter(org => org.status === 'approved' && org.member_status === 'accepted').length > 0 && (
                 <div style={{ marginBottom: '40px' }}>
                   <div style={{ 
@@ -288,57 +319,114 @@ const MyOrganizations = () => {
                     paddingBottom: '12px',
                     borderBottom: '2px solid #70136C'
                   }}>
-                    <span style={{ fontSize: '24px' }}>✅</span>
-                    <h2 style={{ margin: 0, color: '#70136C', fontSize: '20px' }}>
-                      Organizations ที่ใช้งานได้
+                    <h2 style={{ margin: 0, color: '#70136C', fontSize: '30px' }}>
+                      Organizations ของฉัน
                     </h2>
-                    <span style={{ 
-                      background: '#4CAF50', 
-                      color: 'white', 
-                      padding: '4px 12px', 
-                      borderRadius: '12px',
-                      fontSize: '14px',
-                      fontWeight: '600'
-                    }}>
-                      {organizations.filter(org => org.status === 'approved').length}
-                    </span>
+                   
                   </div>
-                  
                   <div className="orgs-grid">
                     {organizations.filter(org => org.status === 'approved' && org.member_status === 'accepted').map((org) => (
-                      <div 
-                        key={org.organization_id} 
-                        className="org-card"
+                      <div
+                        key={org.organization_id}
+                        style={{
+                          background: '#70136C',
+                          borderRadius: 10,
+                          boxShadow: '0 1px 4px 0 rgba(0,0,0,0.12)',
+                          border: '1px solid #30363d',
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '0 24px',
+                          minHeight: 64,
+                          marginBottom: 16,
+                          width: '100%',
+                          boxSizing: 'border-box',
+                          cursor: 'pointer',
+                          transition: 'box-shadow 0.2s, transform 0.2s',
+                        }}
                         onClick={() => navigate(`/organization/${org.organization_id}`)}
-                        style={{ borderLeft: '4px solid #4CAF50' }}
+                        onMouseOver={e => {
+                          e.currentTarget.style.boxShadow = '0 4px 16px rgba(112,19,108,0.18)';
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                        }}
+                        onMouseOut={e => {
+                          e.currentTarget.style.boxShadow = '0 1px 4px 0 rgba(0,0,0,0.12)';
+                          e.currentTarget.style.transform = 'none';
+                        }}
                       >
-                        <div className="org-cover">
+                        {/* Logo/cover */}
+                        <div style={{ width: 40, height: 40, minWidth: 40, minHeight: 40, borderRadius: 6, overflow: 'hidden', marginRight: 16, background: '#21262d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           {org.cover_image ? (
-                            <img src={org.cover_image} alt={org.name} />
+                            <img src={org.cover_image} alt={org.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           ) : (
-                            <div className="org-cover-placeholder">
-                              <span>🏢</span>
-                            </div>
+                            <span style={{ fontSize: 22, color: '#c9d1d9' }}>🏢</span>
                           )}
                         </div>
-                        
-                        <div className="org-content">
-                          <h3>{org.name}</h3>
-                          <p className="org-description">
-                            {org.description || 'ไม่มีคำอธิบาย'}
-                          </p>
-                          
-                          <div className="org-meta">
-                            
-                            {getStatusBadge(org.status)}
-                          </div>
-                          
-                          <div className="org-stats">
-                            <span>สมาชิก {org.member_count || 0} คน</span>
-                            <span>•</span>
-                            <span>การประกวด {org.competition_count || 0} รายการ</span>
-                          </div>
+                        {/* Main info */}
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <span
+                            style={{
+                              color: '#ffffff',
+                              fontWeight: 600,
+                              fontSize: 17,
+                              textAlign: 'left',
+                              wordBreak: 'break-word',
+                              // maxWidth: 220, // ถ้าอยากให้กว้างสุดเท่า card ก็ลบ maxWidth ออก
+                              transition: 'color 0.2s',
+                              // ลบ overflow, textOverflow, whiteSpace
+                            }}
+                          >
+                            {org.name}
+                          </span>
+                          {/* Role badge (fetch from orgRoles) */}
+                          {orgRoles[org.organization_id] === 'creator' && (
+                            <span style={{
+                              background: '#fff',
+                              color: '#70136C',
+                              borderRadius: 12,
+                              fontSize: 13,
+                              fontWeight: 600,
+                              padding: '2px 12px',
+                              marginLeft: 6,
+                              border: '2px solid #e0c7e7',
+                              boxShadow: '0 1px 4px 0 rgba(112,19,108,0.06)',
+                              display: 'inline-block',
+                            }}>ผู้สร้าง</span>
+                          )}
+                          {orgRoles[org.organization_id] === 'assistant' && (
+                            <span style={{
+                              background: '#fff',
+                              color: '#70136C',
+                              borderRadius: 12,
+                              fontSize: 13,
+                              fontWeight: 600,
+                              padding: '2px 12px',
+                              marginLeft: 6,
+                              border: '2px solid #e0c7e7',
+                              boxShadow: '0 1px 4px 0 rgba(112,19,108,0.06)',
+                              display: 'inline-block',
+                            }}>ผู้ช่วย</span>
+                          )}
                         </div>
+                        {/* Setting button for owner only */}
+                        {org.role === 'creator' && (
+                          <button
+                            style={{
+                              marginLeft: 16,
+                              background: '#21262d',
+                              border: '1px solid #30363d',
+                              borderRadius: 6,
+                              color: '#c9d1d9',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              padding: '6px 16px',
+                              cursor: 'pointer',
+                              transition: 'background 0.2s',
+                            }}
+                            onClick={e => { e.stopPropagation(); alert('ยังไม่มีหน้าตั้งค่า'); }}
+                          >
+                            Settings
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>

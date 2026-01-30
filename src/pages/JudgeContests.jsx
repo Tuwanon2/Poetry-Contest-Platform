@@ -13,6 +13,19 @@ const JudgeContests = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('invitations'); // invitations, contests
 
+
+  // Calculate unique contests for tab count (must be before any return)
+  const uniqueContests = React.useMemo(() => {
+    const contestMap = {};
+    contests.forEach(c => {
+      const key = c.id;
+      if (!contestMap[key]) {
+        contestMap[key] = true;
+      }
+    });
+    return Object.keys(contestMap);
+  }, [contests]);
+
   useEffect(() => {
     fetchJudgeData();
   }, []);
@@ -152,28 +165,29 @@ const JudgeContests = () => {
     );
   }
 
+
+
   return (
     <>
       <TopNav />
       <div className="judge-contests-container">
         <div className="page-header">
           <h1>งานกรรมการของฉัน</h1>
-          <p className="subtitle">คำเชิญและการประกวดที่คุณรับผิดชอบ</p>
         </div>
 
         {/* Tabs */}
         <div className="tabs-container">
           <button 
+            className={`tab-btn ${activeTab === 'contests' ? 'active' : ''}`}
+            onClick={() => setActiveTab('contests')}
+          >
+            การประกวดของฉัน ({uniqueContests.length})
+          </button>
+          <button 
             className={`tab-btn ${activeTab === 'invitations' ? 'active' : ''}`}
             onClick={() => setActiveTab('invitations')}
           >
             คำเชิญ ({invitations.length})
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'contests' ? 'active' : ''}`}
-            onClick={() => setActiveTab('contests')}
-          >
-            การประกวดของฉัน ({contests.length})
           </button>
         </div>
 
@@ -253,49 +267,86 @@ const JudgeContests = () => {
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                {contests.map((contest) => (
-                  <div
-                    key={contest.id}
-                    className="contest-card"
-                    onClick={() => navigate(`/my-work/${contest.id}`)}
-                    style={{
-                      background: '#fff',
-                      borderLeft: '4px solid #70136C',
-                      borderRadius: 12,
-                      boxShadow: '0 2px 8px rgba(112,19,108,0.08)',
-                      padding: '28px 32px 24px 32px',
-                      margin: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 8,
-                      width: '100%',
-                      maxWidth: '100%',
-                      cursor: 'pointer',
-                      transition: 'box-shadow 0.2s',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginBottom: 0 }}>
-                      <h3 style={{ fontSize: 22, fontWeight: 700, color: '#70136C', margin: 0, flex: 1, lineHeight: 1.2 }}>{contest.title}</h3>
-                      <span style={{ marginLeft: 16 }}>{getStatusBadge(contest.status)}</span>
-                    </div>
-                    <button
-                      className="view-btn"
+                {/* Deduplicate contests by id and collect all levels */}
+                {(() => {
+                  const contestMap = {};
+                  contests.forEach(c => {
+                    const key = c.id;
+                    if (!contestMap[key]) {
+                      contestMap[key] = { ...c, levels: [], judgeIds: [] };
+                    }
+                    if (c.level_name && !contestMap[key].levels.includes(c.level_name)) {
+                      contestMap[key].levels.push(c.level_name);
+                    }
+                    if (c.judge_id && !contestMap[key].judgeIds.includes(c.judge_id)) {
+                      contestMap[key].judgeIds.push(c.judge_id);
+                    }
+                  });
+                  const uniqueContests = Object.values(contestMap);
+                  return uniqueContests.map((contest) => (
+                    <div
+                      key={contest.id}
+                      className="contest-card"
+                      onClick={() => navigate(`/my-work/${contest.id}`)}
                       style={{
-                        marginTop: 18,
-                        padding: '14px 0',
-                        background: '#70136C',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 8,
-                        fontSize: 18,
-                        fontWeight: 600,
-                        cursor: 'pointer',
+                        background: '#fff',
+                        borderLeft: '4px solid #70136C',
+                        borderRadius: 12,
+                        boxShadow: '0 2px 8px rgba(112,19,108,0.08)',
+                        padding: '28px 32px 24px 32px',
+                        margin: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 8,
                         width: '100%',
-                        boxShadow: '0 2px 8px rgba(112,19,108,0.10)'
+                        maxWidth: '100%',
+                        cursor: 'pointer',
+                        transition: 'box-shadow 0.2s',
                       }}
-                    >ดูรายละเอียดและให้คะแนน →</button>
-                  </div>
-                ))}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginBottom: 0 }}>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, color: '#70136C', margin: 0, flex: 1, lineHeight: 1.2 }}>{contest.title}</h3>
+                        <span style={{ marginLeft: 16 }}>{getStatusBadge(contest.status)}</span>
+                      </div>
+                      {/* Show all levels as badges if more than one */}
+                      {contest.levels.length > 0 && (
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '8px 0 0 0' }}>
+                          {contest.levels.map((level, idx) => (
+                            <span key={level+idx} style={{
+                              background: '#f3e5f5',
+                              color: '#70136C',
+                              borderRadius: 8,
+                              padding: '4px 12px',
+                              fontSize: 15,
+                              fontWeight: 600,
+                              letterSpacing: 0.2
+                            }}>{level}</span>
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        className="view-btn"
+                        style={{
+                          marginTop: 18,
+                          padding: '14px 0',
+                          background: '#70136C',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 8,
+                          fontSize: 18,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          width: '100%',
+                          boxShadow: '0 2px 8px rgba(112,19,108,0.10)'
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          navigate(`/my-work/${contest.id}`);
+                        }}
+                      >ดูรายละเอียดและให้คะแนน →</button>
+                    </div>
+                  ));
+                })()}
               </div>
             )}
           </>

@@ -266,7 +266,6 @@ const OrganizationDetail = () => {
       'completed': { text: 'เสร็จสิ้น', color: '#95a5a6' }
     };
     const badge = statusMap[status] || { text: status, color: '#666' };
-    
     return (
       <span style={{
         padding: '4px 12px',
@@ -278,17 +277,6 @@ const OrganizationDetail = () => {
       }}>
         {badge.text}
       </span>
-    );
-  };
-
-  if (loading && !organization) {
-    return (
-      <div style={{ minHeight: "100vh", background: "#f8f9fb" }}>
-        <TopNav />
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#666' }}>
-          กำลังโหลดข้อมูล...
-        </div>
-      </div>
     );
   }
 
@@ -308,31 +296,62 @@ const OrganizationDetail = () => {
       <TopNav />
 
       <div style={{ padding: '24px 24px 32px 24px', maxWidth: 1200, margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ marginBottom: 24 }}>
-          <button 
-            onClick={() => navigate(-1)}
-            style={{
-              padding: '8px 16px',
-              background: 'white',
-              border: '2px solid #70136C',
-              borderRadius: 8,
+        {/* Header: Settings button, org image, org name (horizontal) */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 18,
+          marginBottom: 24,
+          justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            {/* Org image (square) */}
+            <div style={{
+              width: 140,
+              height: 140,
+              borderRadius: 24,
+              overflow: 'hidden',
+              background: '#f3f3f3',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '4px solid #e0c7e7',
+            }}>
+              {organization && organization.cover_image ? (
+                <img src={organization.cover_image} alt={organization.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontSize: 80, color: '#8bc34a' }}>🏢</span>
+              )}
+            </div>
+            {/* Org name */}
+            <span style={{
               color: '#70136C',
+              fontWeight: 700,
+              fontSize: '1.5rem',
+              marginLeft: 0,
+              letterSpacing: 0.2,
+            }}>
+              {organization?.name}
+            </span>
+          </div>
+          {/* Settings button (rightmost) */}
+          <button
+            onClick={() => alert('ยังไม่มีหน้าตั้งค่า')}
+            style={{
+              background: '#fff',
+              border: '2px solid #70136C',
+              color: '#70136C',
+              borderRadius: 8,
               fontWeight: 600,
+              fontSize: 16,
+              padding: '8px 18px',
               cursor: 'pointer',
-              marginBottom: 16
+              marginLeft: 12,
+              transition: 'background 0.2s',
             }}
           >
-            ← กลับ
+            Settings
           </button>
-          <h1 style={{ 
-            color: "#70136C", 
-            fontWeight: 700, 
-            fontSize: "1.8rem", 
-            margin: 0 
-          }}>
-            {organization?.name}
-          </h1>
         </div>
 
         {/* Tabs */}
@@ -355,7 +374,7 @@ const OrganizationDetail = () => {
               fontSize: '1rem'
             }}
           >
-            📊 ภาพรวม
+             ภาพรวม
           </button>
           <button
             onClick={() => setActiveTab('assistants')}
@@ -370,7 +389,7 @@ const OrganizationDetail = () => {
               fontSize: '1rem'
             }}
           >
-            ✨ ผู้ช่วยจัดการ
+            ผู้ช่วยจัดการ
           </button>
         </div>
 
@@ -397,39 +416,6 @@ const OrganizationDetail = () => {
                       marginBottom: 8,
                     }}
                   >
-                    <h2
-                      style={{
-                        color: "#70136C",
-                        fontWeight: 800,
-                        fontSize: "1.55rem",
-                        margin: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 10,
-                      }}
-                    >
-                      {organization?.name}
-                    </h2>
-
-                    {userRole && (
-                      <span
-                        style={{
-                          background: userRole === 'creator' ? "#1abc9c" : userRole === 'assistant' ? "#3498db" : "#f39c12",
-                          color: "#fff",
-                          borderRadius: 8,
-                          padding: "6px 18px",
-                          fontWeight: 700,
-                          fontSize: "1.08rem",
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 7,
-                        }}
-                      >
-                        {userRole === 'creator' && '👑 ผู้สร้าง'}
-                        {userRole === 'assistant' && '✅ ผู้ช่วย'}
-                        {userRole === 'judge' && '⚖️ กรรมการ'}
-                      </span>
-                    )}
                   </div>
 
                   <div style={{ color: "#666", fontSize: "1.02rem", marginBottom: 8 }}>
@@ -442,7 +428,7 @@ const OrganizationDetail = () => {
                 {/* Create Competition & Invite Member Buttons */}
                 {(userRole === 'creator' || userRole === 'assistant') && (
                   <>
-                    <div style={{ borderBottom: '1px solid #e6e6e6', margin: '16px 0 16px 0' }} />
+                   
                     <div style={{ fontWeight: 700, fontSize: '1.13rem', color: '#6c5ce7', margin: '0 0 10px 2px', letterSpacing: '-0.5px' }}>
                       จัดการ
                     </div>

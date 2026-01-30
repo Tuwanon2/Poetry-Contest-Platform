@@ -1,5 +1,5 @@
 .my-orgs-container {
-  max-width: 1200px;
+  max-width: 1400px;   /* หรือ 100% ถ้าอยากเต็มจอ */
   margin: 40px auto;
   padding: 0 24px;
 }
@@ -120,7 +120,7 @@
 
 .orgs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: 1fr;   /* (ถ้าแก้ตามที่คุยกัน) */
   gap: 24px;
 }
 
@@ -128,7 +128,7 @@
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(191, 144, 144, 0.1);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }

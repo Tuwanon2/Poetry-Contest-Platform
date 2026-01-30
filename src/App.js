@@ -38,7 +38,6 @@ import TestPage from './pages/TestPage';
 function App() {
   return (
     <Router>
-      <div style={{ minHeight: '100vh', position: 'relative', paddingBottom: '60px' }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/test" element={<TestPage />} />
@@ -78,7 +77,7 @@ function App() {
           <Route path="/judge/contests" element={<JudgeContests />} />
         </Routes>
         <Footer />
-      </div>
+     
     </Router>
   );
 }

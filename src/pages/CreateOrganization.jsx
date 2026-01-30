@@ -116,8 +116,8 @@ const CreateOrganization = () => {
             <button className="back-btn" onClick={() => navigate('/my-organizations')}>
               ← กลับ
             </button>
-            <h1>สร้าง Organization ใหม่</h1>
-            <p>กรอกข้อมูลเพื่อสร้าง Organization ของคุณ (จะต้องได้รับการอนุมัติจากผู้ดูแลระบบก่อน)</p>
+            <h1>สร้าง Organization</h1>
+            
           </div>
 
           <form className="create-org-form" onSubmit={handleSubmit}>
@@ -178,7 +178,7 @@ const CreateOrganization = () => {
                 accept=".pdf,.jpg,.jpeg,.png"
                 required
               />
-              <small>อัปโหลดเอกสารที่แสดงความเป็น Organization ที่มีตัวตนจริง (PDF, JPG, PNG)</small>
+              
               {previews.certificate && (
                 <div className="file-preview">
                   📄 {formData.certificate.name}

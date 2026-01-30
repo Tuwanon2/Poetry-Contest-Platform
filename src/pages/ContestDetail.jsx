@@ -1,9 +1,22 @@
+
 import React, { useState, useEffect } from "react";
 import TopNav from "../components/TopNav";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { FaRegCalendarAlt, FaRegClock } from "react-icons/fa"; // เหลือไว้เฉพาะที่ใช้ในเนื้อหา (วันที่/เวลา)
 import '../App.css';
+
+// Utility: Render text with /n as line breaks
+function renderWithCustomNewlines(text) {
+  if (!text) return null;
+  // Split by /n and render as paragraphs
+  return text.split('/n').map((line, idx) => (
+    <React.Fragment key={idx}>
+      {line}
+      <br />
+    </React.Fragment>
+  ));
+}
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
@@ -178,8 +191,8 @@ const ContestDetail = () => {
                             <div style={sectionTitle}>
                                 รายละเอียด
                             </div>
-                            <div style={{ color: '#555', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                                {contest.description || contest.Description}
+                            <div style={{ color: '#555', lineHeight: 1.6 }}>
+                              {renderWithCustomNewlines(contest.description || contest.Description)}
                             </div>
                             {divider}
                         </>
@@ -294,8 +307,7 @@ const ContestDetail = () => {
           alignItems: 'center',
           padding: '25px 0',
           zIndex: 1000,
-          background: 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%)',
-          backdropFilter: 'none',
+          background: 'transparent',
           pointerEvents: 'none'
         }}>
           <button

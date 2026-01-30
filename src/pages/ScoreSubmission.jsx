@@ -271,18 +271,7 @@ const ScoreSubmission = () => {
                     />
                   </div>
                 ))}
-                
-                <div style={{ 
-                  background: '#70136C', 
-                  color: 'white', 
-                  padding: '12px 16px', 
-                  borderRadius: '8px',
-                  textAlign: 'right',
-                  fontWeight: 'bold',
-                  fontSize: '16px'
-                }}>
-                  คะแนนรวม: {calculateTotalScore().toFixed(2)} คะแนน
-                </div>
+              
               </div>
             </>
           ) : (

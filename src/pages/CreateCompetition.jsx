@@ -248,30 +248,39 @@ export default function CreateCompetition() {
         setLoading(false);
         return;
       }
+      // Replace newlines with /n for description, purpose, and level details
+      const processedDescription = contestDescription.replace(/\n/g, '/n');
+      const processedPurpose = contestPurpose.replace(/\n/g, '/n');
+      const processedLevelDetails = { ...levelDetails };
+      Object.keys(processedLevelDetails).forEach(key => {
+        if (key.endsWith('_description') && typeof processedLevelDetails[key] === 'string') {
+          processedLevelDetails[key] = processedLevelDetails[key].replace(/\n/g, '/n');
+        }
+      });
       const formData = new FormData();
       formData.append('name', contestName);
       formData.append('organization_id', organizationId);
       formData.append('registration_start', regOpen);
       formData.append('registration_end', regClose);
-      formData.append('description', contestDescription);
-      formData.append('objective', contestPurpose);
+      formData.append('description', processedDescription);
+      formData.append('objective', processedPurpose);
       // ส่ง poster_url (URL string ที่ได้จาก /api/v1/upload) แทนการแนบไฟล์
       if (posterURL) formData.append('poster_url', posterURL);
       formData.append('levels_json', JSON.stringify(selectedLevels.map(lvl => {
-        const criteria = levelDetails[lvl + '_criteria'] || [];
+        const criteria = processedLevelDetails[lvl + '_criteria'] || [];
         return {
           level_name: lvl,
           poem_types: levelPoemTypes[lvl] || [],
           topic_mode: levelTopics[lvl]?.topicEnabled ? 'fixed' : 'free',
           topic_name: levelTopics[lvl]?.topicName || '',
-          description: levelDetails[lvl + '_description'] || '',
+          description: processedLevelDetails[lvl + '_description'] || '',
           criteria: criteria,
           scoring_criteria: criteria.map(c => ({ name: c.title, max_score: Number(c.score) })),
           total_score: calculateTotalScore(lvl),
-          prizes: levelDetails[lvl + '_prize_enabled'] ? {
-            prize_1: levelDetails[lvl + '_prize1'],
-            prize_2: levelDetails[lvl + '_prize2'],
-            prize_3: levelDetails[lvl + '_prize3'],
+          prizes: processedLevelDetails[lvl + '_prize_enabled'] ? {
+            prize_1: processedLevelDetails[lvl + '_prize1'],
+            prize_2: processedLevelDetails[lvl + '_prize2'],
+            prize_3: processedLevelDetails[lvl + '_prize3'],
           } : null
         };
       })));

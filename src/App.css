@@ -1270,3 +1270,10 @@ h1 {
   transform: scale(1.05);
   box-shadow: 0 0 10px #2c9caf;
 }
+
+/* Flex container for app layout */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
