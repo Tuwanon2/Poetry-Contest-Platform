@@ -73,7 +73,6 @@ func main() {
 
 	// Public register/login route (should be accessible without auth middleware)
 	r.POST("/api/v1/auth/register", kh.Register)
-	r.POST("/api/v1/auth/login", kh.Login)
 
 	v1 := r.Group("/api/v1")
 	routes.Register(v1, kh)
