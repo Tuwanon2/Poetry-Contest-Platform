@@ -31,6 +31,7 @@ func main() {
 
 	// Connect klon DB
 	connStr := cfg.GetConnectionString()
+	log.Printf("Connecting to DB with connStr: %s", connStr)
 	klonDB, err := klon.NewPostgresKlonDB(connStr)
 	if err != nil {
 		log.Fatalf("failed to connect klon db: %v", err)

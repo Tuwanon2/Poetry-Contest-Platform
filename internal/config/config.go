@@ -4,6 +4,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -17,6 +18,7 @@ type Config struct {
 	DatabasePassword string
 	DatabaseName     string
 	DatabaseSSLMode  string
+	DatabaseURL      string // เพิ่ม field สำหรับ DATABASE_URL
 }
 
 func LoadConfig() (Config, error) {
@@ -33,20 +35,28 @@ func LoadConfig() (Config, error) {
 	viper.SetDefault("POSTGRES.SSLMODE", "disable")
 
 	// Set config values
+	dbURL := viper.GetString("DATABASE_URL")
+	if dbURL == "" {
+		dbURL = os.Getenv("DATABASE_URL")
+	}
 	config := Config{
-		AppPort:          viper.GetString("APP.PORT"),
-		DatabaseHost:     viper.GetString("POSTGRES.HOST"),
-		DatabasePort:     viper.GetInt("POSTGRES.PORT"),
-		DatabaseUser:     viper.GetString("POSTGRES.USER"),
-		DatabasePassword: viper.GetString("POSTGRES.PASSWORD"),
-		DatabaseName:     viper.GetString("POSTGRES.DBNAME"),
-		DatabaseSSLMode:  viper.GetString("POSTGRES.SSLMODE"),
+		AppPort:          viper.GetString("APP_PORT"),
+		DatabaseHost:     viper.GetString("POSTGRES_HOST"),
+		DatabasePort:     viper.GetInt("POSTGRES_PORT"),
+		DatabaseUser:     viper.GetString("POSTGRES_USER"),
+		DatabasePassword: viper.GetString("POSTGRES_PASSWORD"),
+		DatabaseName:     viper.GetString("POSTGRES_DBNAME"),
+		DatabaseSSLMode:  viper.GetString("POSTGRES_SSLMODE"),
+		DatabaseURL:      dbURL,
 	}
 
 	return config, nil
 }
 
 func (c *Config) GetConnectionString() string {
+	if c.DatabaseURL != "" {
+		return c.DatabaseURL
+	}
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		c.DatabaseHost,
 		c.DatabasePort,
