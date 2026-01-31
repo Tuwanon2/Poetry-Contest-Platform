@@ -1,3 +1,4 @@
+import API_BASE_URL from '../../config/api';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../../styles/AdminDashboard.css";
@@ -35,7 +36,7 @@ export default function AdminDashboard() {
 
   const fetchDashboardStats = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/v1/admin/dashboard/stats');
+      const res = await axios.get(`${API_BASE_URL}/admin/dashboard/stats`);
       setDashboardStats(res.data || {});
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
   const fetchPendingOrganizations = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:8080/api/v1/admin/organizations/pending');
+      const res = await axios.get(`${API_BASE_URL}/admin/organizations/pending`);
       setPendingOrganizations(res.data || []);
     } catch (err) {
       console.error('Error fetching pending organizations:', err);
@@ -57,7 +58,7 @@ export default function AdminDashboard() {
   const fetchApprovedOrganizations = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:8080/api/v1/admin/organizations/approved');
+      const res = await axios.get(`${API_BASE_URL}/admin/organizations/approved`);
       setApprovedOrganizations(res.data || []);
     } catch (err) {
       console.error('Error fetching approved organizations:', err);
@@ -68,7 +69,7 @@ export default function AdminDashboard() {
 
   const handleApproveOrganization = async (orgId, status) => {
     try {
-      await axios.put(`http://localhost:8080/api/v1/admin/organizations/${orgId}/status`, {
+      await axios.put(`${API_BASE_URL}/admin/organizations/${orgId}/status`, {
         status: status
       });
       alert(`องค์กรถูก${status === 'approved' ? 'อนุมัติ' : 'ปฏิเสธ'}เรียบร้อย`);

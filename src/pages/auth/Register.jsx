@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import API_BASE_URL from '../../config/api';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthHeader from '../../components/AuthHeader';
@@ -51,7 +52,7 @@ const Register = () => {
         Role: 'student'
       };
 
-      const res = await axios.post('http://localhost:8080/api/v1/auth/register', payload);
+      const res = await axios.post(`${API_BASE_URL}/auth/register`, payload);
 
       if (res.status === 201 || res.status === 200) {
         setLoading(false);

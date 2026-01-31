@@ -9,7 +9,7 @@ import ContestFilters from '../../components/ContestFilters';
 // CSS: ใช้ไฟล์เดียวกับ ActivitiesList (ต้องมีไฟล์ ActivitiesList.css ในโฟลเดอร์เดียวกัน)
 import '../../components/ActivitiesList.css';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+import API_BASE_URL from '../../config/api';
 
 const AllCompetitions = () => {
   // --- State ---
@@ -62,7 +62,7 @@ const AllCompetitions = () => {
     const posterPath = contest.poster_url || contest.PosterURL;
     if (!posterPath) return null;
     if (posterPath.startsWith('http')) return posterPath;
-    return `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    return `${API_BASE_URL.replace('/api/v1','')}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
   };
 
   // --- Filter Logic ---

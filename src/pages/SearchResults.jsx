@@ -4,7 +4,7 @@ import axios from 'axios';
 import TopNav from '../components/TopNav';
 import '../components/ActivitiesList.css';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+import API_BASE_URL from '../config/api';
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -74,7 +74,7 @@ const SearchResults = () => {
       if (posterPath.startsWith('http')) {
         imageUrl = posterPath;
       } else {
-        imageUrl = `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+        imageUrl = `${API_BASE_URL.replace('/api/v1','')}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
       }
     }
 

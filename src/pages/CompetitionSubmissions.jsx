@@ -1,3 +1,4 @@
+import API_BASE_URL from '../config/api';
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -35,7 +36,7 @@ const CompetitionSubmissions = () => {
 
   const fetchCompetitionDetails = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/competitions/${competitionId}`);
+      const res = await axios.get(`${API_BASE_URL}/competitions/${competitionId}`);
       setCompetition(res.data);
     } catch (err) {
       console.error("Failed to fetch competition details", err);
@@ -44,7 +45,7 @@ const CompetitionSubmissions = () => {
 
   const fetchSubmissions = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/competitions/${competitionId}/submissions`);
+      const res = await axios.get(`${API_BASE_URL}/competitions/${competitionId}/submissions`);
       setSubmissions(res.data || []);
     } catch (err) {
       console.error("Failed to fetch submissions", err);

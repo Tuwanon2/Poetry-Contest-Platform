@@ -4,7 +4,7 @@ import axios from "axios";
 import TopNav from "../components/TopNav";
 import "../styles/SubmitCompetition.css";
 import { FaChalkboardTeacher, FaUserGraduate, FaUniversity, FaUsers } from "react-icons/fa";
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+import API_BASE_URL from '../config/api';
 
 const POEM_PATTERNS = {
   "กลอนแปด": { linesPerStanza: 4, initialStanzas: 2, label: "กลอนแปด" },
@@ -430,7 +430,7 @@ export default function SubmitCompetition() {
     if (posterPath.startsWith('http')) {
       posterUrl = posterPath;
     } else {
-      posterUrl = `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+      posterUrl = `${API_BASE_URL.replace('/api/v1','')}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
     }
   }
 

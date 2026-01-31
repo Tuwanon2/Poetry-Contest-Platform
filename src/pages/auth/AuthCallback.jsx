@@ -1,3 +1,4 @@
+import API_BASE_URL from '../../config/api';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../config/supabase';
@@ -51,7 +52,7 @@ const AuthCallback = () => {
           // Send to your backend to create/update user
           try {
             setStatus('กำลังเชื่อมต่อกับระบบ...');
-            const res = await axios.post('http://localhost:8080/api/v1/auth/google-login', {
+            const res = await axios.post(`${API_BASE_URL}/auth/google-login`, {
               email,
               full_name: fullName,
               google_id: googleId,

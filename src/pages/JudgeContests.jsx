@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
@@ -40,14 +41,14 @@ const JudgeContests = () => {
         return;
       }
       // Fetch invitations (pending)
-      const invResponse = await axios.get(`http://localhost:8080/api/v1/judge/invitations?user_id=${userId}`);
+      const invResponse = await axios.get(`${API_BASE_URL}/judge/invitations?user_id=${userId}`);
       let invitationsData = invResponse.data || [];
 
       // For invitations missing organization_id, fetch contest detail to get org id
       const invitationsWithOrg = await Promise.all(invitationsData.map(async (inv) => {
         if (!inv.organization_id && inv.competition_id) {
           try {
-            const contestRes = await axios.get(`http://localhost:8080/api/v1/contests/${inv.competition_id}`);
+            const contestRes = await axios.get(`${API_BASE_URL}/contests/${inv.competition_id}`);
             return { ...inv, organization_id: contestRes.data.organization_id };
           } catch {
             return inv;
@@ -62,7 +63,7 @@ const JudgeContests = () => {
       const orgsMap = {};
       await Promise.all(orgIds.map(async (orgId) => {
         try {
-          const res = await axios.get(`http://localhost:8080/api/v1/organizations/${orgId}`);
+          const res = await axios.get(`${API_BASE_URL}/organizations/${orgId}`);
           orgsMap[orgId] = res.data;
         } catch (e) {
           orgsMap[orgId] = null;
@@ -71,7 +72,7 @@ const JudgeContests = () => {
       setOrgs(orgsMap);
 
       // Fetch accepted contests
-      const contestResponse = await axios.get(`http://localhost:8080/api/v1/judge/contests?user_id=${userId}`);
+      const contestResponse = await axios.get(`${API_BASE_URL}/judge/contests?user_id=${userId}`);
       setContests(contestResponse.data || []);
       setError(null);
     } catch (err) {
@@ -84,7 +85,7 @@ const JudgeContests = () => {
 
   const handleAcceptInvitation = async (invitationId) => {
     try {
-      await axios.post(`http://localhost:8080/api/v1/judge/invitations/${invitationId}/accept`);
+      await axios.post(`${API_BASE_URL}/judge/invitations/${invitationId}/accept`);
       alert('ตอบรับคำเชิญสำเร็จ!');
       fetchJudgeData(); // Refresh data
     } catch (err) {
@@ -97,7 +98,7 @@ const JudgeContests = () => {
     if (!window.confirm('คุณต้องการปฏิเสธคำเชิญนี้หรือไม่?')) return;
     
     try {
-      await axios.post(`http://localhost:8080/api/v1/judge/invitations/${invitationId}/reject`);
+      await axios.post(`${API_BASE_URL}/judge/invitations/${invitationId}/reject`);
       alert('ปฏิเสธคำเชิญแล้ว');
       fetchJudgeData();
     } catch (err) {

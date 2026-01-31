@@ -34,7 +34,7 @@ const InviteCompetitionRoleModal = ({
 
   const fetchOrganizationMembers = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/organizations/${organizationId}/members`);
+      const res = await axios.get(`${API_BASE_URL}/organizations/${organizationId}/members`);
       setOrganizationMembers(res.data || []);
     } catch (err) {
       console.error('Error fetching organization members:', err);
@@ -43,7 +43,7 @@ const InviteCompetitionRoleModal = ({
 
   const fetchCompetitionLevels = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/contests/${competitionId}`);
+      const res = await axios.get(`${API_BASE_URL}/contests/${competitionId}`);
       // สมมุติว่า API ส่ง levels กลับมา
       if (res.data.levels) {
         setLevels(JSON.parse(res.data.levels));
@@ -61,13 +61,13 @@ const InviteCompetitionRoleModal = ({
 
     try {
       if (roleType === 'judge') {
-        await axios.post(`http://localhost:8080/api/v1/contests/${competitionId}/judges`, {
+        await axios.post(`${API_BASE_URL}/contests/${competitionId}/judges`, {
           user_id: parseInt(selectedUserId),
           level_id: parseInt(selectedLevelId)
         });
         setSuccess('เชิญกรรมการสำเร็จ!');
       } else if (roleType === 'assistant') {
-        await axios.post(`http://localhost:8080/api/v1/contests/${competitionId}/assistants`, {
+        await axios.post(`${API_BASE_URL}/contests/${competitionId}/assistants`, {
           user_id: parseInt(selectedUserId),
           ...permissions
         });

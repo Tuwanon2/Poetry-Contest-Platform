@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 import axios from 'axios';
 
 // This modal is for inviting judges in CompetitionManagement (เชิญจริงทันที)
@@ -16,7 +17,7 @@ const InviteJudgeModalManagement = ({ isOpen, onClose, competitionId, levels, on
       const delaySearch = setTimeout(async () => {
         try {
           setSearching(true);
-          const res = await axios.get(`http://localhost:8080/api/v1/users/search?q=${searchEmail}`);
+          const res = await axios.get(`${API_BASE_URL}/users/search?q=${searchEmail}`);
           setSearchResults(res.data || []);
         } catch (err) {
           setSearchResults([]);
@@ -63,7 +64,7 @@ const InviteJudgeModalManagement = ({ isOpen, onClose, competitionId, levels, on
           invited_by: currentUserId
         };
         console.log('Invite judge payload:', payload);
-        await axios.post(`http://localhost:8080/api/v1/contests/${competitionId}/judges`, payload);
+        await axios.post(`${API_BASE_URL}/contests/${competitionId}/judges`, payload);
       }
       alert('เชิญกรรมการสำเร็จ!');
       setSearchEmail('');

@@ -1,3 +1,4 @@
+import API_BASE_URL from '../config/api';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -68,13 +69,13 @@ const CreateOrganization = () => {
       
       if (formData.coverImage) {
         formDataToSend.append('file', formData.coverImage);
-        const coverRes = await axios.post('http://localhost:8080/api/v1/upload', formDataToSend);
+        const coverRes = await axios.post(`${API_BASE_URL}/upload`, formDataToSend);
         coverImageUrl = coverRes.data?.url || coverRes.data?.file_url;
       }
       
       const certFormData = new FormData();
       certFormData.append('file', formData.certificate);
-      const certRes = await axios.post('http://localhost:8080/api/v1/upload', certFormData);
+      const certRes = await axios.post(`${API_BASE_URL}/upload`, certFormData);
       const certificateUrl = certRes.data?.url || certRes.data?.file_url;
 
       // Create organization
@@ -86,7 +87,7 @@ const CreateOrganization = () => {
         creator_user_id: parseInt(userId)
       };
 
-      await axios.post('http://localhost:8080/api/v1/organizations', orgData);
+      await axios.post(`${API_BASE_URL}/organizations`, orgData);
       
       // Navigate back to My Organizations page
       alert('สร้าง Organization สำเร็จ! รอการอนุมัติจากผู้ดูแลระบบ');

@@ -39,7 +39,7 @@ const CompetitionManagement = () => {
 
   const fetchCompetitionDetails = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/contests/${competitionId}`);
+      const res = await axios.get(`${API_BASE_URL}/contests/${competitionId}`);
       setCompetition(res.data);
       
       // Parse levels from competition object
@@ -65,7 +65,7 @@ const CompetitionManagement = () => {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`http://localhost:8080/api/v1/contests/${competitionId}/submissions`);
+      const res = await axios.get(`${API_BASE_URL}/contests/${competitionId}/submissions`);
       setSubmissions(res.data || []);
     } catch (err) {
       console.error('Error fetching submissions:', err);
@@ -78,9 +78,9 @@ const CompetitionManagement = () => {
   const handleStatusChange = async (newStatus) => {
     try {
       if (newStatus === 'open') {
-        await axios.post(`http://localhost:8080/api/v1/contests/${competitionId}/open`);
+        await axios.post(`${API_BASE_URL}/contests/${competitionId}/open`);
       } else if (newStatus === 'closed') {
-        await axios.post(`http://localhost:8080/api/v1/contests/${competitionId}/close`);
+        await axios.post(`${API_BASE_URL}/contests/${competitionId}/close`);
       }
       alert(`เปลี่ยนสถานะเป็น ${newStatus === 'open' ? 'เปิดรับสมัคร' : 'ปิดรับสมัคร'} แล้ว`);
       fetchCompetitionDetails();
@@ -116,7 +116,7 @@ const CompetitionManagement = () => {
 
   const handleSaveCriteria = async (levelId) => {
     try {
-      await axios.put(`http://localhost:8080/api/v1/competition-levels/${levelId}/criteria`, {
+      await axios.put(`${API_BASE_URL}/competition-levels/${levelId}/criteria`, {
         scoring_criteria: editingCriteria
       });
       alert('บันทึกเกณฑ์การให้คะแนนสำเร็จ');

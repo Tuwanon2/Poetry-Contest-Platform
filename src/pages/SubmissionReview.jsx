@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
@@ -20,7 +21,7 @@ const SubmissionReview = () => {
   const fetchSubmissionDetails = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`http://localhost:8080/api/v1/submission/${submissionId}`);
+      const res = await axios.get(`${API_BASE_URL}/submission/${submissionId}`);
       setSubmission(res.data);
     } catch (err) {
       console.error('Error fetching submission:', err);
@@ -138,7 +139,7 @@ const SubmissionReview = () => {
                   <div className="info-label">เอกสารรับรองการเป็นนักเรียน/นักศึกษา</div>
                   <div className="info-value">
                     <a 
-                      href={`http://localhost:8080${submission.document}`}
+                      href={`${API_BASE_URL.replace('/api/v1','')}${submission.document}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="document-link"

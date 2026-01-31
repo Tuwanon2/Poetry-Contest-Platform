@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 import axios from 'axios';
@@ -35,7 +36,7 @@ const Home = () => {
             
             try {
               // Send to backend
-              const res = await axios.post('http://localhost:8080/api/v1/auth/google-login', {
+              const res = await axios.post(`${API_BASE_URL}/auth/google-login`, {
                 email,
                 full_name: fullName,
                 google_id: googleId,

@@ -5,6 +5,7 @@ import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers, FaTrash, Fa
 import TopNav from "../components/TopNav";
 import InviteJudgeModal from "../components/InviteJudgeModal";
 import styles from "./CreateCompetition.module.css";
+import API_BASE_URL from '../config/api';
 
 function LevelSelectCard({ label, icon, selected, onClick }) {
   return (
@@ -269,7 +270,7 @@ export default function CreateCompetition() {
         formData.append('judges_json', JSON.stringify(judges));
       }
 
-      await axios.post('http://localhost:8080/api/v1/competitions', formData, {
+      await axios.post(`${API_BASE_URL}/competitions`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -368,7 +369,7 @@ export default function CreateCompetition() {
                   try {
                     const formData = new FormData();
                     formData.append('file', file);
-                    const res = await axios.post('http://localhost:8080/api/v1/upload', formData);
+                    const res = await axios.post(`${API_BASE_URL}/upload`, formData);
                     setPosterURL(res.data?.url || res.data?.file_url || "");  // ✅ แก้ให้เป็นแบบนี้
                   } catch (err) {
                     alert('อัปโหลดโปสเตอร์ล้มเหลว');

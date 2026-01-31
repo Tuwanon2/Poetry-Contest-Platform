@@ -8,7 +8,7 @@ import ContestFilters from '../../components/ContestFilters';
 // CSS: ใช้ไฟล์เดียวกับ ActivitiesList
 import '../../components/ActivitiesList.css';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+import API_BASE_URL from '../../config/api';
 
 const UniversityCompetitions = () => {
   // --- State ---
@@ -69,8 +69,11 @@ const UniversityCompetitions = () => {
   const getPosterUrl = (contest) => {
     const posterPath = contest.poster_url || contest.PosterURL;
     if (!posterPath) return null;
+    // Always use API_BASE_URL for relative poster paths
     if (posterPath.startsWith('http')) return posterPath;
-    return `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    // Remove trailing slash from API_BASE_URL if present
+    const baseUrl = API_BASE_URL.replace(/\/api\/v1$/, '').replace(/\/$/, '');
+    return `${baseUrl}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
   };
 
   // --- 3. Filter Logic ---

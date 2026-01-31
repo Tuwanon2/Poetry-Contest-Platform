@@ -4,7 +4,7 @@ import axios from 'axios';
 import TopNav from '../components/TopNav';
 import '../styles/ScoreSubmission.css';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+import API_BASE_URL from '../config/api';
 
 const ScoreSubmission = () => {
   const { submissionId } = useParams();

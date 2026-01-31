@@ -1,3 +1,4 @@
+import API_BASE_URL from '../config/api';
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -22,7 +23,7 @@ const InviteMemberModal = ({ isOpen, onClose, organizationId, onSuccess }) => {
 
     try {
       setSearching(true);
-      const res = await axios.get(`http://localhost:8080/api/v1/users/search?email=${value}`);
+      const res = await axios.get(`${API_BASE_URL}/users/search?email=${value}`);
       setSearchResults(res.data || []);
       setShowDropdown(res.data && res.data.length > 0);
     } catch (err) {
@@ -47,7 +48,7 @@ const InviteMemberModal = ({ isOpen, onClose, organizationId, onSuccess }) => {
     setSuccess('');
 
     try {
-      await axios.post(`http://localhost:8080/api/v1/organizations/${organizationId}/invite`, {
+      await axios.post(`${API_BASE_URL}/organizations/${organizationId}/invite`, {
         email
       });
 

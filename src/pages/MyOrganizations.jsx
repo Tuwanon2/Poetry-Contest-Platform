@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
@@ -28,7 +29,7 @@ const MyOrganizations = () => {
     try {
       setLoading(true);
       const userId = localStorage.getItem('user_id') || sessionStorage.getItem('user_id');
-      const res = await axios.get(`http://localhost:8080/api/v1/organizations/user/${userId}`);
+      const res = await axios.get(`${API_BASE_URL}/organizations/user/${userId}`);
       setOrganizations(res.data || []);
 
       // Fetch roles for each org
@@ -36,7 +37,7 @@ const MyOrganizations = () => {
       await Promise.all(
         (res.data || []).map(async (org) => {
           try {
-            const membersRes = await axios.get(`http://localhost:8080/api/v1/organizations/${org.organization_id}/members`);
+            const membersRes = await axios.get(`${API_BASE_URL}/organizations/${org.organization_id}/members`);
             const me = (membersRes.data || []).find(m => String(m.user_id) === String(userId));
             if (me && me.role) {
               rolesObj[org.organization_id] = me.role;
@@ -98,7 +99,7 @@ const MyOrganizations = () => {
 
   const handleAcceptInvitation = async (memberId) => {
     try {
-      await axios.put(`http://localhost:8080/api/v1/organizations/members/${memberId}/accept`);
+      await axios.put(`${API_BASE_URL}/organizations/members/${memberId}/accept`);
       alert('ยอมรับคำเชิญสำเร็จ!');
       fetchMyOrganizations(); // Refresh
     } catch (err) {
@@ -111,7 +112,7 @@ const MyOrganizations = () => {
     if (!window.confirm('คุณแน่ใจหรือไม่ที่จะปฏิเสธคำเชิญนี้?')) return;
 
     try {
-      await axios.delete(`http://localhost:8080/api/v1/organizations/members/${memberId}/reject`);
+      await axios.delete(`${API_BASE_URL}/organizations/members/${memberId}/reject`);
       alert('ปฏิเสธคำเชิญสำเร็จ');
       fetchMyOrganizations(); // Refresh
     } catch (err) {

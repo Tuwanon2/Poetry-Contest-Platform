@@ -5,7 +5,7 @@ import axios from 'axios';
 import TopNav from '../components/TopNav';
 import { FaArrowLeft, FaPrint } from 'react-icons/fa';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+import API_BASE_URL from '../config/api';
 
 const SubmissionDetail = () => {
   const { submissionId } = useParams();

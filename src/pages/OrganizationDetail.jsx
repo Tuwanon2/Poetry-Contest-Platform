@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
@@ -91,7 +92,7 @@ const OrganizationDetail = () => {
 
   const fetchMembers = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/organizations/${orgId}/members`);
+      const res = await axios.get(`${API_BASE_URL}/organizations/${orgId}/members`);
       setMembers(res.data || []);
     } catch (err) {
       console.error('Error fetching members:', err);
@@ -100,7 +101,7 @@ const OrganizationDetail = () => {
 
   const fetchAssistants = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/organizations/${orgId}/assistants`);
+      const res = await axios.get(`${API_BASE_URL}/organizations/${orgId}/assistants`);
       setAssistants(res.data || []);
     } catch (err) {
       console.error('Error fetching assistants:', err);
@@ -109,9 +110,9 @@ const OrganizationDetail = () => {
 
   const calculateStats = async () => {
     try {
-      const compsRes = await axios.get(`http://localhost:8080/api/v1/organizations/${orgId}/competitions`);
+      const compsRes = await axios.get(`${API_BASE_URL}/organizations/${orgId}/competitions`);
       const comps = compsRes.data || [];
-      const membersRes = await axios.get(`http://localhost:8080/api/v1/organizations/${orgId}/members`);
+      const membersRes = await axios.get(`${API_BASE_URL}/organizations/${orgId}/members`);
       const mems = membersRes.data || [];
 
       setStats({
@@ -137,7 +138,7 @@ const OrganizationDetail = () => {
       console.log('Current userId:', userId);
 
       // ดึงข้อมูลสมาชิกจาก organization_members
-      const membersRes = await axios.get(`http://localhost:8080/api/v1/organizations/${orgId}/members`);
+      const membersRes = await axios.get(`${API_BASE_URL}/organizations/${orgId}/members`);
       const members = membersRes.data || [];
       console.log('Members list:', members);
       
@@ -196,7 +197,7 @@ const OrganizationDetail = () => {
 
   const fetchOrganizationDetails = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/organizations/${orgId}`);
+      const res = await axios.get(`${API_BASE_URL}/organizations/${orgId}`);
       setOrganization(res.data);
     } catch (err) {
       console.error('Error fetching organization:', err);
@@ -207,7 +208,7 @@ const OrganizationDetail = () => {
   const fetchCompetitions = async () => {
     try {
       setLoading(true);
-      const url = `http://localhost:8080/api/v1/organizations/${orgId}/competitions`;
+      const url = `${API_BASE_URL}/organizations/${orgId}/competitions`;
       console.log('Fetching competitions from:', url);
       
       const res = await axios.get(url);
@@ -527,16 +528,16 @@ const OrganizationDetail = () => {
                       let imageUrl = comp.image_url || comp.poster_url;
                       if (imageUrl && !imageUrl.startsWith('http')) {
                         if (imageUrl.startsWith('/DB_poem/uploads')) {
-                          imageUrl = `http://localhost:8080${imageUrl}`;
+                          imageUrl = `${API_BASE_URL.replace('/api/v1','')}${imageUrl}`;
                         }
                         // If it starts with /uploads, use as-is (served by backend static route)
                         // If it starts with something else, fallback to original logic
                         else if (imageUrl.startsWith('/uploads')) {
-                          imageUrl = `http://localhost:8080${imageUrl}`;
+                          imageUrl = `${API_BASE_URL.replace('/api/v1','')}${imageUrl}`;
                         }
                         // else, fallback (for legacy or unexpected cases)
                         else {
-                          imageUrl = `http://localhost:8080/${imageUrl}`;
+                          imageUrl = `${API_BASE_URL.replace('/api/v1','')}/${imageUrl}`;
                         }
                       }
                       return (

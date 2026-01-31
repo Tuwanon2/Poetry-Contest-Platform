@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 import axios from 'axios';
 
 const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess, prepareMode = false }) => {
@@ -15,7 +16,7 @@ const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess, p
       const delaySearch = setTimeout(async () => {
         try {
           setSearching(true);
-          const res = await axios.get(`http://localhost:8080/api/v1/users/search?q=${searchEmail}`);
+          const res = await axios.get(`${API_BASE_URL}/users/search?q=${searchEmail}`);
           setSearchResults(res.data || []);
         } catch (err) {
           console.error('Failed to search users:', err);
@@ -79,7 +80,7 @@ const InviteJudgeModal = ({ isOpen, onClose, competitionId, levels, onSuccess, p
           level_id: parseInt(levelValue),
           invited_by: currentUserId
         };
-        await axios.post(`http://localhost:8080/api/v1/contests/${competitionId}/judges`, payload);
+        await axios.post(`${API_BASE_URL}/contests/${competitionId}/judges`, payload);
       }
       
       alert('เชิญกรรมการสำเร็จ!');

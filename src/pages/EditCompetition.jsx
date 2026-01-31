@@ -1,3 +1,4 @@
+import API_BASE_URL from '../config/api';
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -48,7 +49,7 @@ const EditCompetition = () => {
 
   const fetchCompetitionData = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/v1/competitions/${competitionId}`);
+      const res = await axios.get(`${API_BASE_URL}/competitions/${competitionId}`);
       const comp = res.data;
       
       setTitle(comp.title || "");
@@ -87,7 +88,7 @@ const EditCompetition = () => {
         max_score: maxScore
       };
 
-      await axios.put(`http://localhost:8080/api/v1/competitions/${competitionId}`, payload);
+      await axios.put(`${API_BASE_URL}/competitions/${competitionId}`, payload);
       
       // 2. อัพเดต scoring_criteria สำหรับแต่ละ level
       const updatePromises = levels
@@ -95,7 +96,7 @@ const EditCompetition = () => {
         .map(level => {
           if (level.scoring_criteria && Array.isArray(level.scoring_criteria)) {
             return axios.put(
-              `http://localhost:8080/api/v1/competition-levels/${level.competition_level_id}/criteria`,
+              `${API_BASE_URL}/competition-levels/${level.competition_level_id}/criteria`,
               { scoring_criteria: level.scoring_criteria }
             ).catch(err => {
               console.error(`Failed to update criteria for level ${level.competition_level_id}:`, err);
@@ -182,7 +183,7 @@ const EditCompetition = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const res = await axios.post('http://localhost:8080/api/v1/upload', formData, {
+      const res = await axios.post(`${API_BASE_URL}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
@@ -204,7 +205,7 @@ const EditCompetition = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:8080/api/v1/competitions/${competitionId}`);
+      await axios.delete(`${API_BASE_URL}/competitions/${competitionId}`);
       alert("ลบการประกวดสำเร็จ");
       navigate("/");
     } catch (err) {

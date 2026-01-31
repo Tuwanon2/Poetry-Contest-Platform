@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+import API_BASE_URL from '../config/api';
 
 const MyWorks = () => {
   const [submissions, setSubmissions] = useState([]);
@@ -129,7 +129,7 @@ const MyWorks = () => {
                 const posterPath = contest.poster_url || contest.PosterURL;
                 posterUrl = posterPath.startsWith('http')
                   ? posterPath
-                  : `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+                  : `${API_BASE_URL.replace('/api/v1','')}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
               }
               return (
                 <Card 

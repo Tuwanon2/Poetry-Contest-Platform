@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import TopNav from "../components/TopNav";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { FaRegCalendarAlt, FaRegClock } from "react-icons/fa";
 import '../App.css';
+import API_BASE_URL from '../config/api';
 
 // ฟังก์ชันแปลง /n เป็น <br />
 function renderWithCustomNewlines(text) {
@@ -14,8 +14,6 @@ function renderWithCustomNewlines(text) {
     );
 }
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
-
 const ContestDetail = () => {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -24,6 +22,7 @@ const ContestDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
+
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 992);
         window.addEventListener('resize', handleResize);
@@ -103,11 +102,14 @@ const ContestDetail = () => {
     const levels = contest.levels || [];
     const levelList = levels.map(l => l.level_name || l.name || '').filter(Boolean);
 
-    let posterUrl = null;
-    if (contest.poster_url || contest.PosterURL) {
-        const posterPath = contest.poster_url || contest.PosterURL;
-        posterUrl = posterPath.startsWith('http') ? posterPath : `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
-    }
+    // Helper for safe image URL
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        if (path.startsWith('http')) return path;
+        const baseUrl = API_BASE_URL.replace(/\/api\/v1$/, '').replace(/\/$/, '');
+        return `${baseUrl}${path.startsWith('/') ? path : '/' + path}`;
+    };
+    const posterUrl = getImageUrl(contest?.poster_url || contest?.PosterURL);
 
     // --- Design Variables ---
     const themePurple = "#70136c";
@@ -199,14 +201,13 @@ const ContestDetail = () => {
 
                             {divider}
 
-                            {/* Section: หัวข้อ */}
                             {levels.some(l => l.topic_enabled !== undefined) && (
                                 <>
                                     <div style={sectionTitle}>
                                         หัวข้อประกวด
                                     </div>
                                     {levels.map((l, i) => (
-                                        <div key={i} style={{ marginBottom: 15 }}>
+                                        <div key={i} style={{ marginBottom: 10 }}>
                                             {levels.length > 1 && <strong>{l.level_name} : </strong>}
                                             <span style={{ color: '#555', lineHeight: 1.6 }}>
                                                 {l.topic_enabled ? `หัวข้อบังคับ: ${l.topic_name}` : 'หัวข้ออิสระ'}
@@ -244,7 +245,6 @@ const ContestDetail = () => {
                                 if (!hasAny) return null;
                                 return (
                                     <>
-
                                         {desiredOrder.map((name, idx) => {
                                             const lvl = findByName(name);
                                             if (!lvl) return null;
@@ -289,8 +289,6 @@ const ContestDetail = () => {
                                     ))}
                                 </>
                             )}
-
-                            
 
                         </div>
                     </div>
@@ -347,9 +345,7 @@ const ContestDetail = () => {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px', marginBottom: '8px' }}>
                                         {(organization.cover_image || organization.coverImage || organization.logo || organization.coverImageUrl) ? (
                                             <img
-                                                src={(organization.cover_image || organization.coverImage || organization.logo || organization.coverImageUrl).startsWith('http')
-                                                    ? (organization.cover_image || organization.coverImage || organization.logo || organization.coverImageUrl)
-                                                    : `http://localhost:8080${(organization.cover_image || organization.coverImage || organization.logo || organization.coverImageUrl)}`}
+                                                src={getImageUrl(organization.cover_image || organization.coverImage || organization.logo || organization.coverImageUrl)}
                                                 alt={organization.name || organization.Name || 'ผู้จัดการแข่งขัน'}
                                                 style={{ width: 48, height: 48, borderRadius: '8px', objectFit: 'cover' }}
                                             />

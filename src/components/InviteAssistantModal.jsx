@@ -1,3 +1,4 @@
+import API_BASE_URL from '../config/api';
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -29,7 +30,7 @@ const InviteAssistantModal = ({ isOpen, onClose, organizationId, onSuccess }) =>
       const user = JSON.parse(userStr);
       const invitedBy = user.user_id || user.id;
 
-      await axios.post(`http://localhost:8080/api/v1/organizations/${organizationId}/assistants`, {
+      await axios.post(`${API_BASE_URL}/organizations/${organizationId}/assistants`, {
         email,
         invited_by: invitedBy,
         ...permissions
