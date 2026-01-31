@@ -44,14 +44,19 @@ func main() {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	r.Use(cors.New(cors.Config{
-    AllowOrigins:     []string{"http://localhost:4000", "https://localhost:4000"},
-    AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-    AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-    ExposeHeaders:    []string{"Content-Length"},
-    AllowCredentials: true,
-    MaxAge:           12 * time.Hour,
-}))
+	   r.Use(cors.New(cors.Config{
+		   AllowOrigins: []string{
+			   "http://localhost:4000",
+			   "https://localhost:4000",
+			   "https://poetry-contest-platform-production.up.railway.app",
+			   "http://poetry-contest-platform-production.up.railway.app",
+		   },
+		   AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		   AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		   ExposeHeaders:    []string{"Content-Length"},
+		   AllowCredentials: true,
+		   MaxAge:           12 * time.Hour,
+	   }))
     r.Use(TimeoutMiddleware(5 * time.Second))
 
 	r.GET("/health", func(c *gin.Context) {
