@@ -45,12 +45,12 @@ func main() {
 	r.Use(gin.Recovery())
 
 	   r.Use(cors.New(cors.Config{
-		   AllowOrigins: []string{
-			   "http://localhost:4000",
-			   "https://localhost:4000",
-			   "https://poetry-contest-platform-production.up.railway.app",
-			   "http://poetry-contest-platform-production.up.railway.app",
-			   "null",
+		   AllowOriginFunc: func(origin string) bool {
+			   return origin == "null" ||
+				   origin == "http://localhost:4000" ||
+				   origin == "https://localhost:4000" ||
+				   origin == "https://poetry-contest-platform-production.up.railway.app" ||
+				   origin == "http://poetry-contest-platform-production.up.railway.app"
 		   },
 		   AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		   AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
