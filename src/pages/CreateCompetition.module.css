@@ -339,3 +339,265 @@
   align-items: center;
   gap: 8px;
 }
+
+/* === STEP 4 REVIEW STYLES === */
+
+.reviewTitle {
+  font-size: 28px;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 25px;
+  margin-top: 0;
+  text-align: left;
+}
+
+.reviewCard {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  border: 1px solid #eee;
+  padding: 30px;
+  margin-bottom: 24px;
+}
+
+.reviewCardSmall {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  border: 1px solid #eee;
+  padding: 20px;
+}
+
+.sectionHeading {
+  color: #70136C;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  border-left: 5px solid #70136C;
+  padding-left: 15px;
+}
+
+.sectionHeadingSmall {
+  color: #70136C;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  border-left: 4px solid #70136C;
+  padding-left: 12px;
+}
+
+.labelField {
+  font-size: 12px;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.valueField {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+}
+
+.levelBadge {
+  background: #f6e7f5;
+  color: #70136C;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #e8d8f0;
+  display: inline-block;
+}
+
+.gridTwoColumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.dividerLine {
+  border: 0;
+  border-top: 1px solid #f0f0f0;
+  margin: 18px 0;
+}
+
+.levelDetailItem {
+  margin-bottom: 14px;
+}
+
+.levelDetailTitle {
+  font-size: 15px;
+  font-weight: bold;
+  color: #70136C;
+  margin-bottom: 12px;
+}
+
+.descriptionsBox {
+  font-size: 14px;
+  color: #333;
+  white-space: pre-wrap;
+  background: #fafbfc;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border-left: 3px solid #70136C;
+  line-height: 1.6;
+}
+
+.scoringBox {
+  background: linear-gradient(135deg, #f6e7f5 0%, #faf5fd 100%);
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid #e8d8f0;
+}
+
+.scoringHeader {
+  font-weight: bold;
+  font-size: 12px;
+  color: #70136C;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  text-transform: uppercase;
+}
+
+.scoringList {
+  margin: 0;
+  padding-left: 20px;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.scoringItem {
+  margin-bottom: 8px;
+}
+
+.scoringItemTitle {
+  font-weight: bold;
+}
+
+.scoringItemScore {
+  color: #999;
+}
+
+.judgeItem {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.judgeItem:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.judgeName {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.judgeEmail {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.judgeLevel {
+  font-size: 13px;
+  color: #70136C;
+  font-weight: 500;
+}
+
+.summaryField {
+  margin-bottom: 10px;
+}
+
+.summaryFieldLabel {
+  font-weight: bold;
+}
+
+.noticeBox {
+  background: linear-gradient(135deg, #fef7fb 0%, #faf5fd 100%);
+  border-radius: 12px;
+  border: 1px solid #e8d8f0;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.noticeBoxTitle {
+  color: #70136C;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.noticeBoxText {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.posterSection {
+  margin-bottom: 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  border: 1px solid #eee;
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.posterImage {
+  flex: 0 0 240px;
+  text-align: center;
+}
+
+.posterLabel {
+  font-size: 12px;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.posterImg {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.selectInput {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  background-color: #fafbfc;
+  margin-top: 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+  color: #333;
+  transition: all 0.2s;
+  /* ลบ Default Arrow ของ Browser แล้วใส่เอง (Optional - ถ้าอยากให้เหมือนกันทุกเครื่อง) */
+  /* appearance: none; */ 
+}
+
+.selectInput:focus {
+  border-color: #70136C; /* สีม่วงตาม Theme */
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(112, 19, 108, 0.1);
+}
