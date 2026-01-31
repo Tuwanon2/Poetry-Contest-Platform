@@ -66,6 +66,11 @@ func main() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
+	// Explicit OPTIONS handler for CORS preflight (debug)
+	r.OPTIONS("/*path", func(c *gin.Context) {
+		c.Status(204)
+	})
+
 	// Serve static files from uploads directory
 	// Serve static files from absolute uploads directory for robustness
 	r.Static("/uploads", "/DB_poem/uploads")
