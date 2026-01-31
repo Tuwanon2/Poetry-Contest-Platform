@@ -39,7 +39,10 @@ func main() {
 	kh := handlers.NewKlonHandlers(klonDB)
 
 	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
+	r := gin.New()
+	// Logging middleware: log every request
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
 
 	r.Use(cors.New(cors.Config{
     AllowOrigins:     []string{"http://localhost:4000", "https://localhost:4000"},
