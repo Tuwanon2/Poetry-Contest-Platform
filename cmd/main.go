@@ -44,20 +44,22 @@ func main() {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	   r.Use(cors.New(cors.Config{
-		   AllowOriginFunc: func(origin string) bool {
-			   return origin == "null" ||
-				   origin == "http://localhost:4000" ||
-				   origin == "https://localhost:4000" ||
-				   origin == "https://poetry-contest-platform-production.up.railway.app" ||
-				   origin == "http://poetry-contest-platform-production.up.railway.app"
-		   },
-		   AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		   AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		   ExposeHeaders:    []string{"Content-Length"},
-		   AllowCredentials: true,
-		   MaxAge:           12 * time.Hour,
-	   }))
+	// --- CORS CONFIG ---
+	r.Use(cors.New(cors.Config{
+		AllowOriginFunc: func(origin string) bool {
+			// อนุญาต origin เฉพาะ FE dev, FE production, และ "null" (สำหรับ dev/test เท่านั้น)
+			return origin == "null" ||
+				origin == "http://localhost:4000" ||
+				origin == "https://localhost:4000" ||
+				origin == "https://poetry-contest-platform-production.up.railway.app" ||
+				origin == "http://poetry-contest-platform-production.up.railway.app"
+		},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
     r.Use(TimeoutMiddleware(5 * time.Second))
 
 	r.GET("/health", func(c *gin.Context) {
