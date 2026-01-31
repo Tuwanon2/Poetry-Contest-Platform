@@ -50,6 +50,7 @@ func main() {
 			   "https://localhost:4000",
 			   "https://poetry-contest-platform-production.up.railway.app",
 			   "http://poetry-contest-platform-production.up.railway.app",
+			   "null",
 		   },
 		   AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		   AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
