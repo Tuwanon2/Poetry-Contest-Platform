@@ -57,7 +57,10 @@ func main() {
 				origin == "http://localhost:4000" ||
 				origin == "https://localhost:4000" ||
 				origin == "https://poetry-contest-platform-production.up.railway.app" ||
-				origin == "http://poetry-contest-platform-production.up.railway.app"
+				origin == "http://poetry-contest-platform-production.up.railway.app" ||
+                // 👇 เพิ่ม 2 บรรทัดนี้ (โดเมน Vercel ของคุณ)
+                origin == "https://poetry-contest-platform.vercel.app" ||
+                origin == "https://poetry-contest-platform-tuwanon2s-projects.vercel.app"
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
