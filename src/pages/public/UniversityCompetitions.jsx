@@ -8,7 +8,7 @@ import ContestFilters from '../../components/ContestFilters';
 // CSS: ใช้ไฟล์เดียวกับ ActivitiesList
 import '../../components/ActivitiesList.css';
 
-import API_BASE_URL from '../../config/api';
+const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 const UniversityCompetitions = () => {
   // --- State ---
@@ -69,11 +69,8 @@ const UniversityCompetitions = () => {
   const getPosterUrl = (contest) => {
     const posterPath = contest.poster_url || contest.PosterURL;
     if (!posterPath) return null;
-    // Always use API_BASE_URL for relative poster paths
     if (posterPath.startsWith('http')) return posterPath;
-    // Remove trailing slash from API_BASE_URL if present
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1$/, '').replace(/\/$/, '');
-    return `${baseUrl}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    return `http://localhost:8080${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
   };
 
   // --- 3. Filter Logic ---
@@ -143,7 +140,15 @@ const UniversityCompetitions = () => {
                   const posterUrl = getPosterUrl(contest);
                   const dateRange = formatDate(contest.end_date || contest.EndDate);
                   const levels = (contest.levels || []).map(l => l.level_name || l.name).join(', ') || 'ไม่ระบุ';
-                  const poetryType = contest.poetry_type || '-';
+  
+                  // ✅ ดึง poetry_type จากหลายแหล่ง
+                  const levelsList = contest.levels || contest.Levels || [];
+                  let poetryType = contest.poetry_type || contest.PoetryType;
+                  if (!poetryType && levelsList.length > 0) {
+                    poetryType = levelsList[0].poetry_type || levelsList[0].poetry_name || levelsList[0].PoetryType || levelsList[0].PoetryName;
+                  }
+                  const poetryTypeStr = poetryType || '-';
+                  
                   const topicType = contest.topic_type || '-';
 
                   return (
@@ -178,7 +183,7 @@ const UniversityCompetitions = () => {
                           </div>
                           <div className="card-row">
                             <span className="label-purple">ประเภท</span>
-                            <span className="value-text">: {poetryType}</span>
+                            <span className="value-text">: {poetryTypeStr}</span>
                           </div>
                           <div className="card-row">
                              <span className="label-purple">หัวข้อ</span>
