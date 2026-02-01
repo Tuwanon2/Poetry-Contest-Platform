@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Row, Col } from 'react-bootstrap'; // เพิ่ม Row, Col
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -11,6 +12,7 @@ import API_BASE_URL from '../../config/api';
 const GeneralCompetitions = () => {
   // --- State ---
   const [contests, setContests] = useState([]);
+  const [orgs, setOrgs] = useState({}); // เพิ่ม state สำหรับเก็บข้อมูล Organization
   const [loading, setLoading] = useState(true);
 
   // --- Filter States ---
@@ -24,9 +26,10 @@ const GeneralCompetitions = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
+        const allContests = response.data || [];
         
         // ✅ คง Logic กรองเฉพาะ "ประชาชนทั่วไป" ของคุณไว้
-        const generalContests = (response.data || []).filter(contest => {
+        const generalContests = allContests.filter(contest => {
           const levels = contest.levels || contest.Levels || [];
           return levels.some(level => 
             (level.level_name || level.name || '').includes('ประชาชน') ||
@@ -37,6 +40,21 @@ const GeneralCompetitions = () => {
         });
         
         setContests(generalContests);
+
+        // --- เพิ่ม Logic ดึงข้อมูล Organization ---
+        const orgIds = Array.from(new Set(generalContests.map(c => c.organization_id).filter(Boolean)));
+        const orgsMap = {};
+        await Promise.all(orgIds.map(async (orgId) => {
+          try {
+            const res = await axios.get(`${API_BASE_URL}/organizations/${orgId}`);
+            orgsMap[orgId] = res.data;
+          } catch {
+            orgsMap[orgId] = null;
+          }
+        }));
+        setOrgs(orgsMap);
+        // ---------------------------------------
+
       } catch (err) {
         console.error('❌ Error fetching contests:', err);
       } finally {
@@ -59,7 +77,7 @@ const GeneralCompetitions = () => {
     const startDate = new Date(contest.start_date || contest.StartDate);
     const endDate = new Date(contest.end_date || contest.EndDate);
     
-    // ใช้ Theme สี Pastel แบบเดียวกับหน้าหลัก
+    // Theme Colors
     if (now < startDate) return { text: 'Coming Soon', bg: '#fff3cd', color: '#856404' }; // เหลือง
     if (now > endDate) return { text: 'Closed', bg: '#e9ecef', color: '#495057' }; // เทา
     return { text: 'Open', bg: '#d1e7dd', color: '#0f5132' }; // เขียว
@@ -69,7 +87,8 @@ const GeneralCompetitions = () => {
     const posterPath = contest.poster_url || contest.PosterURL;
     if (!posterPath) return null;
     if (posterPath.startsWith('http')) return posterPath;
-    return `${API_BASE_URL.replace('/api/v1','')}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    const baseUrl = API_BASE_URL.replace(/\/api\/v1$/, '').replace(/\/$/, '');
+    return `${baseUrl}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
   };
 
   // --- 3. Filter Logic ---
@@ -80,15 +99,15 @@ const GeneralCompetitions = () => {
   };
 
   const filteredContests = contests.filter(contest => {
-    // Logic Status สำหรับ Filter
     const now = new Date();
-    const startDate = new Date(contest.start_date);
-    const endDate = new Date(contest.end_date);
+    const startDate = new Date(contest.start_date || contest.StartDate);
+    const endDate = new Date(contest.end_date || contest.EndDate);
     let statusKey = 'open';
     if (now < startDate) statusKey = 'upcoming';
     if (now > endDate) statusKey = 'finished';
 
     const matchStatus = filterStatus === 'all' || statusKey === filterStatus;
+    // หมายเหตุ: การกรองตรงนี้ยังใช้ field เดิมจาก DB ถ้าต้องการกรองละเอียดอาจต้องปรับ logic
     const matchTopic = filterTopic === 'all' || (contest.topic_type === filterTopic);
     const matchPoetry = filterPoetry === 'all' || (contest.poetry_type === filterPoetry);
     
@@ -103,7 +122,7 @@ const GeneralCompetitions = () => {
 
         <div className="activities-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
           
-          {/* Header แบบ Center */}
+          {/* Header */}
           <div className="section-wrapper" style={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -128,81 +147,106 @@ const GeneralCompetitions = () => {
           {loading ? (
             <div className="text-center mt-5" style={{fontFamily:'Kanit'}}>กำลังโหลดข้อมูล...</div>
           ) : (
-            <div style={{ 
-  display: 'grid', 
-  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', // ✅ ปรับลดขนาดลงเพื่อให้ใส่ได้ 4 ช่อง
-  gap: '24px',
-  marginTop: '30px'
-}}>
+            <Row xs={1} md={2} lg={4} className="g-4 mt-3">
               {filteredContests.length > 0 ? (
                 filteredContests.map(contest => {
                   const badge = getStatusBadge(contest);
                   const posterUrl = getPosterUrl(contest);
                   const dateRange = formatDate(contest.end_date || contest.EndDate);
-                  const levels = (contest.levels || []).map(l => l.level_name || l.name).join(', ') || 'ไม่ระบุ';
-                  const poetryType = contest.poetry_type || '-';
-                  const topicType = contest.topic_type || '-';
+                  const org = contest.organization_id ? orgs[contest.organization_id] : null;
+
+                  // --- Logic การดึงข้อมูลแบบเจาะลึก ---
+                  const levelsList = contest.levels || contest.Levels || [];
+
+                  // 1. Levels
+                  const levelsStr = levelsList
+                    .map(l => (l.level_name || l.name || ''))
+                    .filter(Boolean)
+                    .join(', ') || 'ไม่ระบุ';
+
+                  // 2. Topics (หัวข้อ)
+                  const rawTopics = levelsList.map(l => l.topic_name || l.topic || l.TopicName || l.Topic);
+                  const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
+                  const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
+
+                  // 3. Type (ประเภท)
+                  let typeVal = contest.type || contest.Type || contest.category || contest.Category;
+                  if (!typeVal && levelsList.length > 0) {
+                      const firstLevel = levelsList[0];
+                      typeVal = firstLevel.type || firstLevel.Type || firstLevel.category || firstLevel.Category;
+                  }
+                  const typeStr = typeVal || '-';
 
                   return (
-                    <Link 
-                      key={contest.competition_id || contest.id} 
-                      to={`/contest-detail/${contest.competition_id || contest.id}`} 
-                      className="card-link-wrapper"
-                    >
-                      <div className="custom-card">
-                        {/* Image */}
-                        <div className="card-image-wrapper">
-                          {posterUrl ? (
-                             <img src={posterUrl} alt={contest.title} className="card-img" onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='flex'}} />
-                          ) : null}
-                          <div className="no-image-placeholder" style={{ display: posterUrl ? 'none' : 'flex' }}>
-                             <span>ไม่มีรูปภาพ</span>
+                    <Col key={contest.competition_id || contest.id}>
+                      <Link 
+                        to={`/contest-detail/${contest.competition_id || contest.id}`} 
+                        className="card-link-wrapper"
+                      >
+                        <div className="custom-card">
+                          <div className="card-image-wrapper">
+                            {posterUrl ? (
+                              <img src={posterUrl} alt={contest.title} className="card-img" onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='flex'}} />
+                            ) : null}
+                            <div className="no-image-placeholder" style={{ display: posterUrl ? 'none' : 'flex' }}>
+                               <span>ไม่มีรูปภาพ</span>
+                            </div>
+                            <span className="status-badge" style={{ backgroundColor: badge.bg, color: badge.color }}>
+                              {badge.text === 'Open' ? 'เปิดรับสมัคร' : badge.text === 'Closed' ? 'ปิดรับสมัคร' : 'เร็วๆ นี้'}
+                            </span>
                           </div>
-                          <span className="status-badge" style={{ backgroundColor: badge.bg, color: badge.color }}>
-                            {badge.text === 'Open' ? 'เปิดรับสมัคร' : badge.text === 'Closed' ? 'ปิดรับสมัคร' : 'เร็วๆ นี้'}
-                          </span>
+
+                          <div className="card-content">
+                            <h3 className="card-title" title={contest.title}>
+                                {contest.title}
+                            </h3>
+                            
+                            {/* ORGANIZATION NAME */}
+                            {org && (
+                              <div className="card-row" style={{ marginBottom: 4 }}>
+                                <span className="label-gray">จัดโดย</span>
+                                <span className="value-text" style={{ color: '#009688', fontWeight: 600 }}> : {org.name || org.organization_name || '-'}</span>
+                              </div>
+                            )}
+
+                            {/* เรียงลำดับใหม่: หัวข้อ -> ระดับ -> ประเภท */}
+                            <div className="card-row">
+                              <span className="label-purple">หัวข้อ</span>
+                              <span className="value-text">: {topicsStr}</span>
+                            </div>
+
+                            <div className="card-row">
+                               <span className="label-purple">ระดับ</span>
+                               <span className="value-text">: {levelsStr}</span>
+                            </div>
+                            
+                            <div className="card-row">
+                              <span className="label-purple">ประเภท</span>
+                              <span className="value-text">: {typeStr}</span>
+                            </div>
+
+                            <div className="modern-divider"></div>
+
+                            <div className="card-footer-row">
+                              <svg className="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                 <circle cx="12" cy="12" r="10"></circle>
+                                 <polyline points="12 6 12 12 16 14"></polyline>
+                              </svg>
+                              <span className="label-gray">ปิดรับสมัคร :</span>
+                              <span className="value-date">{dateRange}</span>
+                            </div>
+                          </div>
                         </div>
-
-                        {/* Content */}
-                        <div className="card-content">
-                          <h3 className="card-title" title={contest.title}>
-                             {contest.title}
-                          </h3>
-                          
-                          <div className="card-row">
-                            <span className="label-purple">ระดับ</span>
-                            <span className="value-text">: {levels}</span>
-                          </div>
-                          <div className="card-row">
-                            <span className="label-purple">ประเภท</span>
-                            <span className="value-text">: {poetryType}</span>
-                          </div>
-                          <div className="card-row">
-                             <span className="label-purple">หัวข้อ</span>
-                             <span className="value-text">: {topicType}</span>
-                          </div>
-
-                          <div className="modern-divider"></div>
-
-                          <div className="card-footer-row">
-                            <svg className="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                               <circle cx="12" cy="12" r="10"></circle>
-                               <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            <span className="label-gray">ปิดรับสมัคร :</span>
-                            <span className="value-date">{dateRange}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </Col>
                   );
                 })
               ) : (
-                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: '#999' }}>
-                  ไม่พบรายการที่ค้นหา
+                <div style={{ width: '100%', textAlign: 'center', padding: '4rem', color: '#999' }}>
+                   ไม่พบรายการที่ค้นหา
                 </div>
               )}
-            </div>
+            </Row>
           )}
         </div>
       </div>
