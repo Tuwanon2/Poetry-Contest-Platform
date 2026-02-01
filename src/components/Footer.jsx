@@ -3,7 +3,7 @@ import './Footer.css';
 
 const Footer = () => (
   <footer className="footer-edu">
-    <span>web application นี้ จัดทำเพื่อการศึกษาเท่านั้น</span>
+    <span>Web application นี้ จัดทำเพื่อการศึกษาเท่านั้น</span>
   </footer>
 );
 
