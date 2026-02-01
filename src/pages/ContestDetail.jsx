@@ -230,7 +230,7 @@ const ContestDetail = () => {
                                 </>
                             )}
 
-                            {/* Section: กติกา (ประถม/มัธยม เป็นหัวข้อใหญ่สีม่วง มีหัวข้อรอง "กติกา" แล้วแสดงรายละเอียด) */}
+                            {/* Section: กติกา (แก้ไข: ใช้รูปแบบเดียวกันทุกระดับชั้น) */}
                             {(() => {
                                 const desiredOrder = ['ประถม', 'มัธยม', 'มหาวิทยาลัย', 'บุคคลทั่วไป'];
                                 const normalize = (s) => (s || '').toString().trim();
@@ -250,18 +250,14 @@ const ContestDetail = () => {
                                             if (!lvl) return null;
                                             const detail = lvl.details || lvl.description || lvl.rules || lvl.rules_detail || lvl.rulesDescription || '';
                                             const content = detail || 'ไม่มีรายละเอียด';
-                                            if (name === 'ประถม' || name === 'มัธยม') {
-                                                return (
-                                                    <div key={idx} style={{ marginBottom: 18 }}>
-                                                        <div style={sectionTitle}>ระดับ{name}</div>
-                                                        <div style={ruleSubTitleStyle}>กติกา</div>
-                                                        <div style={detailStyle}>{renderWithCustomNewlines(content)}</div>
-                                                    </div>
-                                                );
-                                            }
+
+                                            // แก้ไข: ลบเงื่อนไข if/else ออก เพื่อให้ทุกระดับใช้ style เดียวกัน (มีขีดม่วงและหัวข้อกติกา)
                                             return (
-                                                <div key={idx} style={{ marginBottom: 15 }}>
-                                                    <div style={{ fontWeight: 700, marginBottom: 6 }}>{name}</div>
+                                                <div key={idx} style={{ marginBottom: 18 }}>
+                                                    <div style={sectionTitle}>
+                                                        {name.startsWith('ระดับ') ? name : `ระดับ${name}`}
+                                                    </div>
+                                                    <div style={ruleSubTitleStyle}>กติกา</div>
                                                     <div style={detailStyle}>{renderWithCustomNewlines(content)}</div>
                                                 </div>
                                             );
