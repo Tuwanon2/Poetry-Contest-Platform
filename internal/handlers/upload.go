@@ -79,26 +79,14 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 	// ---------- UPLOAD TO SUPABASE STORAGE ----------
 	bucketName := "product-images"
 
-	// สำหรับ supabase-go v0.0.4: 
-	// client.Storage จะคืนค่าเป็น *storage_go.Client
-	// ในเวอร์ชันนี้ Method การอัปโหลดจะชื่อว่า 'UploadFile' 
-	// และรับ parameter เป็น (bucketId, relativePath, data)
-	
-	resp, err := client.Storage.UploadFile(bucketName, pathInBucket, fileReader)
+	// สำหรับเวอร์ชัน 0.0.4: UploadFile คืนค่า (FileUploadResponse, error)
+	// ถ้า err เป็น nil แสดงว่าการส่ง Request สำเร็จ
+	_, err = client.Storage.UploadFile(bucketName, pathInBucket, fileReader)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":  "failed to upload to Supabase",
 			"detail": err.Error(),
-		})
-		return
-	}
-
-	// ตรวจสอบว่ามี Error Message ใน Response หรือไม่
-	if strings.Contains(resp, "error") {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to upload to Supabase",
-			"detail": resp,
 		})
 		return
 	}
@@ -111,6 +99,7 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 		pathInBucket,
 	)
 
+	// ---------- RETURN RESPONSE ----------
 	c.JSON(http.StatusOK, gin.H{
 		"url":      publicURL,
 		"filename": filename,
