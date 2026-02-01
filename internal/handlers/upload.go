@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -12,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/supabase-community/storage-go" // เพิ่มตัวนี้เข้ามาเพื่อแก้เรื่อง Type
 	supabase "github.com/supabase-community/supabase-go"
 )
 
@@ -81,23 +79,26 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 	// ---------- UPLOAD TO SUPABASE STORAGE ----------
 	bucketName := "product-images"
 
-	// แก้จุดที่ Error: ใช้โครงสร้างที่ SDK community รองรับ
-	// 1. เรียกผ่าน client.Storage.From()
-	// 2. ใช้ storage.FileOptions (จาก package storage-go)
+	// สำหรับ supabase-go v0.0.4: 
+	// client.Storage จะคืนค่าเป็น *storage_go.Client
+	// ในเวอร์ชันนี้ Method การอัปโหลดจะชื่อว่า 'UploadFile' 
+	// และรับ parameter เป็น (bucketId, relativePath, data)
 	
-	opts := storage.FileOptions{
-		ContentType: stringPtr(file.Header.Get("Content-Type")),
-		Upsert:      boolPtr(false),
-	}
-
-	// สำหรับเวอร์ชันส่วนใหญ่ใน community จะคืนค่าเป็นแผนผัง error หรือผลลัพธ์
-	// เราจะส่ง fileReader เข้าไปโดยตรง (ประหยัด memory กว่า ReadAll)
-	_, err = client.Storage.From(bucketName).Upload(pathInBucket, fileReader, opts)
+	resp, err := client.Storage.UploadFile(bucketName, pathInBucket, fileReader)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":  "failed to upload to Supabase",
 			"detail": err.Error(),
+		})
+		return
+	}
+
+	// ตรวจสอบว่ามี Error Message ใน Response หรือไม่
+	if strings.Contains(resp, "error") {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to upload to Supabase",
+			"detail": resp,
 		})
 		return
 	}
@@ -116,7 +117,3 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 		"size":     file.Size,
 	})
 }
-
-// Helper functions เพื่อจัดการ Pointer (SDK นี้มักต้องการ Pointer)
-func stringPtr(s string) *string { return &s }
-func boolPtr(b bool) *bool     { return &b }
