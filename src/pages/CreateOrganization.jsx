@@ -3,16 +3,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TopNav from '../components/TopNav';
-
-// เอา import SidebarHome ออกแล้ว
+import { supabase } from '../supabaseClient';
 import '../styles/CreateOrganization.css';
 
 const CreateOrganization = () => {
   const navigate = useNavigate();
-  // ลบ state sidebarOpen ออก เพราะไม่ได้ใช้แล้ว
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -35,8 +33,7 @@ const CreateOrganization = () => {
     if (files && files[0]) {
       const file = files[0];
       setFormData(prev => ({ ...prev, [name]: file }));
-      
-      // Create preview
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviews(prev => ({ ...prev, [name]: reader.result }));
@@ -45,56 +42,83 @@ const CreateOrganization = () => {
     }
   };
 
+  // -------- ฟังก์ชันอัปโหลดไฟล์ไป Supabase ----------
+const uploadToSupabase = async (file, folder) => {
+    if (!file) return "";
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+    
+    // ✅ กำหนด path ให้ชัดเจน (เช่น product-images/12345.png)
+    const filePath = `${folder}/${fileName}`;
+
+    const { error } = await supabase.storage
+      .from("product-images") // ✅ ชื่อ Bucket ต้องตรงกับในรูปที่นายส่งมา
+      .upload(filePath, file);
+
+    if (error) {
+      console.error("Upload Detail:", error);
+      throw new Error(`อัปโหลดไฟล์ไม่สำเร็จ: ${error.message}`);
+    }
+
+    const { data } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!formData.name.trim()) {
-      setError('กรุณากรอกชื่อ Organization');
+      setError("กรุณากรอกชื่อ Organization");
       return;
     }
 
     if (!formData.certificate) {
-      setError('กรุณาอัปโหลดใบรับรองความเป็น Organization');
+      setError("กรุณาอัปโหลดใบรับรองความเป็น Organization");
       return;
     }
 
     try {
       setLoading(true);
-      const userId = localStorage.getItem('user_id') || sessionStorage.getItem('user_id');
-      
-      // Upload files first
-      const formDataToSend = new FormData();
-      let coverImageUrl = '';
-      
-      if (formData.coverImage) {
-        formDataToSend.append('file', formData.coverImage);
-        const coverRes = await axios.post(`${API_BASE_URL}/upload`, formDataToSend);
-        coverImageUrl = coverRes.data?.url || coverRes.data?.file_url;
-      }
-      
-      const certFormData = new FormData();
-      certFormData.append('file', formData.certificate);
-      const certRes = await axios.post(`${API_BASE_URL}/upload`, certFormData);
-      const certificateUrl = certRes.data?.url || certRes.data?.file_url;
+      const userId =
+        localStorage.getItem("user_id") ||
+        sessionStorage.getItem("user_id");
 
-      // Create organization
+      // ---- อัปโหลดรูปปก (ถ้ามี) ----
+      let coverImageUrl = "";
+      if (formData.coverImage) {
+        coverImageUrl = await uploadToSupabase(
+          formData.coverImage,
+          "product-images"
+        );
+      }
+
+      // ---- อัปโหลดใบรับรอง (ต้องมี) ----
+      const certificateUrl = await uploadToSupabase(
+        formData.certificate,
+        "org-certificates"
+      );
+
+      // ---- ส่งข้อมูลไป Backend ----
       const orgData = {
         name: formData.name,
-        description: formData.description,
-        cover_image: coverImageUrl || '',
+        description: formData.description || "",
+        cover_image: coverImageUrl,
         certificate_document: certificateUrl,
-        creator_user_id: parseInt(userId)
+        creator_user_id: Number(userId),
       };
 
       await axios.post(`${API_BASE_URL}/organizations`, orgData);
-      
-      // Navigate back to My Organizations page
-      alert('สร้าง Organization สำเร็จ! รอการอนุมัติจากผู้ดูแลระบบ');
-      navigate('/my-organizations');
+
+      alert("สร้าง Organization สำเร็จ! รอการอนุมัติจากผู้ดูแลระบบ");
+      navigate("/my-organizations");
     } catch (err) {
-      console.error('Error creating organization:', err);
-      setError(err.response?.data?.error || 'ไม่สามารถสร้าง Organization ได้');
+      console.error("Error:", err);
+      setError(err.message || "ไม่สามารถสร้าง Organization ได้");
     } finally {
       setLoading(false);
     }
@@ -102,84 +126,73 @@ const CreateOrganization = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* ลบ <SidebarHome /> ออกแล้ว */}
-      
-      <div style={{
-        flex: 1,
-        marginLeft: 0, // ปรับเป็น 0 เพราะไม่มี Sidebar
-        minWidth: 0,
-        transition: 'margin-left 0.25s cubic-bezier(.4,0,.2,1)',
-      }}>
+      <div style={{ flex: 1 }}>
         <TopNav />
 
         <div className="create-org-container">
           <div className="create-org-header">
-            <button className="back-btn" onClick={() => navigate('/my-organizations')}>
+            <button
+              className="back-btn"
+              onClick={() => navigate('/my-organizations')}
+            >
               ← กลับ
             </button>
             <h1>สร้าง Organization</h1>
-            
           </div>
 
           <form className="create-org-form" onSubmit={handleSubmit}>
-            {error && (
-              <div className="form-error">
-                {error}
-              </div>
-            )}
+            {error && <div className="form-error">{error}</div>}
 
             <div className="form-group">
-              <label htmlFor="name">ชื่อ Organization *</label>
+              <label>ชื่อ Organization *</label>
               <input
                 type="text"
-                id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="เช่น สมาคมกวีไทย, มหาวิทยาลัยXYZ"
+                placeholder="เช่น สมาคมกวีไทย"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="description">คำอธิบาย</label>
+              <label>คำอธิบาย</label>
               <textarea
-                id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="บอกเล่าเกี่ยวกับ Organization ของคุณ..."
                 rows={4}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="coverImage">รูปปก</label>
+              <label>รูปปก</label>
               <input
                 type="file"
-                id="coverImage"
                 name="coverImage"
                 onChange={handleFileChange}
                 accept="image/*"
               />
               {previews.coverImage && (
                 <div className="image-preview">
-                  <img src={previews.coverImage} alt="Cover preview" />
+                  <img
+                    src={previews.coverImage}
+                    alt="Cover preview"
+                    style={{ maxWidth: "200px" }}
+                  />
                 </div>
               )}
             </div>
 
             <div className="form-group">
-              <label htmlFor="certificate">ใบรับรองความเป็น Organization *</label>
+              <label>ใบรับรองความเป็น Organization *</label>
               <input
                 type="file"
-                id="certificate"
                 name="certificate"
                 onChange={handleFileChange}
                 accept=".pdf,.jpg,.jpeg,.png"
                 required
               />
-              
               {previews.certificate && (
                 <div className="file-preview">
                   📄 {formData.certificate.name}
@@ -201,7 +214,7 @@ const CreateOrganization = () => {
                 className="submit-btn"
                 disabled={loading}
               >
-                {loading ? 'กำลังสร้าง...' : 'สร้าง Organization'}
+                {loading ? "กำลังสร้าง..." : "สร้าง Organization"}
               </button>
             </div>
           </form>
