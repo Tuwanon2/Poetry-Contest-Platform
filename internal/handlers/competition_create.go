@@ -34,8 +34,14 @@ func (h *KlonHandlers) CreateCompetitionWithFormData(c *gin.Context) {
 
 	orgID, err := strconv.Atoi(orgIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid organization_id"})
-		return
+    // 1. ปริ้นท์ดูในจอด้วย
+    fmt.Printf("Error!!!: %v\n", err)
+    
+    // 2. 🔴 หยุดทันที! แล้วส่ง Error กลับไปบอกหน้าเว็บ
+    c.JSON(http.StatusInternalServerError, gin.H{
+        "error": "พังตรงบันทึก Level: " + err.Error(),
+    })
+    return // จบการทำงานเลย
 	}
 
 	       // Handle poster upload or poster_url
