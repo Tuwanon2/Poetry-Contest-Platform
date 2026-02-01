@@ -58,17 +58,15 @@ const ActivitiesList = ({ filterCategory }) => {
     const endDate = new Date(contest.end_date || contest.EndDate);
     
     // Modern Colors
-    if (now < startDate) return { text: 'Coming Soon', bg: '#fff3cd', color: '#856404' }; // สีเหลืองพาสเทล
-    if (now > endDate) return { text: 'Closed', bg: '#e9ecef', color: '#495057' }; // สีเทาอ่อน
-    return { text: 'Open', bg: '#d1e7dd', color: '#0f5132' }; // สีเขียวพาสเทล
+    if (now < startDate) return { text: 'Coming Soon', bg: '#fff3cd', color: '#856404' };
+    if (now > endDate) return { text: 'Closed', bg: '#e9ecef', color: '#495057' };
+    return { text: 'Open', bg: '#d1e7dd', color: '#0f5132' };
   };
 
   const getPosterUrl = (contest) => {
     const posterPath = contest.poster_url || contest.PosterURL;
     if (!posterPath) return null;
-    // Always use API_BASE_URL for relative poster paths
     if (posterPath.startsWith('http')) return posterPath;
-    // Remove trailing slash from API_BASE_URL if present
     const baseUrl = API_BASE_URL.replace(/\/api\/v1$/, '').replace(/\/$/, '');
     return `${baseUrl}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
   };
@@ -92,11 +90,28 @@ const ActivitiesList = ({ filterCategory }) => {
   const ContestCard = ({ contest }) => {
     const badge = getStatusBadge(contest);
     const posterUrl = getPosterUrl(contest);
-    const levels = (contest.levels || contest.Levels || [])
-      .map(l => (l.level_name || l.name || ''))
-      .join(', ') || 'ไม่ระบุ';
-    const dateRange = formatDate(contest.end_date || contest.EndDate);
     const org = contest.organization_id ? orgs[contest.organization_id] : null;
+    const dateRange = formatDate(contest.end_date || contest.EndDate);
+
+    // 1. ดึงระดับชั้น (Levels)
+    const levelsList = contest.levels || contest.Levels || [];
+    const levelsStr = levelsList
+      .map(l => (l.level_name || l.name || ''))
+      .filter(Boolean)
+      .join(', ') || 'ไม่ระบุ';
+
+    // 2. ดึงหัวข้อ (Topics) จาก Levels
+    // สมมติว่าใน DB ฟิลด์ชื่อ topic_name อยู่ในตาราง levels
+    const topicsStr = levelsList
+      .map(l => l.topic_name || l.topic || l.TopicName) 
+      .filter(t => t && t !== '-' && t !== 'ไม่ระบุ') // กรองค่าว่าง
+      // .filter((v, i, a) => a.indexOf(v) === i) // (Optional) ถ้าอยากตัดคำซ้ำออก
+      .join(', ') || '-';
+
+    // 3. ดึงประเภท (Type/Category)
+    // สมมติว่าใน DB มีฟิลด์ type หรือ category ที่ contest หรือ levels
+    // ถ้าไม่มีฟิลด์นี้ ให้ลองแก้เป็น contest.category หรือ levels[0]?.type ตามโครงสร้างจริง
+    const typeStr = contest.type || contest.Type || contest.category || contest.Category || '-';
 
     return (
       <Link 
@@ -120,6 +135,7 @@ const ActivitiesList = ({ filterCategory }) => {
             <h3 className="card-title" title={contest.title || contest.Title}>
                 {contest.title || contest.Title}
             </h3>
+            
             {/* ORGANIZATION NAME */}
             {org && (
               <div className="card-row" style={{ marginBottom: 4 }}>
@@ -127,11 +143,27 @@ const ActivitiesList = ({ filterCategory }) => {
                 <span className="value-text" style={{ color: '#009688', fontWeight: 600 }}> : {org.name || org.organization_name || '-'}</span>
               </div>
             )}
+
+            {/* TYPE (ประเภท) - เพิ่มส่วนนี้ */}
+            <div className="card-row">
+              <span className="label-purple">ประเภท</span>
+              <span className="value-text">: {typeStr}</span>
+            </div>
+
+            {/* TOPIC (หัวข้อ) - เพิ่มส่วนนี้ */}
+            <div className="card-row">
+              <span className="label-purple">หัวข้อ</span>
+              <span className="value-text">: {topicsStr}</span>
+            </div>
+
+            {/* LEVEL (ระดับ) */}
             <div className="card-row">
               <span className="label-purple">ระดับ</span>
-              <span className="value-text">: {levels}</span>
+              <span className="value-text">: {levelsStr}</span>
             </div>
+
             <div className="modern-divider"></div>
+            
             <div className="card-footer-row">
               {/* SVG Icon นาฬิกา */}
               <svg className="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
