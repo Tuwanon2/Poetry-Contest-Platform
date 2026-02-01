@@ -43,8 +43,8 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 	}
 
 	// ---------- LOAD SUPABASE CONFIG ----------
-	supabaseURL := os.Getenv("https://ekpstgavxcnmmrhqswmc.supabase.co/")
-	supabaseKey := os.Getenv("sb_publishable_JG42UBTfT_uw_xalLAVP2Q_eSIDIn21")
+	supabaseURL := os.Getenv("SUPABASE_URL")
+	supabaseKey := os.Getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 	if supabaseURL == "" || supabaseKey == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
