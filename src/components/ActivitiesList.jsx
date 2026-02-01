@@ -104,13 +104,23 @@ const ActivitiesList = ({ filterCategory }) => {
     const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
     const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
 
-    // --- ส่วนแสดงผล ประเภท (Type) ---
-    let typeVal = contest.type || contest.Type || contest.category || contest.Category;
-    if (!typeVal && levelsList.length > 0) {
-        const firstLevel = levelsList[0];
-        typeVal = firstLevel.type || firstLevel.Type || firstLevel.category || firstLevel.Category;
+    // --- ส่วนแสดงผล ประเภท (Type) [แก้ไขใหม่] ---
+    let finalTypeStr = contest.type || contest.Type || contest.category || contest.Category;
+
+    // ถ้าไม่มีที่ Root ให้ไปกวาดหาจาก poem_types ใน levels ทุกอัน
+    if (!finalTypeStr && levelsList.length > 0) {
+        // ใช้ flatMap เพื่อดึง array ซ้อน array (poem_types) ออกมาแผ่
+        const allTypes = levelsList.flatMap(l => l.poem_types || l.PoemTypes || []);
+        // กรองค่าซ้ำ (Unique) และค่าว่างทิ้ง
+        const uniqueTypes = [...new Set(allTypes.filter(t => t && t !== ''))];
+        
+        if (uniqueTypes.length > 0) {
+            finalTypeStr = uniqueTypes.join(', ');
+        }
     }
-    const typeStr = typeVal || '-';
+    // ถ้าหาไม่เจอเลยให้ใส่ขีด
+    finalTypeStr = finalTypeStr || '-';
+
 
     return (
       <Link 
@@ -143,22 +153,22 @@ const ActivitiesList = ({ filterCategory }) => {
               </div>
             )}
 
-            {/* 1. TOPIC (หัวข้อ) - ย้ายมาเป็นอันดับแรก */}
+            {/* 1. TOPIC (หัวข้อ) */}
             <div className="card-row">
               <span className="label-purple">หัวข้อ</span>
               <span className="value-text">: {topicsStr}</span>
             </div>
 
-            {/* 2. LEVEL (ระดับ) - ย้ายมาเป็นอันดับสอง */}
+            {/* 2. LEVEL (ระดับ) */}
             <div className="card-row">
               <span className="label-purple">ระดับ</span>
               <span className="value-text">: {levelsStr}</span>
             </div>
 
-            {/* 3. TYPE (ประเภท) - ย้ายมาเป็นอันดับสุดท้าย */}
+            {/* 3. TYPE (ประเภท) - ใช้ตัวแปรใหม่ finalTypeStr */}
             <div className="card-row">
               <span className="label-purple">ประเภท</span>
-              <span className="value-text">: {typeStr}</span>
+              <span className="value-text">: {finalTypeStr}</span>
             </div>
 
             <div className="modern-divider"></div>
