@@ -8,7 +8,9 @@ import InviteJudgeModal from "../components/InviteJudgeModal";
 import styles from "./CreateCompetition.module.css";
 import API_BASE_URL from '../config/api';
 
-
+// =========================
+// Helper Component: Level Card
+// =========================
 function LevelSelectCard({ label, icon, selected, onClick }) {
   return (
     <div
@@ -21,9 +23,8 @@ function LevelSelectCard({ label, icon, selected, onClick }) {
   );
 }
 
-
 // =========================
-// Upload Poster Box (Updated with Preview)
+// Helper Component: Upload Box UI
 // =========================
 const UploadBox = ({ file, onSelect }) => {
   const [preview, setPreview] = useState(null);
@@ -192,6 +193,7 @@ export default function CreateCompetition() {
     if (step === 1) {
       if (!contestName.trim()) return alert("กรุณากรอกชื่อการประกวด");
       if (selectedLevels.length === 0) return alert("กรุณาเลือกระดับการแข่งขันอย่างน้อย 1 ระดับ");
+      if (posterUploading) return alert("กรุณารออัปโหลดรูปภาพให้เสร็จสักครู่");
       if (!regOpen) return alert("กรุณาระบุวันเปิดรับสมัคร");
       if (!regClose) return alert("กรุณาระบุวันปิดรับสมัคร");
       if (new Date(regClose) < new Date(regOpen)) return alert("วันปิดรับสมัครต้องไม่ก่อนวันเปิดรับสมัคร");
@@ -364,9 +366,9 @@ export default function CreateCompetition() {
                 ))}
               </div>
 
-              {/* ✅ แก้ไข: ส่งรูปเข้า Backend Go แทนการยิง Supabase โดยตรง */}
-              <UploadBox 
-                file={poster} 
+              {/* ✅ FIXED: Upload Direct to Supabase */}
+              <UploadBox
+                file={poster}
                 onSelect={async (file) => {
                   setPoster(file);
                   setPosterURL(""); // Reset URL
@@ -374,37 +376,34 @@ export default function CreateCompetition() {
                   if (file) {
                     setPosterUploading(true);
                     
-                    // 1. เตรียมข้อมูล FormData เพื่อส่งให้ Backend
-                    const formData = new FormData();
-                    formData.append("file", file); // ชื่อ key "file" ต้องตรงกับที่ Go รอรับ
-
                     try {
-                      // 2. ยิงไปที่ Endpoint ของ Go Backend
-                      // ใช้ API_BASE_URL ที่คุณ import มาแล้ว
-                      const response = await axios.post(
-                        `${API_BASE_URL}/upload/poster`, 
-                        formData,
-                        {
-                          headers: { "Content-Type": "multipart/form-data" },
-                        }
-                      );
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `poster-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+                      const filePath = `competition-posters/${fileName}`;
 
-                      // 3. รับ URL ที่ Go ส่งกลับมา
-                      const uploadedUrl = response.data.url;
-                      setPosterURL(uploadedUrl);
-                      console.log("Upload Success, URL:", uploadedUrl);
+                      // ⚠️ Make sure bucket name matches your Supabase setup
+                      const { error: uploadError } = await supabase.storage
+                        .from("product-images") 
+                        .upload(filePath, file);
+
+                      if (uploadError) throw uploadError;
+
+                      const { data } = supabase.storage
+                        .from("product-images")
+                        .getPublicUrl(filePath);
+
+                      setPosterURL(data.publicUrl);
+                      console.log("Upload Success, URL:", data.publicUrl);
 
                     } catch (err) {
                       console.error("Upload Failed:", err);
-                      // ดึงข้อความ error จาก Backend ถ้ามี
-                      const errMsg = err.response?.data?.error || err.message;
-                      alert(`อัปโหลดไม่ผ่าน: ${errMsg}`);
-                      setPoster(null); // ล้างค่าออกถ้าพัง
+                      alert(`อัปโหลดไม่ผ่าน: ${err.message}`);
+                      setPoster(null);
                     } finally {
                       setPosterUploading(false);
                     }
                   }
-                }} 
+                }}
               />
 
               {posterUploading && <div style={{ marginTop: 10, color: '#ff9800' }}>กำลังอัปโหลดโปสเตอร์...</div>}
