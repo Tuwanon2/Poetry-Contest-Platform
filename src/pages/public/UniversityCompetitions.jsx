@@ -140,15 +140,7 @@ const UniversityCompetitions = () => {
                   const posterUrl = getPosterUrl(contest);
                   const dateRange = formatDate(contest.end_date || contest.EndDate);
                   const levels = (contest.levels || []).map(l => l.level_name || l.name).join(', ') || 'ไม่ระบุ';
-  
-                  // ✅ ดึง poetry_type จากหลายแหล่ง
-                  const levelsList = contest.levels || contest.Levels || [];
-                  let poetryType = contest.poetry_type || contest.PoetryType;
-                  if (!poetryType && levelsList.length > 0) {
-                    poetryType = levelsList[0].poetry_type || levelsList[0].poetry_name || levelsList[0].PoetryType || levelsList[0].PoetryName;
-                  }
-                  const poetryTypeStr = poetryType || '-';
-                  
+                  const poetryType = contest.poetry_type || '-';
                   const topicType = contest.topic_type || '-';
 
                   return (
@@ -183,7 +175,7 @@ const UniversityCompetitions = () => {
                           </div>
                           <div className="card-row">
                             <span className="label-purple">ประเภท</span>
-                            <span className="value-text">: {poetryTypeStr}</span>
+                            <span className="value-text">: {poetryType}</span>
                           </div>
                           <div className="card-row">
                              <span className="label-purple">หัวข้อ</span>
