@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col } from 'react-bootstrap'; // เพิ่ม Row, Col
+import { Row, Col } from 'react-bootstrap'; // ใช้ Bootstrap Grid
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+// Components
 import TopNav from '../../components/TopNav';
 import ContestFilters from '../../components/ContestFilters';
 
@@ -14,7 +15,7 @@ import API_BASE_URL from '../../config/api';
 const UniversityCompetitions = () => {
   // --- State ---
   const [contests, setContests] = useState([]);
-  const [orgs, setOrgs] = useState({}); // เพิ่ม state สำหรับเก็บข้อมูล Organization
+  const [orgs, setOrgs] = useState({}); // เก็บข้อมูล Organization
   const [loading, setLoading] = useState(true);
 
   // --- Filter States ---
@@ -30,7 +31,7 @@ const UniversityCompetitions = () => {
         const response = await axios.get(`${API_BASE_URL}/contests`);
         const allContests = response.data || [];
         
-        // ✅ กรองเฉพาะ "มหาวิทยาลัย / อุดมศึกษา" (Logic เดิมของคุณ)
+        // ✅ กรองเฉพาะ "มหาวิทยาลัย / อุดมศึกษา"
         const universityContests = allContests.filter(contest => {
           const levels = contest.levels || contest.Levels || [];
           return levels.some(level => 
@@ -41,7 +42,7 @@ const UniversityCompetitions = () => {
         
         setContests(universityContests);
 
-        // --- เพิ่ม Logic ดึงข้อมูล Organization ---
+        // --- Logic ดึงข้อมูล Organization ---
         const orgIds = Array.from(new Set(universityContests.map(c => c.organization_id).filter(Boolean)));
         const orgsMap = {};
         await Promise.all(orgIds.map(async (orgId) => {
@@ -154,27 +155,54 @@ const UniversityCompetitions = () => {
                   const dateRange = formatDate(contest.end_date || contest.EndDate);
                   const org = contest.organization_id ? orgs[contest.organization_id] : null;
 
-                   // --- Logic การดึงข้อมูลแบบเจาะลึก ---
-                   const levelsList = contest.levels || contest.Levels || [];
+                  // --- Logic การดึงข้อมูลแบบเจาะลึก ---
+                  const levelsList = contest.levels || contest.Levels || [];
 
-                   // 1. Levels
-                   const levelsStr = levelsList
-                     .map(l => (l.level_name || l.name || ''))
-                     .filter(Boolean)
-                     .join(', ') || 'ไม่ระบุ';
- 
-                   // 2. Topics (หัวข้อ)
-                   const rawTopics = levelsList.map(l => l.topic_name || l.topic || l.TopicName || l.Topic);
-                   const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
-                   const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
- 
-                   // 3. Type (ประเภท)
-                   let typeVal = contest.type || contest.Type || contest.category || contest.Category;
-                   if (!typeVal && levelsList.length > 0) {
-                       const firstLevel = levelsList[0];
-                       typeVal = firstLevel.type || firstLevel.Type || firstLevel.category || firstLevel.Category;
-                   }
-                   const typeStr = typeVal || '-';
+                  // 1. Levels
+                  const levelsStr = levelsList
+                    .map(l => (l.level_name || l.name || ''))
+                    .filter(Boolean)
+                    .join(', ') || 'ไม่ระบุ';
+
+                  // 2. Topics (หัวข้อ)
+                  const rawTopics = levelsList.map(l => l.topic_name || l.topic || l.TopicName || l.Topic);
+                  const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
+                  const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
+
+                  // 3. Type (ประเภท) - [Logic ใหม่ที่ดักทุกทาง]
+                  let collectedTypes = [];
+                  // 3.1 หาจาก Root
+                  const rootType = contest.type || contest.Type || contest.category || contest.Category;
+                  if (rootType) collectedTypes.push(rootType);
+
+                  // 3.2 วนลูปหาจาก Levels
+                  if (levelsList.length > 0) {
+                    levelsList.forEach(l => {
+                      const candidate = l.poem_type || l.poem_types || l.PoemTypes || l.type || l.Type || l.category || l.Category;
+                      
+                      if (Array.isArray(candidate)) {
+                        collectedTypes.push(...candidate);
+                      } else if (typeof candidate === 'string' && candidate.trim() !== '') {
+                        // ลอง Parse JSON เผื่อเก็บมาเป็น String Array
+                        if (candidate.startsWith('[') && candidate.endsWith(']')) {
+                          try {
+                            const parsed = JSON.parse(candidate);
+                            if (Array.isArray(parsed)) collectedTypes.push(...parsed);
+                          } catch (e) {
+                            collectedTypes.push(candidate);
+                          }
+                        } else {
+                          collectedTypes.push(candidate);
+                        }
+                      }
+                    });
+                  }
+                  
+                  // กรองตัวซ้ำ
+                  const uniqueTypes = [...new Set(
+                    collectedTypes.filter(t => t && typeof t === 'string' && t.trim() !== '' && t !== '-' && t !== 'ไม่ระบุ')
+                  )];
+                  const typeStr = uniqueTypes.length > 0 ? uniqueTypes.join(', ') : '-';
 
                   return (
                     <Col key={contest.competition_id || contest.id}>

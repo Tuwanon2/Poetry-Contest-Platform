@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Row, Col } from 'react-bootstrap'; // ใช้ Bootstrap Grid
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+
+// Components
 import TopNav from '../../components/TopNav';
 import ContestFilters from '../../components/ContestFilters';
 
-// CSS: ใช้ไฟล์เดียวกับ ActivitiesList
+// CSS
 import '../../components/ActivitiesList.css';
 
 import API_BASE_URL from '../../config/api';
@@ -12,6 +15,7 @@ import API_BASE_URL from '../../config/api';
 const SecondaryCompetitions = () => {
   // --- State ---
   const [contests, setContests] = useState([]);
+  const [orgs, setOrgs] = useState({}); // เก็บข้อมูล Organization
   const [loading, setLoading] = useState(true);
 
   // --- Filter States ---
@@ -25,9 +29,10 @@ const SecondaryCompetitions = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
+        const allContests = response.data || [];
         
-        // ✅ กรองเฉพาะ "มัธยม" (Logic เดิมของคุณ)
-        const secondaryContests = (response.data || []).filter(contest => {
+        // ✅ กรองเฉพาะ "มัธยม" (Logic เดิม)
+        const secondaryContests = allContests.filter(contest => {
           const levels = contest.levels || contest.Levels || [];
           return levels.some(level => 
             (level.level_name || level.name || '').includes('มัธยม') ||
@@ -37,6 +42,21 @@ const SecondaryCompetitions = () => {
         });
         
         setContests(secondaryContests);
+
+        // --- Logic ดึงข้อมูล Organization ---
+        const orgIds = Array.from(new Set(secondaryContests.map(c => c.organization_id).filter(Boolean)));
+        const orgsMap = {};
+        await Promise.all(orgIds.map(async (orgId) => {
+          try {
+            const res = await axios.get(`${API_BASE_URL}/organizations/${orgId}`);
+            orgsMap[orgId] = res.data;
+          } catch {
+            orgsMap[orgId] = null;
+          }
+        }));
+        setOrgs(orgsMap);
+        // ---------------------------------------
+
       } catch (err) {
         console.error('❌ Error fetching contests:', err);
       } finally {
@@ -59,7 +79,7 @@ const SecondaryCompetitions = () => {
     const startDate = new Date(contest.start_date || contest.StartDate);
     const endDate = new Date(contest.end_date || contest.EndDate);
     
-    // Theme สี Pastel (เหลือง/เทา/เขียว)
+    // Theme สี Pastel
     if (now < startDate) return { text: 'Coming Soon', bg: '#fff3cd', color: '#856404' }; 
     if (now > endDate) return { text: 'Closed', bg: '#e9ecef', color: '#495057' }; 
     return { text: 'Open', bg: '#d1e7dd', color: '#0f5132' }; 
@@ -69,7 +89,8 @@ const SecondaryCompetitions = () => {
     const posterPath = contest.poster_url || contest.PosterURL;
     if (!posterPath) return null;
     if (posterPath.startsWith('http')) return posterPath;
-    return `${API_BASE_URL.replace('/api/v1','')}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+    const baseUrl = API_BASE_URL.replace(/\/api\/v1$/, '').replace(/\/$/, '');
+    return `${baseUrl}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
   };
 
   // --- 3. Filter Logic ---
@@ -81,8 +102,8 @@ const SecondaryCompetitions = () => {
 
   const filteredContests = contests.filter(contest => {
     const now = new Date();
-    const startDate = new Date(contest.start_date);
-    const endDate = new Date(contest.end_date);
+    const startDate = new Date(contest.start_date || contest.StartDate);
+    const endDate = new Date(contest.end_date || contest.EndDate);
     let statusKey = 'open';
     if (now < startDate) statusKey = 'upcoming';
     if (now > endDate) statusKey = 'finished';
@@ -127,81 +148,132 @@ const SecondaryCompetitions = () => {
           {loading ? (
             <div className="text-center mt-5" style={{fontFamily:'Kanit'}}>กำลังโหลดข้อมูล...</div>
           ) : (
-            <div style={{ 
-  display: 'grid', 
-  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', // ✅ ปรับลดขนาดลงเพื่อให้ใส่ได้ 4 ช่อง
-  gap: '24px',
-  marginTop: '30px'
-}}>
+            <Row xs={1} md={2} lg={4} className="g-4 mt-3">
               {filteredContests.length > 0 ? (
                 filteredContests.map(contest => {
                   const badge = getStatusBadge(contest);
                   const posterUrl = getPosterUrl(contest);
                   const dateRange = formatDate(contest.end_date || contest.EndDate);
-                  const levels = (contest.levels || []).map(l => l.level_name || l.name).join(', ') || 'ไม่ระบุ';
-                  const poetryType = contest.poetry_type || '-';
-                  const topicType = contest.topic_type || '-';
+                  const org = contest.organization_id ? orgs[contest.organization_id] : null;
+
+                  // --- Logic การดึงข้อมูลแบบเจาะลึก ---
+                  const levelsList = contest.levels || contest.Levels || [];
+
+                  // 1. Levels
+                  const levelsStr = levelsList
+                    .map(l => (l.level_name || l.name || ''))
+                    .filter(Boolean)
+                    .join(', ') || 'ไม่ระบุ';
+
+                  // 2. Topics (หัวข้อ)
+                  const rawTopics = levelsList.map(l => l.topic_name || l.topic || l.TopicName || l.Topic);
+                  const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
+                  const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
+
+                  // 3. Type (ประเภท) - [Logic ใหม่ที่ดักทุกทาง]
+                  let collectedTypes = [];
+                  // 3.1 หาจาก Root
+                  const rootType = contest.type || contest.Type || contest.category || contest.Category;
+                  if (rootType) collectedTypes.push(rootType);
+
+                  // 3.2 วนลูปหาจาก Levels
+                  if (levelsList.length > 0) {
+                    levelsList.forEach(l => {
+                      const candidate = l.poem_type || l.poem_types || l.PoemTypes || l.type || l.Type || l.category || l.Category;
+                      
+                      if (Array.isArray(candidate)) {
+                        collectedTypes.push(...candidate);
+                      } else if (typeof candidate === 'string' && candidate.trim() !== '') {
+                        if (candidate.startsWith('[') && candidate.endsWith(']')) {
+                          try {
+                            const parsed = JSON.parse(candidate);
+                            if (Array.isArray(parsed)) collectedTypes.push(...parsed);
+                          } catch (e) {
+                            collectedTypes.push(candidate);
+                          }
+                        } else {
+                          collectedTypes.push(candidate);
+                        }
+                      }
+                    });
+                  }
+                  
+                  // กรองตัวซ้ำ
+                  const uniqueTypes = [...new Set(
+                    collectedTypes.filter(t => t && typeof t === 'string' && t.trim() !== '' && t !== '-' && t !== 'ไม่ระบุ')
+                  )];
+                  const typeStr = uniqueTypes.length > 0 ? uniqueTypes.join(', ') : '-';
 
                   return (
-                    <Link 
-                      key={contest.competition_id || contest.id} 
-                      to={`/contest-detail/${contest.competition_id || contest.id}`} 
-                      className="card-link-wrapper"
-                    >
-                      <div className="custom-card">
-                        {/* Image Area */}
-                        <div className="card-image-wrapper">
-                          {posterUrl ? (
-                             <img src={posterUrl} alt={contest.title} className="card-img" onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='flex'}} />
-                          ) : null}
-                          <div className="no-image-placeholder" style={{ display: posterUrl ? 'none' : 'flex' }}>
-                             <span>ไม่มีรูปภาพ</span>
+                    <Col key={contest.competition_id || contest.id}>
+                      <Link 
+                        to={`/contest-detail/${contest.competition_id || contest.id}`} 
+                        className="card-link-wrapper"
+                      >
+                        <div className="custom-card">
+                          <div className="card-image-wrapper">
+                            {posterUrl ? (
+                              <img src={posterUrl} alt={contest.title} className="card-img" onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='flex'}} />
+                            ) : null}
+                            <div className="no-image-placeholder" style={{ display: posterUrl ? 'none' : 'flex' }}>
+                               <span>ไม่มีรูปภาพ</span>
+                            </div>
+                            <span className="status-badge" style={{ backgroundColor: badge.bg, color: badge.color }}>
+                              {badge.text === 'Open' ? 'เปิดรับสมัคร' : badge.text === 'Closed' ? 'ปิดรับสมัคร' : 'เร็วๆ นี้'}
+                            </span>
                           </div>
-                          <span className="status-badge" style={{ backgroundColor: badge.bg, color: badge.color }}>
-                            {badge.text === 'Open' ? 'เปิดรับสมัคร' : badge.text === 'Closed' ? 'ปิดรับสมัคร' : 'เร็วๆ นี้'}
-                          </span>
+
+                          <div className="card-content">
+                            <h3 className="card-title" title={contest.title}>
+                                {contest.title}
+                            </h3>
+                            
+                            {/* ORGANIZATION NAME */}
+                            {org && (
+                              <div className="card-row" style={{ marginBottom: 4 }}>
+                                <span className="label-gray">จัดโดย</span>
+                                <span className="value-text" style={{ color: '#009688', fontWeight: 600 }}> : {org.name || org.organization_name || '-'}</span>
+                              </div>
+                            )}
+
+                            {/* เรียงลำดับใหม่: หัวข้อ -> ระดับ -> ประเภท */}
+                            <div className="card-row">
+                              <span className="label-purple">หัวข้อ</span>
+                              <span className="value-text">: {topicsStr}</span>
+                            </div>
+
+                            <div className="card-row">
+                              <span className="label-purple">ระดับ</span>
+                              <span className="value-text">: {levelsStr}</span>
+                            </div>
+
+                            <div className="card-row">
+                              <span className="label-purple">ประเภท</span>
+                              <span className="value-text">: {typeStr}</span>
+                            </div>
+
+                            <div className="modern-divider"></div>
+
+                            <div className="card-footer-row">
+                              <svg className="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                 <circle cx="12" cy="12" r="10"></circle>
+                                 <polyline points="12 6 12 12 16 14"></polyline>
+                              </svg>
+                              <span className="label-gray">ปิดรับสมัคร :</span>
+                              <span className="value-date">{dateRange}</span>
+                            </div>
+                          </div>
                         </div>
-
-                        {/* Content Area */}
-                        <div className="card-content">
-                          <h3 className="card-title" title={contest.title}>
-                             {contest.title}
-                          </h3>
-                          
-                          <div className="card-row">
-                            <span className="label-purple">ระดับ</span>
-                            <span className="value-text">: {levels}</span>
-                          </div>
-                          <div className="card-row">
-                            <span className="label-purple">ประเภท</span>
-                            <span className="value-text">: {poetryType}</span>
-                          </div>
-                          <div className="card-row">
-                             <span className="label-purple">หัวข้อ</span>
-                             <span className="value-text">: {topicType}</span>
-                          </div>
-
-                          <div className="modern-divider"></div>
-
-                          <div className="card-footer-row">
-                            <svg className="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                               <circle cx="12" cy="12" r="10"></circle>
-                               <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            <span className="label-gray">ปิดรับสมัคร :</span>
-                            <span className="value-date">{dateRange}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </Col>
                   );
                 })
               ) : (
-                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: '#999' }}>
-                  ไม่พบรายการที่ค้นหา
+                <div style={{ width: '100%', textAlign: 'center', padding: '4rem', color: '#999' }}>
+                   ไม่พบรายการที่ค้นหา
                 </div>
               )}
-            </div>
+            </Row>
           )}
         </div>
       </div>
