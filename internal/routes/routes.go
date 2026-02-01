@@ -34,8 +34,7 @@ func Register(v1 *gin.RouterGroup, kh *handlers.KlonHandlers) {
     v1.POST("/auth/logout", kh.Logout)
     v1.POST("/auth/google-login", kh.GoogleLogin)
 
-    // Uploads
-    v1.POST("/upload", kh.UploadPoster)
+
 
     // Submission (Public - สมัครเข้าประกวด)
     v1.POST("/submissions", kh.CreateSubmission)
