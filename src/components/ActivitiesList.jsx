@@ -8,7 +8,7 @@ import API_BASE_URL from '../config/api';
 
 const ActivitiesList = ({ filterCategory }) => {
   const [contests, setContests] = useState([]);
-  const [orgs, setOrgs] = useState({}); // org_id: orgData
+  const [orgs, setOrgs] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,11 +17,11 @@ const ActivitiesList = ({ filterCategory }) => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
+        // console.log("Debug API Data:", response.data); // ลองเปิดบรรทัดนี้เพื่อดูโครงสร้างข้อมูลจริงใน Console
         const contestsData = response.data || [];
         setContests(contestsData);
         setError(null);
 
-        // Fetch all unique org ids
         const orgIds = Array.from(new Set(contestsData.map(c => c.organization_id).filter(Boolean)));
         const orgsMap = {};
         await Promise.all(orgIds.map(async (orgId) => {
@@ -57,7 +57,6 @@ const ActivitiesList = ({ filterCategory }) => {
     const startDate = new Date(contest.start_date || contest.StartDate);
     const endDate = new Date(contest.end_date || contest.EndDate);
     
-    // Modern Colors
     if (now < startDate) return { text: 'Coming Soon', bg: '#fff3cd', color: '#856404' };
     if (now > endDate) return { text: 'Closed', bg: '#e9ecef', color: '#495057' };
     return { text: 'Open', bg: '#d1e7dd', color: '#0f5132' };
@@ -86,32 +85,39 @@ const ActivitiesList = ({ filterCategory }) => {
     });
   };
 
-  // --- Helper Component ---
+  // --- Helper Component (แก้ไขจุดนี้) ---
   const ContestCard = ({ contest }) => {
     const badge = getStatusBadge(contest);
     const posterUrl = getPosterUrl(contest);
     const org = contest.organization_id ? orgs[contest.organization_id] : null;
     const dateRange = formatDate(contest.end_date || contest.EndDate);
 
-    // 1. ดึงระดับชั้น (Levels)
+    // 1. ดึง levels ออกมาเตรียมไว้
     const levelsList = contest.levels || contest.Levels || [];
+
+    // --- ส่วนแสดงผล ระดับชั้น ---
     const levelsStr = levelsList
       .map(l => (l.level_name || l.name || ''))
       .filter(Boolean)
       .join(', ') || 'ไม่ระบุ';
 
-    // 2. ดึงหัวข้อ (Topics) จาก Levels
-    // สมมติว่าใน DB ฟิลด์ชื่อ topic_name อยู่ในตาราง levels
-    const topicsStr = levelsList
-      .map(l => l.topic_name || l.topic || l.TopicName) 
-      .filter(t => t && t !== '-' && t !== 'ไม่ระบุ') // กรองค่าว่าง
-      // .filter((v, i, a) => a.indexOf(v) === i) // (Optional) ถ้าอยากตัดคำซ้ำออก
-      .join(', ') || '-';
+    // --- ส่วนแสดงผล หัวข้อ (Topic) ---
+    // ลองดึงจากหลายๆ ชื่อตัวแปรที่เป็นไปได้ และกรองตัวซ้ำออก
+    const rawTopics = levelsList.map(l => l.topic_name || l.topic || l.TopicName || l.Topic);
+    // กรองค่าว่างและค่าซ้ำ (Unique)
+    const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
+    const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
 
-    // 3. ดึงประเภท (Type/Category)
-    // สมมติว่าใน DB มีฟิลด์ type หรือ category ที่ contest หรือ levels
-    // ถ้าไม่มีฟิลด์นี้ ให้ลองแก้เป็น contest.category หรือ levels[0]?.type ตามโครงสร้างจริง
-    const typeStr = contest.type || contest.Type || contest.category || contest.Category || '-';
+    // --- ส่วนแสดงผล ประเภท (Type) ---
+    // 1. ลองหาที่ตัว contest หลักก่อน
+    let typeVal = contest.type || contest.Type || contest.category || contest.Category;
+    
+    // 2. ถ้าที่หลักไม่มี ให้ลองไปค้นใน levels ตัวแรก (เพราะบางที type อยู่ใน levels)
+    if (!typeVal && levelsList.length > 0) {
+        const firstLevel = levelsList[0];
+        typeVal = firstLevel.type || firstLevel.Type || firstLevel.category || firstLevel.Category;
+    }
+    const typeStr = typeVal || '-';
 
     return (
       <Link 
@@ -144,13 +150,13 @@ const ActivitiesList = ({ filterCategory }) => {
               </div>
             )}
 
-            {/* TYPE (ประเภท) - เพิ่มส่วนนี้ */}
+            {/* TYPE (ประเภท) */}
             <div className="card-row">
               <span className="label-purple">ประเภท</span>
               <span className="value-text">: {typeStr}</span>
             </div>
 
-            {/* TOPIC (หัวข้อ) - เพิ่มส่วนนี้ */}
+            {/* TOPIC (หัวข้อ) */}
             <div className="card-row">
               <span className="label-purple">หัวข้อ</span>
               <span className="value-text">: {topicsStr}</span>
@@ -165,7 +171,6 @@ const ActivitiesList = ({ filterCategory }) => {
             <div className="modern-divider"></div>
             
             <div className="card-footer-row">
-              {/* SVG Icon นาฬิกา */}
               <svg className="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                  <circle cx="12" cy="12" r="10"></circle>
                  <polyline points="12 6 12 12 16 14"></polyline>
