@@ -17,7 +17,6 @@ const ActivitiesList = ({ filterCategory }) => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests`);
-        // console.log("Debug API Data:", response.data); // ลองเปิดบรรทัดนี้เพื่อดูโครงสร้างข้อมูลจริงใน Console
         const contestsData = response.data || [];
         setContests(contestsData);
         setError(null);
@@ -85,14 +84,13 @@ const ActivitiesList = ({ filterCategory }) => {
     });
   };
 
-  // --- Helper Component (แก้ไขจุดนี้) ---
+  // --- Helper Component ---
   const ContestCard = ({ contest }) => {
     const badge = getStatusBadge(contest);
     const posterUrl = getPosterUrl(contest);
     const org = contest.organization_id ? orgs[contest.organization_id] : null;
     const dateRange = formatDate(contest.end_date || contest.EndDate);
 
-    // 1. ดึง levels ออกมาเตรียมไว้
     const levelsList = contest.levels || contest.Levels || [];
 
     // --- ส่วนแสดงผล ระดับชั้น ---
@@ -102,17 +100,12 @@ const ActivitiesList = ({ filterCategory }) => {
       .join(', ') || 'ไม่ระบุ';
 
     // --- ส่วนแสดงผล หัวข้อ (Topic) ---
-    // ลองดึงจากหลายๆ ชื่อตัวแปรที่เป็นไปได้ และกรองตัวซ้ำออก
     const rawTopics = levelsList.map(l => l.topic_name || l.topic || l.TopicName || l.Topic);
-    // กรองค่าว่างและค่าซ้ำ (Unique)
     const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
     const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
 
     // --- ส่วนแสดงผล ประเภท (Type) ---
-    // 1. ลองหาที่ตัว contest หลักก่อน
     let typeVal = contest.type || contest.Type || contest.category || contest.Category;
-    
-    // 2. ถ้าที่หลักไม่มี ให้ลองไปค้นใน levels ตัวแรก (เพราะบางที type อยู่ใน levels)
     if (!typeVal && levelsList.length > 0) {
         const firstLevel = levelsList[0];
         typeVal = firstLevel.type || firstLevel.Type || firstLevel.category || firstLevel.Category;
@@ -150,22 +143,22 @@ const ActivitiesList = ({ filterCategory }) => {
               </div>
             )}
 
-            {/* TYPE (ประเภท) */}
-            <div className="card-row">
-              <span className="label-purple">ประเภท</span>
-              <span className="value-text">: {typeStr}</span>
-            </div>
-
-            {/* TOPIC (หัวข้อ) */}
+            {/* 1. TOPIC (หัวข้อ) - ย้ายมาเป็นอันดับแรก */}
             <div className="card-row">
               <span className="label-purple">หัวข้อ</span>
               <span className="value-text">: {topicsStr}</span>
             </div>
 
-            {/* LEVEL (ระดับ) */}
+            {/* 2. LEVEL (ระดับ) - ย้ายมาเป็นอันดับสอง */}
             <div className="card-row">
               <span className="label-purple">ระดับ</span>
               <span className="value-text">: {levelsStr}</span>
+            </div>
+
+            {/* 3. TYPE (ประเภท) - ย้ายมาเป็นอันดับสุดท้าย */}
+            <div className="card-row">
+              <span className="label-purple">ประเภท</span>
+              <span className="value-text">: {typeStr}</span>
             </div>
 
             <div className="modern-divider"></div>
