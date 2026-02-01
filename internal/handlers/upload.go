@@ -4,14 +4,15 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
-	"io"
 
 	"github.com/gin-gonic/gin"
+	"github.com/supabase-community/storage-go" // เพิ่มตัวนี้เข้ามาเพื่อแก้เรื่อง Type
 	supabase "github.com/supabase-community/supabase-go"
 )
 
@@ -43,7 +44,7 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 		return
 	}
 
-	// ---------- LOAD SUPABASE CONFIG FROM ENV ----------
+	// ---------- LOAD SUPABASE CONFIG ----------
 	supabaseURL := os.Getenv("SUPABASE_URL")
 	supabaseKey := os.Getenv("SUPABASE_SERVICE_ROLE_KEY")
 
@@ -60,23 +61,16 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 		return
 	}
 
-	// ---------- GENERATE UNIQUE FILENAME (ดีแล้ว เก็บไว้) ----------
+	// ---------- GENERATE FILENAME ----------
 	now := time.Now()
 	hash := sha256.New()
 	hash.Write([]byte(file.Filename + now.String()))
 	hashStr := hex.EncodeToString(hash.Sum(nil))[:12]
 
 	filename := fmt.Sprintf("poster_%s_%d%s", hashStr, now.Unix(), ext)
+	pathInBucket := fmt.Sprintf("posters/%d/%02d/%s", now.Year(), now.Month(), filename)
 
-	// Path ใน bucket
-	pathInBucket := fmt.Sprintf(
-		"posters/%d/%02d/%s",
-		now.Year(),
-		now.Month(),
-		filename,
-	)
-
-	// ---------- READ FILE INTO BYTES (สำคัญ) ----------
+	// ---------- READ FILE ----------
 	fileReader, err := file.Open()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
@@ -84,25 +78,25 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 	}
 	defer fileReader.Close()
 
-	fileBytes, err := io.ReadAll(fileReader)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file content"})
-		return
+	// ---------- UPLOAD TO SUPABASE STORAGE ----------
+	bucketName := "product-images"
+
+	// แก้จุดที่ Error: ใช้โครงสร้างที่ SDK community รองรับ
+	// 1. เรียกผ่าน client.Storage.From()
+	// 2. ใช้ storage.FileOptions (จาก package storage-go)
+	
+	opts := storage.FileOptions{
+		ContentType: stringPtr(file.Header.Get("Content-Type")),
+		Upsert:      boolPtr(false),
 	}
 
-	// ---------- UPLOAD TO SUPABASE STORAGE ----------
-	bucketName := "poem-images" // ← เปลี่ยนให้ตรงกับ bucket ของคุณ
-
-	_, err = client.Storage.
-		From(bucketName).
-		Upload(pathInBucket, fileBytes, supabase.StorageOptions{
-			ContentType: file.Header.Get("Content-Type"),
-			Upsert:      false,
-		})
+	// สำหรับเวอร์ชันส่วนใหญ่ใน community จะคืนค่าเป็นแผนผัง error หรือผลลัพธ์
+	// เราจะส่ง fileReader เข้าไปโดยตรง (ประหยัด memory กว่า ReadAll)
+	_, err = client.Storage.From(bucketName).Upload(pathInBucket, fileReader, opts)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to upload to Supabase",
+			"error":  "failed to upload to Supabase",
 			"detail": err.Error(),
 		})
 		return
@@ -116,10 +110,13 @@ func (h *KlonHandlers) UploadPoster(c *gin.Context) {
 		pathInBucket,
 	)
 
-	// ---------- RETURN RESPONSE ----------
 	c.JSON(http.StatusOK, gin.H{
 		"url":      publicURL,
 		"filename": filename,
 		"size":     file.Size,
 	})
 }
+
+// Helper functions เพื่อจัดการ Pointer (SDK นี้มักต้องการ Pointer)
+func stringPtr(s string) *string { return &s }
+func boolPtr(b bool) *bool     { return &b }
