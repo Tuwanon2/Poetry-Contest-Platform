@@ -364,41 +364,48 @@ export default function CreateCompetition() {
                 ))}
               </div>
 
-              {/* ✅ 2. จุดที่แก้ไข: ใช้ Supabase Storage (Bucket: product-images) */}
-              <UploadBox file={poster} onSelect={async file => {
-                setPoster(file);
-                setPosterURL(""); // Reset URL ก่อนเริ่มใหม่
-                
-                if (file) {
-                  setPosterUploading(true);
-                  try {
-                    // ตั้งชื่อไฟล์ให้ไม่ซ้ำ
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+              {/* ✅ แก้ไข: ส่งรูปเข้า Backend Go แทนการยิง Supabase โดยตรง */}
+              <UploadBox 
+                file={poster} 
+                onSelect={async (file) => {
+                  setPoster(file);
+                  setPosterURL(""); // Reset URL
+                  
+                  if (file) {
+                    setPosterUploading(true);
                     
-                    // 2.1 อัปโหลดไป Supabase
-                    const { data, error } = await supabase.storage
-                      .from("product-images") // ใช้ชื่อ Bucket นี้ตามที่ตกลง
-                      .upload(fileName, file);
+                    // 1. เตรียมข้อมูล FormData เพื่อส่งให้ Backend
+                    const formData = new FormData();
+                    formData.append("file", file); // ชื่อ key "file" ต้องตรงกับที่ Go รอรับ
 
-                    if (error) throw error;
+                    try {
+                      // 2. ยิงไปที่ Endpoint ของ Go Backend
+                      // ใช้ API_BASE_URL ที่คุณ import มาแล้ว
+                      const response = await axios.post(
+                        `${API_BASE_URL}/upload/poster`, 
+                        formData,
+                        {
+                          headers: { "Content-Type": "multipart/form-data" },
+                        }
+                      );
 
-                    // 2.2 ดึง URL รูปภาพ
-                    const { data: urlData } = supabase.storage
-                      .from("product-images")
-                      .getPublicUrl(fileName);
+                      // 3. รับ URL ที่ Go ส่งกลับมา
+                      const uploadedUrl = response.data.url;
+                      setPosterURL(uploadedUrl);
+                      console.log("Upload Success, URL:", uploadedUrl);
 
-                    setPosterURL(urlData.publicUrl);
-                    console.log("Uploaded Image URL:", urlData.publicUrl);
-
-                  } catch (err) {
-                    console.error("Upload Error:", err);
-                    alert('อัปโหลดโปสเตอร์ล้มเหลว: ' + (err.message || 'Unknown error'));
-                  } finally {
-                    setPosterUploading(false);
+                    } catch (err) {
+                      console.error("Upload Failed:", err);
+                      // ดึงข้อความ error จาก Backend ถ้ามี
+                      const errMsg = err.response?.data?.error || err.message;
+                      alert(`อัปโหลดไม่ผ่าน: ${errMsg}`);
+                      setPoster(null); // ล้างค่าออกถ้าพัง
+                    } finally {
+                      setPosterUploading(false);
+                    }
                   }
-                }
-              }} />
+                }} 
+              />
 
               {posterUploading && <div style={{ marginTop: 10, color: '#ff9800' }}>กำลังอัปโหลดโปสเตอร์...</div>}
 
