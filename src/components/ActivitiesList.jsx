@@ -104,7 +104,7 @@ const ActivitiesList = ({ filterCategory }) => {
     const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
     const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
 
-    // --- ส่วนแสดงผล ประเภท (Type) [LOGIC แบบดักทุกทาง + LOG] ---
+    // --- ส่วนแสดงผล ประเภท (Type) ---
     let collectedTypes = [];
 
     // 1. ลองหาจาก Root
@@ -114,8 +114,8 @@ const ActivitiesList = ({ filterCategory }) => {
     // 2. ลองกวาดหาจาก Levels
     if (levelsList.length > 0) {
         levelsList.forEach(l => {
-            // ดึงตัวแปรที่น่าจะเป็นไปได้ทั้งหมด
-            const candidate = l.poem_types || l.PoemTypes || l.type || l.Type || l.category || l.Category;
+            // แก้ไข: เพิ่ม poem_type (ไม่มี s) เข้าไปในการเช็ค
+            const candidate = l.poem_type || l.poem_types || l.PoemTypes || l.type || l.Type || l.category || l.Category;
             
             if (Array.isArray(candidate)) {
                 collectedTypes.push(...candidate);
@@ -141,23 +141,6 @@ const ActivitiesList = ({ filterCategory }) => {
     )];
 
     let finalTypeStr = uniqueTypes.length > 0 ? uniqueTypes.join(', ') : '-';
-
-    // ================== DEBUG LOG ZONE ==================
-    // กด F12 ดู Console เพื่อเช็คค่า
-    console.group(`Debugging Contest: ${contest.title || 'Untitled'}`);
-    console.log("Full Object:", contest);
-    console.log("Levels List:", levelsList);
-    if (levelsList.length > 0) {
-         levelsList.forEach((lvl, i) => {
-             console.log(`Level ${i} Keys:`, Object.keys(lvl));
-             console.log(`Level ${i} poem_types (raw):`, lvl.poem_types);
-             console.log(`Level ${i} PoemTypes (raw):`, lvl.PoemTypes);
-         });
-    }
-    console.log("Collected Types (Before Filter):", collectedTypes);
-    console.log("Final Type String:", finalTypeStr);
-    console.groupEnd();
-    // ====================================================
 
     return (
       <Link 
