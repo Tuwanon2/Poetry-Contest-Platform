@@ -104,23 +104,60 @@ const ActivitiesList = ({ filterCategory }) => {
     const uniqueTopics = [...new Set(rawTopics.filter(t => t && t !== '-' && t !== 'ไม่ระบุ' && t !== ''))];
     const topicsStr = uniqueTopics.length > 0 ? uniqueTopics.join(', ') : '-';
 
-    // --- ส่วนแสดงผล ประเภท (Type) [แก้ไขใหม่] ---
-    let finalTypeStr = contest.type || contest.Type || contest.category || contest.Category;
+    // --- ส่วนแสดงผล ประเภท (Type) [LOGIC แบบดักทุกทาง + LOG] ---
+    let collectedTypes = [];
 
-    // ถ้าไม่มีที่ Root ให้ไปกวาดหาจาก poem_types ใน levels ทุกอัน
-    if (!finalTypeStr && levelsList.length > 0) {
-        // ใช้ flatMap เพื่อดึง array ซ้อน array (poem_types) ออกมาแผ่
-        const allTypes = levelsList.flatMap(l => l.poem_types || l.PoemTypes || []);
-        // กรองค่าซ้ำ (Unique) และค่าว่างทิ้ง
-        const uniqueTypes = [...new Set(allTypes.filter(t => t && t !== ''))];
-        
-        if (uniqueTypes.length > 0) {
-            finalTypeStr = uniqueTypes.join(', ');
-        }
+    // 1. ลองหาจาก Root
+    const rootType = contest.type || contest.Type || contest.category || contest.Category;
+    if (rootType) collectedTypes.push(rootType);
+
+    // 2. ลองกวาดหาจาก Levels
+    if (levelsList.length > 0) {
+        levelsList.forEach(l => {
+            // ดึงตัวแปรที่น่าจะเป็นไปได้ทั้งหมด
+            const candidate = l.poem_types || l.PoemTypes || l.type || l.Type || l.category || l.Category;
+            
+            if (Array.isArray(candidate)) {
+                collectedTypes.push(...candidate);
+            } else if (typeof candidate === 'string' && candidate.trim() !== '') {
+                 // เผื่อ Backend ส่งมาเป็น JSON String "[...]"
+                if (candidate.startsWith('[') && candidate.endsWith(']')) {
+                    try {
+                        const parsed = JSON.parse(candidate);
+                        if (Array.isArray(parsed)) collectedTypes.push(...parsed);
+                    } catch (e) {
+                        collectedTypes.push(candidate);
+                    }
+                } else {
+                    collectedTypes.push(candidate);
+                }
+            }
+        });
     }
-    // ถ้าหาไม่เจอเลยให้ใส่ขีด
-    finalTypeStr = finalTypeStr || '-';
 
+    // กรองตัวซ้ำ + ค่าว่าง
+    const uniqueTypes = [...new Set(
+        collectedTypes.filter(t => t && typeof t === 'string' && t.trim() !== '' && t !== '-' && t !== 'ไม่ระบุ')
+    )];
+
+    let finalTypeStr = uniqueTypes.length > 0 ? uniqueTypes.join(', ') : '-';
+
+    // ================== DEBUG LOG ZONE ==================
+    // กด F12 ดู Console เพื่อเช็คค่า
+    console.group(`Debugging Contest: ${contest.title || 'Untitled'}`);
+    console.log("Full Object:", contest);
+    console.log("Levels List:", levelsList);
+    if (levelsList.length > 0) {
+         levelsList.forEach((lvl, i) => {
+             console.log(`Level ${i} Keys:`, Object.keys(lvl));
+             console.log(`Level ${i} poem_types (raw):`, lvl.poem_types);
+             console.log(`Level ${i} PoemTypes (raw):`, lvl.PoemTypes);
+         });
+    }
+    console.log("Collected Types (Before Filter):", collectedTypes);
+    console.log("Final Type String:", finalTypeStr);
+    console.groupEnd();
+    // ====================================================
 
     return (
       <Link 
@@ -165,7 +202,7 @@ const ActivitiesList = ({ filterCategory }) => {
               <span className="value-text">: {levelsStr}</span>
             </div>
 
-            {/* 3. TYPE (ประเภท) - ใช้ตัวแปรใหม่ finalTypeStr */}
+            {/* 3. TYPE (ประเภท) */}
             <div className="card-row">
               <span className="label-purple">ประเภท</span>
               <span className="value-text">: {finalTypeStr}</span>
