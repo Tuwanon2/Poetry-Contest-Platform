@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import TopNav from "../components/TopNav";
 import "../styles/SubmitCompetition.css";
-import { FaChalkboardTeacher, FaUserGraduate, FaUniversity, FaUsers } from "react-icons/fa";
-import API_BASE_URL from '../config/api';
+// อย่าลืมตรวจสอบ path ของ config ให้ถูกต้อง
+import API_BASE_URL from '../config/api'; 
 
 const POEM_PATTERNS = {
   "กลอนแปด": { linesPerStanza: 4, initialStanzas: 2, label: "กลอนแปด" },
@@ -36,18 +36,6 @@ export default function SubmitCompetition() {
   const defaultType = "กลอนแปด";
   const defaultPattern = POEM_PATTERNS[defaultType];
 
-  // Mockup poem for default
-  const mockupPoem = [
-    "แสงอรุณอุ่นฟ้าพาใจฝัน",
-    "ปลุกชีวันให้ตื่นจากคืนเหงา",
-    "เสียงลมแผ่วแว่วผ่านลานบ้านเรา",
-    "ดั่งบอกเล่าความหวังยังคงมี",
-    "แม้เส้นทางขวากหนามตามขวางกั้น",
-    "อย่าหวั่นไหวให้ใจนั้นหมองศรี",
-    "ก้าวด้วยศรัทธาพาฝันสู่วันดี",
-    "เพียรวันนี้พรุ่งนี้ย่อมงดงาม"
-  ];
-
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -56,11 +44,13 @@ export default function SubmitCompetition() {
     level: "",
     title: "",
     poemType: defaultType,
-    poemLines: mockupPoem,
+    poemLines: Array(defaultPattern.linesPerStanza * defaultPattern.initialStanzas).fill(""),
     file: null,
   });
 
-  // Autofill user info from localStorage/sessionStorage
+  const [step, setStep] = useState(0);
+
+  // 1. Autofill User Info
   useEffect(() => {
     let userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
     if (userStr) {
@@ -68,30 +58,28 @@ export default function SubmitCompetition() {
         const user = JSON.parse(userStr);
         let firstName = '';
         let lastName = '';
-        // 1. Try full_name
+        
         if (user.full_name) {
           const nameParts = user.full_name.trim().split(' ');
           if (nameParts.length === 1) {
             firstName = nameParts[0];
-            lastName = '';
           } else if (nameParts.length > 1) {
             firstName = nameParts[0];
             lastName = nameParts.slice(1).join(' ');
           }
         }
-        // 2. Fallback to firstName/lastName
+        
         if ((!firstName || !lastName) && (user.firstName || user.firstname)) {
           firstName = user.firstName || user.firstname;
         }
         if ((!firstName || !lastName) && (user.lastName || user.lastname)) {
           lastName = user.lastName || user.lastname;
         }
-        // 3. Fallback to name
+        
         if ((!firstName || !lastName) && user.name) {
           const nameParts = user.name.trim().split(' ');
           if (nameParts.length === 1) {
             firstName = nameParts[0];
-            lastName = '';
           } else if (nameParts.length > 1) {
             firstName = nameParts[0];
             lastName = nameParts.slice(1).join(' ');
@@ -104,31 +92,27 @@ export default function SubmitCompetition() {
           email: user.email || '',
         }));
       } catch (err) {
-        // ignore
+        // ignore error
       }
     }
   }, []);
 
-  const [step, setStep] = useState(0);
-
-  // Fetch contest data
+  // 2. Fetch Contest Data
   useEffect(() => {
     const fetchContest = async () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/contests/${id}`);
-        console.log('🔍 Contest data for submission:', response.data);
         setContest(response.data);
-
-        // ตั้งค่า default ตาม contest
+        
         const levels = response.data.levels || [];
+        // ถ้ามีระดับเดียว ล็อคระดับนั้นเลย
         if (levels.length === 1) {
-          // ถ้ามีระดับเดียว ล็อคเลย
           const singleLevel = levels[0].level_name || levels[0].name;
           const topicName = levels[0].topic_enabled && levels[0].topic_name ? levels[0].topic_name : '';
           setForm(prev => ({ ...prev, level: singleLevel, title: topicName }));
         }
-
+        
         // ตั้งค่า poem type ตาม level แรก
         if (levels.length > 0 && levels[0].poem_types && levels[0].poem_types.length > 0) {
           const firstType = levels[0].poem_types[0];
@@ -139,7 +123,6 @@ export default function SubmitCompetition() {
             poemLines: Array(pattern.linesPerStanza * pattern.initialStanzas).fill("")
           }));
         }
-
         setError(null);
       } catch (err) {
         console.error('❌ Error fetching contest:', err);
@@ -154,34 +137,33 @@ export default function SubmitCompetition() {
     }
   }, [id]);
 
-  // อัพเดต title เมื่อ level เปลี่ยน (สำหรับ topic ที่ล็อค)
+  // 3. Update Title when level changes (Lock topic logic)
   useEffect(() => {
     if (!contest || !contest.levels || !form.level) return;
-
-    const selectedLevel = contest.levels.find(l =>
+    
+    const selectedLevel = contest.levels.find(l => 
       (l.level_name || l.name) === form.level
     );
-
+    
     if (selectedLevel && selectedLevel.topic_enabled && selectedLevel.topic_name) {
-      // ถ้า level นี้ล็อคหัวข้อ ตั้งค่าหัวข้อตาม level
       setForm(prev => ({ ...prev, title: selectedLevel.topic_name }));
     } else if (form.title && contest.levels.some(l => l.topic_name === form.title)) {
-      // ถ้าเปลี่ยนไป level ที่ไม่ล็อคหัวข้อ และ title เดิมเป็นหัวข้อที่ล็อคของ level อื่น ให้ลบออก
       setForm(prev => ({ ...prev, title: '' }));
     }
   }, [form.level, contest]);
 
-  // Dynamic levels และ poem types ตาม contest
+  // --- Helper Functions ---
+
   const getAvailableLevels = () => {
     if (!contest || !contest.levels) return [];
-
+    
     const levelIcons = {
       "ประถม": <span role="img" aria-label="ประถม">🎒</span>,
       "มัธยม": <span role="img" aria-label="มัธยม">🏫</span>,
       "มหาวิทยาลัย": <span role="img" aria-label="มหาวิทยาลัย">🎓</span>,
       "ประชาชนทั่วไป": <span role="img" aria-label="ประชาชนทั่วไป">🏢</span>
     };
-
+    
     return contest.levels.map(level => {
       const levelName = level.level_name || level.name;
       return {
@@ -193,25 +175,14 @@ export default function SubmitCompetition() {
 
   const getAvailablePoemTypes = () => {
     if (!contest || !contest.levels || !form.level) return [];
-
-    // หา level ที่เลือก
-    const selectedLevel = contest.levels.find(l =>
-      (l.level_name || l.name) === form.level
-    );
-
+    const selectedLevel = contest.levels.find(l => (l.level_name || l.name) === form.level);
     if (!selectedLevel || !selectedLevel.poem_types) return [];
-
-    return selectedLevel.poem_types.map(type => ({
-      label: type,
-      value: type
-    }));
+    return selectedLevel.poem_types.map(type => ({ label: type, value: type }));
   };
-
+  
   const isTopicLocked = () => {
     if (!contest || !contest.levels) return false;
-    const selectedLevel = contest.levels.find(l =>
-      (l.level_name || l.name) === form.level
-    );
+    const selectedLevel = contest.levels.find(l => (l.level_name || l.name) === form.level);
     return selectedLevel?.topic_enabled && selectedLevel?.topic_name;
   };
 
@@ -219,29 +190,21 @@ export default function SubmitCompetition() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePoemTypeChange = (type) => {
     if (type === form.poemType) return;
-
     const hasContent = form.poemLines.some(line => line && line.trim() !== "");
-
     if (hasContent) {
       const confirmChange = window.confirm("หากเปลี่ยนประเภทกลอน เนื้อหาที่กรอกไว้จะถูกลบทั้งหมด คุณแน่ใจหรือไม่?");
       if (!confirmChange) return;
     }
-
     const pattern = POEM_PATTERNS[type];
     setForm((f) => ({
       ...f,
       poemType: type,
-      poemLines: Array(
-        pattern.linesPerStanza * pattern.initialStanzas
-      ).fill(""),
+      poemLines: Array(pattern.linesPerStanza * pattern.initialStanzas).fill(""),
     }));
   };
 
@@ -249,10 +212,7 @@ export default function SubmitCompetition() {
     const pattern = POEM_PATTERNS[form.poemType];
     setForm((f) => ({
       ...f,
-      poemLines: [
-        ...f.poemLines,
-        ...Array(pattern.linesPerStanza).fill(""),
-      ],
+      poemLines: [...f.poemLines, ...Array(pattern.linesPerStanza).fill("")],
     }));
   };
 
@@ -260,9 +220,8 @@ export default function SubmitCompetition() {
     const pattern = POEM_PATTERNS[form.poemType];
     const linesPerStanza = pattern.linesPerStanza;
     const minLines = linesPerStanza * pattern.initialStanzas;
-
+    
     if (form.poemLines.length <= minLines) return;
-
     const startIndex = form.poemLines.length - linesPerStanza;
     const lastStanzaLines = form.poemLines.slice(startIndex);
     const hasContent = lastStanzaLines.some(line => line && line.trim() !== "");
@@ -271,11 +230,7 @@ export default function SubmitCompetition() {
       const confirmDelete = window.confirm("บทสุดท้ายมีเนื้อหาอยู่ คุณแน่ใจหรือไม่ที่จะลบ?");
       if (!confirmDelete) return;
     }
-
-    setForm((f) => ({
-      ...f,
-      poemLines: f.poemLines.slice(0, startIndex),
-    }));
+    setForm((f) => ({ ...f, poemLines: f.poemLines.slice(0, startIndex) }));
   };
 
   const handlePoemLineChange = (idx, value) => {
@@ -287,16 +242,20 @@ export default function SubmitCompetition() {
   };
 
   const handleFile = (e) => {
-    setForm({ ...form, file: e.target.files[0] });
+    if (e.target.files && e.target.files[0]) {
+      setForm({ ...form, file: e.target.files[0] });
+    }
   };
 
-  // --- แก้ไข Syntax Error ที่ฟังก์ชัน handleNext ---
-const handleNext = (e) => {
+  const handleNext = (e) => {
     e.preventDefault();
-
     if (step === 0) {
-      if (!form.level) {
-        alert("กรุณาเลือกระดับการแข่งขัน");
+      if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.level) {
+        alert("กรุณากรอกข้อมูลให้ครบทุกช่อง และเลือกระดับการแข่งขัน");
+        return;
+      }
+      if (form.level !== "ประชาชนทั่วไป" && !form.file) {
+        alert("กรุณาอัปโหลดไฟล์ยืนยันรับรองจากสถานศึกษา");
         return;
       }
       setStep(1);
@@ -308,18 +267,16 @@ const handleNext = (e) => {
         return;
       }
 
+      // Logic ตัดบรรทัดว่างท้ายสุดออก (ถ้ามี)
       const pattern = POEM_PATTERNS[form.poemType];
       const linesPerStanza = pattern.linesPerStanza;
       const minLines = linesPerStanza * pattern.initialStanzas;
-
       let currentLines = [...form.poemLines];
-
-      // ลบวรรคว่างๆ ท้ายบทที่ผู้ใช้กดเพิ่มมาแต่ไม่ได้กรอก
+      
       while (currentLines.length > minLines) {
         const lastStanzaStart = currentLines.length - linesPerStanza;
         const lastStanzaLines = currentLines.slice(lastStanzaStart);
         const isLastStanzaEmpty = lastStanzaLines.every(line => !line || line.trim() === "");
-
         if (isLastStanzaEmpty) {
           currentLines = currentLines.slice(0, lastStanzaStart);
         } else {
@@ -332,7 +289,6 @@ const handleNext = (e) => {
         alert("กรุณากรอกเนื้อหากลอนให้ครบทุกวรรค");
         return;
       }
-
       setForm(prev => ({ ...prev, poemLines: currentLines }));
       setStep(2);
     }
@@ -340,65 +296,75 @@ const handleNext = (e) => {
 
   const handleBack = () => {
     if (step === 0) {
-      navigate(`/contest-detail/${id}`); // ย้อนกลับไปหน้ารายละเอียด
+      navigate("/contest-detail");
     } else {
-      setStep((prev) => prev - 1); // ย้อนกลับไป Step ก่อนหน้า
+      setStep((prev) => prev - 1);
     }
   };
 
-  // ฟังก์ชันอัปโหลดไฟล์ (ประกาศไว้ข้างนอกถูกต้องแล้ว)
-  const uploadFile = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await axios.post(`${API_BASE_URL}/upload`, formData);
-    return response.data.url;
-  };
-
+  // ----------------------------------------------------------------
+  // 🔥 ส่วนที่แก้ไข: ใช้ FormData ส่งข้อมูลทั้งหมดในครั้งเดียว
+  // ----------------------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
+      // 1. จัดการเนื้อหากลอน (ใส่ & และ %)
       const pattern = POEM_PATTERNS[form.poemType];
       const linesPerStanza = pattern.linesPerStanza;
       let formattedPoem = '';
-
-      // แปลง Array เป็น String ด้วยสัญลักษณ์ & และ %
+      
       for (let i = 0; i < form.poemLines.length; i++) {
         formattedPoem += form.poemLines[i];
         if (i < form.poemLines.length - 1) {
           if ((i + 1) % linesPerStanza === 0) {
-            formattedPoem += '%'; // จบบท
+            formattedPoem += '%';
           } else {
-            formattedPoem += '&'; // จบวรรค
+            formattedPoem += '&';
           }
         }
       }
-
-      let userId = null;
+      
+      // 2. ดึง User ID
+      let userId = "";
       const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
       if (userStr) {
-        const user = JSON.parse(userStr);
-        userId = user.id || user.ID || user.user_id;
+        try {
+          const user = JSON.parse(userStr);
+          userId = user.id || user.ID || user.user_id;
+        } catch (err) { console.error(err); }
       }
 
-      const submissionData = {
-        competition_id: parseInt(id),
-        user_id: userId,
-        name: `${form.firstName} ${form.lastName}`,
-        email: form.email,
-        phone: form.phone,
-        level_name: form.level,
-        title: form.title,
-        poem_type: form.poemType,
-        content: formattedPoem,
-        document: form.file ? await uploadFile(form.file) : null
-      };
+      // 3. ใช้ FormData เพื่อรองรับไฟล์และข้อมูล text พร้อมกัน
+      const formData = new FormData();
+      formData.append('competition_id', parseInt(id));
+      formData.append('user_id', userId);
+      formData.append('name', `${form.firstName} ${form.lastName}`);
+      formData.append('email', form.email);
+      formData.append('phone', form.phone);
+      formData.append('level_name', form.level);
+      formData.append('title', form.title);
+      formData.append('poem_type', form.poemType);
+      formData.append('content', formattedPoem);
 
-      await axios.post(`${API_BASE_URL}/submissions`, submissionData);
+      // แนบไฟล์ (ถ้ามี) -> ใช้ชื่อ key ว่า 'document'
+      if (form.file) {
+        formData.append('document', form.file); 
+      }
+      
+      console.log('📤 Submitting via FormData...');
+
+      // 4. ส่ง request (ไม่ต้องกำหนด Header เอง axios จัดการให้)
+      const response = await axios.post(`${API_BASE_URL}/submissions`, formData);
+      
+      console.log('✅ Submission successful:', response.data);
       alert("ส่งใบสมัครสำเร็จ!");
-      navigate('/my-works');
+      navigate('/my-works'); 
+
     } catch (err) {
       console.error('❌ Submission error:', err);
-      alert("เกิดข้อผิดพลาด: " + (err.response?.data?.error || err.message));
+      const errMsg = err.response?.data?.error || err.message || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+      alert("เกิดข้อผิดพลาดในการส่งใบสมัคร: " + errMsg);
     }
   };
 
@@ -411,7 +377,8 @@ const handleNext = (e) => {
     if (posterPath.startsWith('http')) {
       posterUrl = posterPath;
     } else {
-      posterUrl = `${API_BASE_URL.replace('/api/v1', '')}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
+      // ปรับแก้ path ให้ถูกต้องตาม environment ของคุณ
+      posterUrl = `${API_BASE_URL.replace('/api/v1','')}${posterPath.startsWith('/') ? posterPath : '/' + posterPath}`;
     }
   }
 
@@ -424,7 +391,7 @@ const handleNext = (e) => {
       day: 'numeric',
     });
   };
-  
+
   const renderPoemInputs = () => {
     const pattern = POEM_PATTERNS[form.poemType];
     const linesPerStanza = pattern.linesPerStanza;
@@ -440,7 +407,6 @@ const handleNext = (e) => {
           <div className="poem-grid">
             {stanzaLines.map((line, localIdx) => {
               const globalIdx = startIndex + localIdx;
-
               return (
                 <div key={globalIdx} className="poem-line-row">
                   <span className="poem-idx">{globalIdx + 1}.</span>
@@ -466,22 +432,20 @@ const handleNext = (e) => {
     const totalStanzas = Math.ceil(form.poemLines.length / linesPerStanza);
 
     return Array.from({ length: totalStanzas }).map((_, stanzaIdx) => {
-      const startIndex = stanzaIdx * linesPerStanza;
-      const stanzaLines = form.poemLines.slice(startIndex, startIndex + linesPerStanza);
+        const startIndex = stanzaIdx * linesPerStanza;
+        const stanzaLines = form.poemLines.slice(startIndex, startIndex + linesPerStanza);
 
-      return (
-        <div key={stanzaIdx} style={{ marginBottom: 15, paddingBottom: 10, borderBottom: '1px dotted #e0e0e0' }}>
-          <div className="confirm-poem-display" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {stanzaLines.map((line, localIdx) => {
-              return (
-                <div key={localIdx} className={`display-line ${!line ? "empty" : ""}`}>
-                  {line}
+        return (
+            <div key={stanzaIdx} style={{ marginBottom: 15, paddingBottom: 10, borderBottom: '1px dotted #e0e0e0' }}> 
+                <div className="confirm-poem-display" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    {stanzaLines.map((line, localIdx) => (
+                        <div key={localIdx} className={`display-line ${!line ? "empty" : ""}`}>
+                            {line}
+                        </div>
+                    ))}
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      );
+            </div>
+        );
     });
   };
 
@@ -517,15 +481,15 @@ const handleNext = (e) => {
       </div>
 
       <div className="layout-container">
-        {/* แก้ไขตรงนี้: เพิ่ม style={{ borderRight: 'none' }} เพื่อลบเส้นขอบ */}
+        {/* Sidebar */}
         <div className="sidebar" style={{ borderRight: 'none' }}>
-          <img
-            src={posterUrl}
-            alt="โปสเตอร์การแข่งขัน"
+          <img 
+            src={posterUrl} 
+            alt="โปสเตอร์การแข่งขัน" 
             className="poster-img"
-            onError={(e) => {
+            onError={(e) => { 
               if (e.target.src !== `${window.location.origin}/assets/images/hug.jpg`) {
-                e.target.src = '/assets/images/hug.jpg';
+                e.target.src = '/assets/images/hug.jpg'; 
               }
             }}
           />
@@ -558,10 +522,9 @@ const handleNext = (e) => {
           )}
         </div>
 
+        {/* Form Area */}
         <div className="form-card">
-          <h2 className="form-header">
-            ฟอร์มสมัครเข้าประกวด
-          </h2>
+          <h2 className="form-header">ฟอร์มสมัครเข้าประกวด</h2>
 
           <div className="stepper-container">
             {steps.map((stepLabel, idx, arr) => (
@@ -582,6 +545,8 @@ const handleNext = (e) => {
           </div>
 
           <form onSubmit={step === 2 ? handleSubmit : handleNext} style={{ width: '100%' }}>
+            
+            {/* Step 0: User Info */}
             {step === 0 && (
               <>
                 <div className="form-group">
@@ -638,7 +603,7 @@ const handleNext = (e) => {
                   <label className="input-label">เลือกระดับการแข่งขัน</label>
                   {levels.length === 1 ? (
                     <div style={{ padding: '10px', background: '#f0f0f0', borderRadius: 8, marginBottom: 10 }}>
-                      <b>ระดับ:</b> {levels[0].label}
+                      <b>ระดับ:</b> {levels[0].label} 
                     </div>
                   ) : (
                     <div className="level-grid">
@@ -683,10 +648,10 @@ const handleNext = (e) => {
                     </div>
                   </div>
                 )}
-
               </>
             )}
 
+            {/* Step 1: Poem Details */}
             {step === 1 && (
               <>
                 <div className="step2-header">
@@ -694,10 +659,10 @@ const handleNext = (e) => {
                     <span style={{ fontSize: 22 }}></span> ขั้นตอนที่ 2: รายละเอียดกลอน
                   </div>
                 </div>
-
+                
                 {isTopicLocked() ? (
                   <div style={{ padding: '10px', background: '#f0f0f0', borderRadius: 8, marginBottom: 18 }}>
-                    <b>หัวข้อ:</b> {form.title}
+                    <b>หัวข้อ:</b> {form.title} 
                   </div>
                 ) : (
                   <input
@@ -713,7 +678,6 @@ const handleNext = (e) => {
 
                 {(() => {
                   const poemTypes = getAvailablePoemTypes();
-
                   if (poemTypes.length === 1) {
                     return (
                       <div style={{ padding: '10px', background: '#f0f0f0', borderRadius: 8, marginBottom: 18 }}>
@@ -721,7 +685,6 @@ const handleNext = (e) => {
                       </div>
                     );
                   }
-
                   return (
                     <div className="poem-type-list">
                       {poemTypes.map(pt => (
@@ -743,34 +706,32 @@ const handleNext = (e) => {
                     <label className="input-label" style={{ color: '#70136C', marginBottom: 0 }}>เนื้อหากลอน</label>
                     <span className="tooltip-icon" title="กลอนต้องเป็นกลอนสุภาพตามรูปแบบที่เลือก">?</span>
                   </div>
-
+                  
                   <div className="poem-box">
                     {renderPoemInputs()}
-
                     <div className="poem-action-buttons">
-                      <button
-                        type="button"
-                        onClick={handleAddStanza}
+                      <button 
+                        type="button" 
+                        onClick={handleAddStanza} 
                         className="btn-add-stanza"
                       >
                         เพิ่มอีก 1 บท
                       </button>
-
-                      <button
-                        type="button"
-                        onClick={handleRemoveStanza}
+                      <button 
+                        type="button" 
+                        onClick={handleRemoveStanza} 
                         className="btn-remove-stanza"
                         disabled={form.poemLines.length <= POEM_PATTERNS[form.poemType].linesPerStanza * POEM_PATTERNS[form.poemType].initialStanzas}
                       >
                         ลบบทล่าสุด
                       </button>
                     </div>
-
                   </div>
                 </div>
               </>
             )}
 
+            {/* Step 2: Confirmation */}
             {step === 2 && (
               <>
                 <div className="confirm-box minimal-confirm-box">
@@ -796,14 +757,14 @@ const handleNext = (e) => {
                               }}
                             >ดูไฟล์รับรอง</button>
                           ) : (
-                            <span style={{ color: 'red' }}>ยังไม่ได้อัปโหลด</span>
+                            <span style={{color:'red'}}>ยังไม่ได้อัปโหลด</span>
                           )}
                         </span>
                       </div>
                     )}
                   </div>
                   <div className="minimal-confirm-section">
-                    <div className="minimal-label" style={{ marginBottom: 8 }}>เนื้อหากลอน</div>
+                    <div className="minimal-label" style={{marginBottom:8}}>เนื้อหากลอน</div>
                     <div className="poem-box" style={{ padding: '20px', background: '#fafbfc', border: '1.5px solid #e0e0e0', borderRadius: 8 }}>
                       {renderConfirmPoem()}
                     </div>
@@ -831,5 +792,5 @@ const handleNext = (e) => {
         </div>
       </div>
     </>
-  );
+  ); 
 }

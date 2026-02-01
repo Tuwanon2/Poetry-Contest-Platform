@@ -1,26 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { 
-  FaUserGraduate, 
-  FaChalkboardTeacher, 
-  FaUniversity, 
-  FaUsers, 
-  FaTrash, 
-  FaPlus, 
-  FaTimes, 
-  FaRegCalendarAlt, 
-  FaRegClock 
-} from "react-icons/fa";
+import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers, FaTrash, FaPlus, FaTimes, FaRegCalendarAlt, FaRegClock } from "react-icons/fa";
 import TopNav from "../components/TopNav";
+import { supabase } from '../supabaseClient';
 import InviteJudgeModal from "../components/InviteJudgeModal";
 import styles from "./CreateCompetition.module.css";
 import API_BASE_URL from '../config/api';
-import { supabase } from '../supabaseClient';
 
-// =========================
-// Sub-Component: LevelSelectCard
-// =========================
+
 function LevelSelectCard({ label, icon, selected, onClick }) {
   return (
     <div
@@ -33,8 +21,9 @@ function LevelSelectCard({ label, icon, selected, onClick }) {
   );
 }
 
+
 // =========================
-// Sub-Component: UploadBox
+// Upload Poster Box (Updated with Preview)
 // =========================
 const UploadBox = ({ file, onSelect }) => {
   const [preview, setPreview] = useState(null);
@@ -109,7 +98,7 @@ export default function CreateCompetition() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // --- Organization Logic ---
+  // Organization Logic
   const organizationIdFromStorage = localStorage.getItem('current_organization_id');
   const organizationIdFromState = location.state?.organizationId;
   const organizationId = organizationIdFromStorage
@@ -244,11 +233,11 @@ export default function CreateCompetition() {
         setLoading(false);
         return;
       }
-      
+      // --- Encode newlines as /n ---
       const encodeNewlines = (str) => (str || '').replace(/\n/g, '/n');
       const encodedContestDescription = encodeNewlines(contestDescription);
       const encodedContestPurpose = encodeNewlines(contestPurpose);
-
+      // For level descriptions
       const encodedLevelDetails = { ...levelDetails };
       Object.keys(encodedLevelDetails).forEach(key => {
         if (key.endsWith('_description')) {
@@ -299,9 +288,6 @@ export default function CreateCompetition() {
     }
   };
 
-  // ===========================================================================
-  // RENDER
-  // ===========================================================================
   return (
     <>
       <TopNav />
@@ -378,19 +364,36 @@ export default function CreateCompetition() {
                 ))}
               </div>
 
+              {/* ✅ 2. จุดที่แก้ไข: ใช้ Supabase Storage (Bucket: product-images) */}
               <UploadBox file={poster} onSelect={async file => {
                 setPoster(file);
-                setPosterURL("");
+                setPosterURL(""); // Reset URL ก่อนเริ่มใหม่
+                
                 if (file) {
                   setPosterUploading(true);
                   try {
-                    const fileName = `competition-posters/${Date.now()}-${file.name}`;
-                    const { data, error } = await supabase.storage.from("poem-images").upload(fileName, file);
-                    if (error) throw new Error("อัปโหลดโปสเตอร์ล้มเหลว");
-                    const { data: urlData } = supabase.storage.from("poem-images").getPublicUrl(fileName);
+                    // ตั้งชื่อไฟล์ให้ไม่ซ้ำ
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    
+                    // 2.1 อัปโหลดไป Supabase
+                    const { data, error } = await supabase.storage
+                      .from("product-images") // ใช้ชื่อ Bucket นี้ตามที่ตกลง
+                      .upload(fileName, file);
+
+                    if (error) throw error;
+
+                    // 2.2 ดึง URL รูปภาพ
+                    const { data: urlData } = supabase.storage
+                      .from("product-images")
+                      .getPublicUrl(fileName);
+
                     setPosterURL(urlData.publicUrl);
+                    console.log("Uploaded Image URL:", urlData.publicUrl);
+
                   } catch (err) {
-                    alert('อัปโหลดโปสเตอร์ล้มเหลว');
+                    console.error("Upload Error:", err);
+                    alert('อัปโหลดโปสเตอร์ล้มเหลว: ' + (err.message || 'Unknown error'));
                   } finally {
                     setPosterUploading(false);
                   }
@@ -452,6 +455,8 @@ export default function CreateCompetition() {
           {step === 2 && (
             <>
               <h2 style={{ marginBottom: 20 }}>ข้อมูลระดับและเกณฑ์การให้คะแนน</h2>
+              {selectedLevels.length === 0 && <p style={{ color: 'red' }}>กรุณาเลือกระดับในขั้นตอนที่ 1 ก่อน</p>}
+
               {selectedLevels.map((level) => {
                 const topicEnabled = levelTopics[level]?.topicEnabled || false;
                 const topicName = levelTopics[level]?.topicName || "";
@@ -528,12 +533,21 @@ export default function CreateCompetition() {
                         </div>
                       </div>
 
+                      {criteriaList.length === 0 && (
+                        <div style={{ textAlign: 'center', color: '#ff4d4f', padding: '10px 0', fontStyle: 'italic' }}>
+                          * กรุณาเพิ่มเกณฑ์การให้คะแนนอย่างน้อย 1 ข้อ
+                        </div>
+                      )}
+
                       {criteriaList.map((item, index) => (
                         <div key={index} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'center' }}>
                           <div style={{
                             width: 24, height: 24, background: '#70136C', color: 'white',
                             borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 12
-                          }}>{index + 1}</div>
+                          }}>
+                            {index + 1}
+                          </div>
+
                           <input
                             type="text"
                             className={styles.input}
@@ -542,6 +556,7 @@ export default function CreateCompetition() {
                             value={item.title}
                             onChange={(e) => handleCriteriaChange(level, index, 'title', e.target.value)}
                           />
+
                           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                             <span style={{ fontSize: '0.9em', color: '#666' }}>เต็ม</span>
                             <input
@@ -553,27 +568,35 @@ export default function CreateCompetition() {
                             />
                             <span style={{ fontSize: '0.9em', color: '#666' }}>คะแนน</span>
                           </div>
+
                           <button
                             type="button"
                             onClick={() => handleRemoveCriteria(level, index)}
                             style={{ background: 'none', border: 'none', color: '#ff4d4f', cursor: 'pointer', padding: 5 }}
-                          ><FaTrash /></button>
+                          >
+                            <FaTrash />
+                          </button>
                         </div>
                       ))}
+
                       <button
                         type="button"
                         onClick={() => handleAddCriteria(level)}
-                        className={styles.addBtnDashed}
                         style={{
                           background: 'white', border: '1px dashed #70136C', color: '#70136C',
                           width: '100%', padding: '8px', borderRadius: 6, cursor: 'pointer',
-                          display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, marginTop: 10
+                          display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5,
+                          marginTop: 10
                         }}
-                      ><FaPlus size={12} /> เพิ่มเกณฑ์คะแนน</button>
+                      >
+                        <FaPlus size={12} /> เพิ่มเกณฑ์คะแนน
+                      </button>
                     </div>
+
                   </div>
                 );
               })}
+
               <div className={styles.navButtonContainer}>
                 <button className={styles.btnSecondary} onClick={() => setStep(1)}>ย้อนกลับ</button>
                 <button className={styles.btnPrimary} onClick={handleNext}>ถัดไป</button>
@@ -586,8 +609,15 @@ export default function CreateCompetition() {
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <h2>เตรียมเชิญกรรมการ</h2>
-                <button className={styles.btnSecondary} onClick={() => setShowInviteJudgeModal(true)}>➕ เพิ่มกรรมการ</button>
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() => setShowInviteJudgeModal(true)}
+                >
+                  ➕ เพิ่มกรรมการ
+                </button>
               </div>
+
+              {/* Judges List Table */}
               <div className={styles.tableContainer}>
                 <table className={styles.table}>
                   <thead>
@@ -618,6 +648,7 @@ export default function CreateCompetition() {
                   </tbody>
                 </table>
               </div>
+
               <div className={styles.navButtonContainer} style={{ marginTop: 40 }}>
                 <button className={styles.btnSecondary} onClick={() => setStep(2)}>ย้อนกลับ</button>
                 <button className={styles.btnPrimary} onClick={() => setStep(4)}>ถัดไป</button>
@@ -627,101 +658,218 @@ export default function CreateCompetition() {
 
           {/* ================= STEP 4 (REVIEW) ================= */}
           {step === 4 && (
-            <div className="fade-in">
+            <>
               <style>{`
-                .review-container { display: flex; gap: 30px; align-items: flex-start; width: 100%; }
-                .review-main { flex: 7; }
-                .review-sidebar { flex: 3; position: sticky; top: 20px; }
-                .review-card { background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-                .section-heading { color: #333; border-left: 4px solid #70136C; padding-left: 12px; line-height: 1.2; font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; }
-                .label-field { font-weight: bold; color: #666; font-size: 0.9rem; margin-bottom: 5px; }
-                .value-highlight { fontSize: '2rem', fontWeight: '800', color: '#70136C', marginTop: '8px', lineHeight: '1.2' }
+                .review-container {
+                  max-width: 1140px;
+                  margin: 0 auto;
+                  display: flex;
+                  gap: 30px;
+                  align-items: flex-start;
+                  width: 100%;
+                }
+                .review-main {
+                  flex: 7;
+                  width: 100%;
+                }
+                .review-sidebar {
+                  flex: 3;
+                  width: 100%;
+                  position: sticky;
+                  top: 20px;
+                }
+                @media (max-width: 992px) {
+                  .review-container {
+                    flex-direction: column;
+                    gap: 24px;
+                  }
+                  .review-sidebar {
+                    position: relative;
+                    top: auto;
+                  }
+                }
               `}</style>
 
               <div className="review-container">
+                {/* --- Left Column --- */}
                 <div className="review-main">
-                  <h1 style={{ marginBottom: 20 }}>ตรวจสอบข้อมูลการประกวด</h1>
-                  <div className="review-card">
-                    <div className="section-heading">ข้อมูลทั่วไป</div>
-                    <div className="label-field">ชื่อการประกวด</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#70136C', marginBottom: 20 }}>{contestName}</div>
-                    
-                    <div className="label-field">ระดับที่เปิดแข่งขัน</div>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-                      {selectedLevels.map(lvl => <span key={lvl} style={{ background: '#70136C', color: 'white', padding: '4px 12px', borderRadius: 20, fontSize: 14 }}>{lvl}</span>)}
+                  <h1 className={styles.reviewTitle}>ตรวจสอบข้อมูลการประกวด</h1>
+                  {posterURL && (
+                    <div className={styles.posterSection}>
+                      <div className={styles.posterImage}>
+                        <div className={styles.posterLabel}>โปสเตอร์ประกวด</div>
+                        <img
+                          src={posterURL}
+                          alt="Contest Poster"
+                          className={styles.posterImg}
+                          style={{ maxWidth: '100%', borderRadius: 8, marginBottom: 20 }}
+                        />
+                      </div>
                     </div>
-                    
-                    <div className="label-field">รายละเอียดภาพรวม</div>
-                    <div style={{ whiteSpace: 'pre-wrap', color: '#444' }}>{contestDescription}</div>
+                  )}
+                  <div className={styles.reviewCard}>
+                    <div className={styles.sectionHeading}>ข้อมูลทั่วไป</div>
+
+                    <div className={styles.gridTwoColumn} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15, marginBottom: 20 }}>
+                      <div>
+                        <div className={styles.labelField} style={{ fontWeight: 'bold', color: '#666' }}>ชื่อการประกวด</div>
+
+                        <div className={styles.valueField} style={{
+                          fontSize: '2rem',       // เพิ่มขนาด (จากเดิม 16)
+                          fontWeight: '800',      // เพิ่มความหนา
+                          color: '#70136C',       // ใส่สี Theme (สีม่วงตามปุ่ม)
+                          marginTop: '8px',
+                          lineHeight: '1.2'
+                        }}>
+                          {contestName || "-"}
+                        </div>
+                      </div>
+                      
+                    </div>
+                    <hr className={styles.dividerLine} style={{ border: 0, borderTop: '1px solid #eee', margin: '15px 0' }} />
+                    <div>
+                      <div className={styles.labelField} style={{ fontWeight: 'bold', color: '#666', marginBottom: 5 }}>ระดับที่เลือก</div>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {selectedLevels.map((lvl, idx) => (
+                          <span key={idx} className={styles.levelBadge} style={{ background: '#70136C', color: 'white', padding: '4px 10px', borderRadius: 20, fontSize: 13 }}>
+                            {lvl}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="review-card">
-                    <div className="section-heading">เกณฑ์คะแนนแต่ละระดับ</div>
-                    {selectedLevels.map((lvl) => (
-                      <div key={lvl} style={{ marginBottom: 30, borderBottom: '1px solid #eee', paddingBottom: 20 }}>
-                        <h4 style={{ color: '#70136C', fontSize: '1.1rem' }}>ระดับ: {lvl}</h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15, margin: '10px 0' }}>
+                  <div className={styles.reviewCard} style={{ marginTop: 20 }}>
+                    <div className={styles.sectionHeading} style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 15 }}>รายละเอียดและเกณฑ์คะแนน</div>
+                    {selectedLevels.map((lvl, levelIdx) => (
+                      <div key={lvl} className={styles.levelDetailItem} style={{
+                        marginBottom: levelIdx === selectedLevels.length - 1 ? 0 : '25px',
+                        paddingBottom: levelIdx === selectedLevels.length - 1 ? 0 : '25px',
+                        borderBottom: levelIdx === selectedLevels.length - 1 ? 'none' : '1px solid #f0f0f0'
+                      }}>
+                        <div className={styles.levelDetailTitle} style={{ fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 10 }}>
+                          ระดับ: <span style={{ color: '#70136C' }}>{lvl}</span>
+                        </div>
+
+                        <div className={styles.gridTwoColumn} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
                           <div>
-                            <div className="label-field">ประเภทกลอน</div>
-                            <div>{levelPoemTypes[lvl]?.join(', ') || '-'}</div>
+                            <div className={styles.labelField} style={{ color: '#666' }}>ประเภทกลอน</div>
+                            <div className={styles.valueField} style={{ fontWeight: 500 }}>
+                              {(levelPoemTypes[lvl] || []).join(', ') || '-'}
+                            </div>
                           </div>
                           <div>
-                            <div className="label-field">หัวข้อ</div>
-                            <div>{levelTopics[lvl]?.topicEnabled ? `หัวข้อบังคับ: ${levelTopics[lvl].topicName}` : 'หัวข้ออิสระ'}</div>
+                            <div className={styles.labelField} style={{ color: '#666' }}>หัวข้อ</div>
+                            <div className={styles.valueField} style={{ fontWeight: 500 }}>
+                              {levelTopics[lvl]?.topicEnabled ? levelTopics[lvl].topicName : 'อิสระ'}
+                            </div>
                           </div>
                         </div>
-                        <div className="label-field">เกณฑ์การให้คะแนน (คะแนนเต็ม {calculateTotalScore(lvl)})</div>
-                        <table style={{ width: '100%', marginTop: 8 }}>
-                          <tbody>
-                            {(levelDetails[lvl + '_criteria'] || []).map((c, i) => (
-                              <tr key={i} style={{ borderBottom: '1px dashed #f0f0f0' }}>
-                                <td style={{ padding: '6px 0' }}>{c.title}</td>
-                                <td style={{ textAlign: 'right', fontWeight: 600 }}>{c.score}</td>
-                              </tr>
+
+                        {levelDetails[lvl + '_description'] && (
+                          <div style={{ marginBottom: '14px', background: '#fafafa', padding: 10, borderRadius: 6 }}>
+                            <div className={styles.labelField} style={{ color: '#666', fontSize: 13 }}>รายละเอียด/กติกาเพิ่มเติม</div>
+                            <div className={styles.descriptionsBox} style={{ whiteSpace: 'pre-wrap', fontSize: 14 }}>
+                              {levelDetails[lvl + '_description']}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className={styles.scoringBox} style={{ border: '1px solid #eee', borderRadius: 8, overflow: 'hidden' }}>
+                          <div className={styles.scoringHeader} style={{ background: '#f5f5f5', padding: '8px 15px', display: 'flex', justifyContent: 'space-between', fontSize: 14, fontWeight: 600 }}>
+                            <span>เกณฑ์การให้คะแนน</span>
+                            <span style={{ color: '#70136C' }}>รวม {calculateTotalScore(lvl)} คะแนน</span>
+                          </div>
+                          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                            {(levelDetails[lvl + '_criteria'] || []).map((crit, cIdx) => (
+                              <li key={cIdx} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 15px', borderBottom: '1px solid #f9f9f9' }}>
+                                <span>{crit.title}</span>
+                                <span style={{ fontWeight: 'bold' }}>{crit.score}</span>
+                              </li>
                             ))}
-                          </tbody>
-                        </table>
+                          </ul>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
+                {/* --- Right Column (Sidebar) --- */}
                 <div className="review-sidebar">
-                  {posterURL && (
-                    <div className="review-card">
-                      <div className="label-field">โปสเตอร์</div>
-                      <img src={posterURL} alt="Poster" style={{ width: '100%', borderRadius: 8, marginTop: 10 }} />
+                  <div style={{ background: 'white', padding: 20, borderRadius: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.05)', border: '1px solid #eee' }}>
+                    <h3 style={{ fontSize: 16, marginTop: 0, marginBottom: 15, borderBottom: '1px solid #eee', paddingBottom: 10 }}>สรุปข้อมูล</h3>
+
+                    <div style={{ marginBottom: 15 }}>
+                      <div style={{ fontSize: 12, color: '#888' }}>วันเปิดรับสมัคร</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 500 }}>
+                        <FaRegCalendarAlt color="#70136C" />
+                        {regOpen || '-'}
+                      </div>
                     </div>
-                  )}
-                  <div className="review-card">
-                    <div className="section-heading" style={{ fontSize: '1rem' }}>กำหนดการ</div>
-                    <div className="label-field">เริ่มรับสมัคร</div>
-                    <div style={{ marginBottom: 15 }}>{regOpen}</div>
-                    <div className="label-field">สิ้นสุดรับสมัคร</div>
-                    <div>{regClose}</div>
+
+                    <div style={{ marginBottom: 20 }}>
+                      <div style={{ fontSize: 12, color: '#888' }}>วันปิดรับสมัคร</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 500 }}>
+                        <FaRegClock color="#70136C" />
+                        {regClose || '-'}
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#e3f2fd', color: '#1565c0', padding: '10px', borderRadius: 6, fontSize: 13, textAlign: 'center' }}>
+                      สถานะ: กำลังสร้าง (Draft)
+                    </div>
                   </div>
-                  <div className="review-card">
-                    <div className="section-heading" style={{ fontSize: '1rem' }}>กรรมการ</div>
-                    {judges.length === 0 ? <p style={{ fontSize: '0.85rem', color: '#999' }}>ไม่มีรายชื่อกรรมการ</p> : 
-                      judges.map((j, i) => <div key={i} style={{ fontSize: '0.9rem', marginBottom: 5 }}>• {j.full_name}</div>)
-                    }
+
+                  <div style={{ marginTop: 20, background: 'white', padding: 20, borderRadius: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.05)', border: '1px solid #eee' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <span style={{ color: '#666' }}>กรรมการ</span>
+                      <span style={{ fontWeight: 'bold' }}>{judges.length} ท่าน</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#666' }}>ระดับชั้น</span>
+                      <span style={{ fontWeight: 'bold' }}>{selectedLevels.length} ระดับ</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className={styles.navButtonContainer} style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
-                <button className={styles.btnSecondary} onClick={() => setStep(3)} disabled={loading}>ย้อนกลับ</button>
-                <button className={styles.btnPrimary} onClick={handleSubmit} disabled={loading}>{loading ? "กำลังบันทึก..." : "ยืนยันการสร้างประกวด"}</button>
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 40, paddingBottom: 40 }}>
+                <button
+                  className={styles.btnSecondary}
+                  onClick={() => setStep(3)}
+                  style={{ padding: '12px 30px', fontSize: 16 }}
+                >
+                  ย้อนกลับแก้ไข
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  style={{
+                    padding: '12px 40px',
+                    borderRadius: '50px',
+                    border: 'none',
+                    background: loading ? '#ccc' : 'linear-gradient(90deg, #70136c 0%, #90188c 100%)',
+                    color: 'white',
+                    fontSize: '16px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    fontWeight: 'bold',
+                    boxShadow: '0 4px 15px rgba(112, 19, 108, 0.3)'
+                  }}
+                >
+                  {loading ? 'กำลังบันทึกข้อมูล...' : 'ยืนยันสร้างการประกวด'}
+                </button>
               </div>
-            </div>
+            </>
           )}
+
         </div>
       </div>
 
-      <InviteJudgeModal 
-        isOpen={showInviteJudgeModal} 
-        onClose={() => setShowInviteJudgeModal(false)} 
-        onJudgeAdded={handleJudgeAdded}
+      <InviteJudgeModal
+        isOpen={showInviteJudgeModal}
+        onClose={() => setShowInviteJudgeModal(false)}
+        onInvite={handleJudgeAdded}
         availableLevels={selectedLevels}
       />
     </>
