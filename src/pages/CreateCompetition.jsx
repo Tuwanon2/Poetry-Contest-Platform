@@ -3,9 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers, FaTrash, FaPlus, FaTimes, FaRegCalendarAlt, FaRegClock } from "react-icons/fa";
 import TopNav from "../components/TopNav";
+import { supabase } from '../supabaseClient';
 import InviteJudgeModal from "../components/InviteJudgeModal";
 import styles from "./CreateCompetition.module.css";
+import API_BASE_URL from '../config/api';
 
+// =========================
+// Helper Component: Level Card
+// =========================
 function LevelSelectCard({ label, icon, selected, onClick }) {
   return (
     <div
@@ -19,7 +24,7 @@ function LevelSelectCard({ label, icon, selected, onClick }) {
 }
 
 // =========================
-// Upload Poster Box (Updated with Preview)
+// Helper Component: Upload Box UI
 // =========================
 const UploadBox = ({ file, onSelect }) => {
   const [preview, setPreview] = useState(null);
@@ -188,6 +193,7 @@ export default function CreateCompetition() {
     if (step === 1) {
       if (!contestName.trim()) return alert("กรุณากรอกชื่อการประกวด");
       if (selectedLevels.length === 0) return alert("กรุณาเลือกระดับการแข่งขันอย่างน้อย 1 ระดับ");
+      if (posterUploading) return alert("กรุณารออัปโหลดรูปภาพให้เสร็จสักครู่");
       if (!regOpen) return alert("กรุณาระบุวันเปิดรับสมัคร");
       if (!regClose) return alert("กรุณาระบุวันปิดรับสมัคร");
       if (new Date(regClose) < new Date(regOpen)) return alert("วันปิดรับสมัครต้องไม่ก่อนวันเปิดรับสมัคร");
@@ -229,13 +235,25 @@ export default function CreateCompetition() {
         setLoading(false);
         return;
       }
+      // --- Encode newlines as /n ---
+      const encodeNewlines = (str) => (str || '').replace(/\n/g, '/n');
+      const encodedContestDescription = encodeNewlines(contestDescription);
+      const encodedContestPurpose = encodeNewlines(contestPurpose);
+      // For level descriptions
+      const encodedLevelDetails = { ...levelDetails };
+      Object.keys(encodedLevelDetails).forEach(key => {
+        if (key.endsWith('_description')) {
+          encodedLevelDetails[key] = encodeNewlines(encodedLevelDetails[key]);
+        }
+      });
+
       const formData = new FormData();
       formData.append('name', contestName);
       formData.append('organization_id', organizationId);
       formData.append('registration_start', regOpen);
       formData.append('registration_end', regClose);
-      formData.append('description', contestDescription);
-      formData.append('objective', contestPurpose);
+      formData.append('description', encodedContestDescription);
+      formData.append('objective', encodedContestPurpose);
 
       if (posterURL) formData.append('poster_url', posterURL);
 
@@ -246,7 +264,7 @@ export default function CreateCompetition() {
           poem_types: levelPoemTypes[lvl] || [],
           topic_mode: levelTopics[lvl]?.topicEnabled ? 'fixed' : 'free',
           topic_name: levelTopics[lvl]?.topicName || '',
-          description: levelDetails[lvl + '_description'] || '',
+          description: encodedLevelDetails[lvl + '_description'] || '',
           criteria: criteria,
           scoring_criteria: criteria.map(c => ({ name: c.title, max_score: Number(c.score) })),
           total_score: calculateTotalScore(lvl),
@@ -257,7 +275,7 @@ export default function CreateCompetition() {
         formData.append('judges_json', JSON.stringify(judges));
       }
 
-      await axios.post('http://localhost:8080/api/v1/competitions', formData, {
+      await axios.post(`${API_BASE_URL}/competitions`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -348,23 +366,45 @@ export default function CreateCompetition() {
                 ))}
               </div>
 
-              <UploadBox file={poster} onSelect={async file => {
-                setPoster(file);
-                setPosterURL("");
-                if (file) {
-                  setPosterUploading(true);
-                  try {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    const res = await axios.post('http://localhost:8080/api/v1/upload', formData);
-                    setPosterURL(res.data?.url || res.data?.file_url || "");  // ✅ แก้ให้เป็นแบบนี้
-                  } catch (err) {
-                    alert('อัปโหลดโปสเตอร์ล้มเหลว');
-                  } finally {
-                    setPosterUploading(false);
+              {/* ✅ FIXED: Upload Direct to Supabase */}
+              <UploadBox
+                file={poster}
+                onSelect={async (file) => {
+                  setPoster(file);
+                  setPosterURL(""); // Reset URL
+                  
+                  if (file) {
+                    setPosterUploading(true);
+                    
+                    try {
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `poster-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+                      const filePath = `competition-posters/${fileName}`;
+
+                      // ⚠️ Make sure bucket name matches your Supabase setup
+                      const { error: uploadError } = await supabase.storage
+                        .from("product-images") 
+                        .upload(filePath, file);
+
+                      if (uploadError) throw uploadError;
+
+                      const { data } = supabase.storage
+                        .from("product-images")
+                        .getPublicUrl(filePath);
+
+                      setPosterURL(data.publicUrl);
+                      console.log("Upload Success, URL:", data.publicUrl);
+
+                    } catch (err) {
+                      console.error("Upload Failed:", err);
+                      alert(`อัปโหลดไม่ผ่าน: ${err.message}`);
+                      setPoster(null);
+                    } finally {
+                      setPosterUploading(false);
+                    }
                   }
-                }
-              }} />
+                }}
+              />
 
               {posterUploading && <div style={{ marginTop: 10, color: '#ff9800' }}>กำลังอัปโหลดโปสเตอร์...</div>}
 
