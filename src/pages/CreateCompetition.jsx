@@ -661,18 +661,14 @@ export default function CreateCompetition() {
                 <div className="review-main">
                   <h1 className={styles.reviewTitle}>ตรวจสอบข้อมูลการประกวด</h1>
                   {posterURL && (
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 40 }}>
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ marginBottom: 15, fontSize: 16, fontWeight: 'bold', color: '#333' }}>โปสเตอร์ประกวด</div>
+                    <div className={styles.posterSection}>
+                      <div className={styles.posterImage}>
+                        <div className={styles.posterLabel}>โปสเตอร์ประกวด</div>
                         <img
                           src={posterURL}
                           alt="Contest Poster"
-                          style={{ 
-                            width: '100%', 
-                            maxWidth: '800px',
-                            borderRadius: 12, 
-                            boxShadow: '0 6px 16px rgba(0,0,0,0.12)'
-                          }}
+                          className={styles.posterImg}
+                          style={{ maxWidth: '100%', borderRadius: 8, marginBottom: 20 }}
                         />
                       </div>
                     </div>
@@ -685,14 +681,11 @@ export default function CreateCompetition() {
                         <div className={styles.labelField} style={{ fontWeight: 'bold', color: '#666' }}>ชื่อการประกวด</div>
 
                         <div className={styles.valueField} style={{
-                          fontSize: '2rem',
-                          fontWeight: '800',
-                          color: '#70136C',
+                          fontSize: '2rem',       // เพิ่มขนาด (จากเดิม 16)
+                          fontWeight: '800',      // เพิ่มความหนา
+                          color: '#70136C',       // ใส่สี Theme (สีม่วงตามปุ่ม)
                           marginTop: '8px',
-                          lineHeight: '1.4',
-                          wordWrap: 'break-word',
-                          overflowWrap: 'break-word',
-                          hyphens: 'auto'
+                          lineHeight: '1.2'
                         }}>
                           {contestName || "-"}
                         </div>
@@ -809,18 +802,9 @@ export default function CreateCompetition() {
               {/* Action Buttons */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 40, paddingBottom: 40 }}>
                 <button
+                  className={styles.btnSecondary}
                   onClick={() => setStep(3)}
-                  style={{ 
-                    padding: '10px 24px',
-                    border: '2px solid #70136C',
-                    background: 'white',
-                    color: '#70136C',
-                    cursor: 'pointer',
-                    borderRadius: '50px',
-                    fontWeight: 600,
-                    fontSize: 16,
-                    transition: 'all 0.3s'
-                  }}
+                  style={{ padding: '12px 30px', fontSize: 16 }}
                 >
                   ย้อนกลับแก้ไข
                 </button>
@@ -828,15 +812,15 @@ export default function CreateCompetition() {
                   onClick={handleSubmit}
                   disabled={loading}
                   style={{
-                    padding: '10px 24px',
-                    border: '2px solid #70136C',
-                    background: loading ? '#ccc' : '#70136C',
-                    color: loading ? '#666' : 'white',
+                    padding: '12px 40px',
+                    borderRadius: '50px',
+                    border: 'none',
+                    background: loading ? '#ccc' : 'linear-gradient(90deg, #70136c 0%, #90188c 100%)',
+                    color: 'white',
                     fontSize: '16px',
                     cursor: loading ? 'not-allowed' : 'pointer',
                     fontWeight: 'bold',
-                    borderRadius: '50px',
-                    transition: 'all 0.3s'
+                    boxShadow: '0 4px 15px rgba(112, 19, 108, 0.3)'
                   }}
                 >
                   {loading ? 'กำลังบันทึกข้อมูล...' : 'ยืนยันสร้างการประกวด'}
