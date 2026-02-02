@@ -3,14 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaUsers, FaTrash, FaPlus, FaTimes, FaRegCalendarAlt, FaRegClock } from "react-icons/fa";
 import TopNav from "../components/TopNav";
-import { supabase } from '../supabaseClient';
 import InviteJudgeModal from "../components/InviteJudgeModal";
 import styles from "./CreateCompetition.module.css";
-import API_BASE_URL from '../config/api';
 
-// =========================
-// Helper Component: Level Card
-// =========================
 function LevelSelectCard({ label, icon, selected, onClick }) {
   return (
     <div
@@ -24,7 +19,7 @@ function LevelSelectCard({ label, icon, selected, onClick }) {
 }
 
 // =========================
-// Helper Component: Upload Box UI
+// Upload Poster Box (Updated with Preview)
 // =========================
 const UploadBox = ({ file, onSelect }) => {
   const [preview, setPreview] = useState(null);
@@ -193,7 +188,6 @@ export default function CreateCompetition() {
     if (step === 1) {
       if (!contestName.trim()) return alert("กรุณากรอกชื่อการประกวด");
       if (selectedLevels.length === 0) return alert("กรุณาเลือกระดับการแข่งขันอย่างน้อย 1 ระดับ");
-      if (posterUploading) return alert("กรุณารออัปโหลดรูปภาพให้เสร็จสักครู่");
       if (!regOpen) return alert("กรุณาระบุวันเปิดรับสมัคร");
       if (!regClose) return alert("กรุณาระบุวันปิดรับสมัคร");
       if (new Date(regClose) < new Date(regOpen)) return alert("วันปิดรับสมัครต้องไม่ก่อนวันเปิดรับสมัคร");
@@ -235,25 +229,13 @@ export default function CreateCompetition() {
         setLoading(false);
         return;
       }
-      // --- Encode newlines as /n ---
-      const encodeNewlines = (str) => (str || '').replace(/\n/g, '/n');
-      const encodedContestDescription = encodeNewlines(contestDescription);
-      const encodedContestPurpose = encodeNewlines(contestPurpose);
-      // For level descriptions
-      const encodedLevelDetails = { ...levelDetails };
-      Object.keys(encodedLevelDetails).forEach(key => {
-        if (key.endsWith('_description')) {
-          encodedLevelDetails[key] = encodeNewlines(encodedLevelDetails[key]);
-        }
-      });
-
       const formData = new FormData();
       formData.append('name', contestName);
       formData.append('organization_id', organizationId);
       formData.append('registration_start', regOpen);
       formData.append('registration_end', regClose);
-      formData.append('description', encodedContestDescription);
-      formData.append('objective', encodedContestPurpose);
+      formData.append('description', contestDescription);
+      formData.append('objective', contestPurpose);
 
       if (posterURL) formData.append('poster_url', posterURL);
 
@@ -264,7 +246,7 @@ export default function CreateCompetition() {
           poem_types: levelPoemTypes[lvl] || [],
           topic_mode: levelTopics[lvl]?.topicEnabled ? 'fixed' : 'free',
           topic_name: levelTopics[lvl]?.topicName || '',
-          description: encodedLevelDetails[lvl + '_description'] || '',
+          description: levelDetails[lvl + '_description'] || '',
           criteria: criteria,
           scoring_criteria: criteria.map(c => ({ name: c.title, max_score: Number(c.score) })),
           total_score: calculateTotalScore(lvl),
@@ -275,7 +257,7 @@ export default function CreateCompetition() {
         formData.append('judges_json', JSON.stringify(judges));
       }
 
-      await axios.post(`${API_BASE_URL}/competitions`, formData, {
+      await axios.post('http://localhost:8080/api/v1/competitions', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -366,45 +348,23 @@ export default function CreateCompetition() {
                 ))}
               </div>
 
-              {/* ✅ FIXED: Upload Direct to Supabase */}
-              <UploadBox
-                file={poster}
-                onSelect={async (file) => {
-                  setPoster(file);
-                  setPosterURL(""); // Reset URL
-                  
-                  if (file) {
-                    setPosterUploading(true);
-                    
-                    try {
-                      const fileExt = file.name.split('.').pop();
-                      const fileName = `poster-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-                      const filePath = `competition-posters/${fileName}`;
-
-                      // ⚠️ Make sure bucket name matches your Supabase setup
-                      const { error: uploadError } = await supabase.storage
-                        .from("product-images") 
-                        .upload(filePath, file);
-
-                      if (uploadError) throw uploadError;
-
-                      const { data } = supabase.storage
-                        .from("product-images")
-                        .getPublicUrl(filePath);
-
-                      setPosterURL(data.publicUrl);
-                      console.log("Upload Success, URL:", data.publicUrl);
-
-                    } catch (err) {
-                      console.error("Upload Failed:", err);
-                      alert(`อัปโหลดไม่ผ่าน: ${err.message}`);
-                      setPoster(null);
-                    } finally {
-                      setPosterUploading(false);
-                    }
+              <UploadBox file={poster} onSelect={async file => {
+                setPoster(file);
+                setPosterURL("");
+                if (file) {
+                  setPosterUploading(true);
+                  try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const res = await axios.post('http://localhost:8080/api/v1/upload', formData);
+                    setPosterURL(res.data?.url || res.data?.file_url || "");  // ✅ แก้ให้เป็นแบบนี้
+                  } catch (err) {
+                    alert('อัปโหลดโปสเตอร์ล้มเหลว');
+                  } finally {
+                    setPosterUploading(false);
                   }
-                }}
-              />
+                }
+              }} />
 
               {posterUploading && <div style={{ marginTop: 10, color: '#ff9800' }}>กำลังอัปโหลดโปสเตอร์...</div>}
 
@@ -701,14 +661,18 @@ export default function CreateCompetition() {
                 <div className="review-main">
                   <h1 className={styles.reviewTitle}>ตรวจสอบข้อมูลการประกวด</h1>
                   {posterURL && (
-                    <div className={styles.posterSection}>
-                      <div className={styles.posterImage}>
-                        <div className={styles.posterLabel}>โปสเตอร์ประกวด</div>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 40 }}>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ marginBottom: 15, fontSize: 16, fontWeight: 'bold', color: '#333' }}>โปสเตอร์ประกวด</div>
                         <img
                           src={posterURL}
                           alt="Contest Poster"
-                          className={styles.posterImg}
-                          style={{ maxWidth: '100%', borderRadius: 8, marginBottom: 20 }}
+                          style={{ 
+                            width: '100%', 
+                            maxWidth: '800px',
+                            borderRadius: 12, 
+                            boxShadow: '0 6px 16px rgba(0,0,0,0.12)'
+                          }}
                         />
                       </div>
                     </div>
@@ -721,11 +685,14 @@ export default function CreateCompetition() {
                         <div className={styles.labelField} style={{ fontWeight: 'bold', color: '#666' }}>ชื่อการประกวด</div>
 
                         <div className={styles.valueField} style={{
-                          fontSize: '2rem',       // เพิ่มขนาด (จากเดิม 16)
-                          fontWeight: '800',      // เพิ่มความหนา
-                          color: '#70136C',       // ใส่สี Theme (สีม่วงตามปุ่ม)
+                          fontSize: '2rem',
+                          fontWeight: '800',
+                          color: '#70136C',
                           marginTop: '8px',
-                          lineHeight: '1.2'
+                          lineHeight: '1.4',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          hyphens: 'auto'
                         }}>
                           {contestName || "-"}
                         </div>
@@ -842,9 +809,18 @@ export default function CreateCompetition() {
               {/* Action Buttons */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 40, paddingBottom: 40 }}>
                 <button
-                  className={styles.btnSecondary}
                   onClick={() => setStep(3)}
-                  style={{ padding: '12px 30px', fontSize: 16 }}
+                  style={{ 
+                    padding: '10px 24px',
+                    border: '2px solid #70136C',
+                    background: 'white',
+                    color: '#70136C',
+                    cursor: 'pointer',
+                    borderRadius: '50px',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    transition: 'all 0.3s'
+                  }}
                 >
                   ย้อนกลับแก้ไข
                 </button>
@@ -852,15 +828,15 @@ export default function CreateCompetition() {
                   onClick={handleSubmit}
                   disabled={loading}
                   style={{
-                    padding: '12px 40px',
-                    borderRadius: '50px',
-                    border: 'none',
-                    background: loading ? '#ccc' : 'linear-gradient(90deg, #70136c 0%, #90188c 100%)',
-                    color: 'white',
+                    padding: '10px 24px',
+                    border: '2px solid #70136C',
+                    background: loading ? '#ccc' : '#70136C',
+                    color: loading ? '#666' : 'white',
                     fontSize: '16px',
                     cursor: loading ? 'not-allowed' : 'pointer',
                     fontWeight: 'bold',
-                    boxShadow: '0 4px 15px rgba(112, 19, 108, 0.3)'
+                    borderRadius: '50px',
+                    transition: 'all 0.3s'
                   }}
                 >
                   {loading ? 'กำลังบันทึกข้อมูล...' : 'ยืนยันสร้างการประกวด'}
